@@ -106,6 +106,42 @@ class Foobar
 EOT
 
             ],
+            'It does adds type docblocks' => [
+                <<<'EOT'
+<?php
+
+class Foobar
+{
+    public function __construct(string $foo, Foobar $bar)
+    {
+    }
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    private $foo;
+
+    /**
+     * @var Foobar
+     */
+    private $bar;
+
+    public function __construct(string $foo, Foobar $bar)
+    {
+        $this->foo = $foo;
+        $this->bar = $bar;
+    }
+}
+EOT
+
+            ],
         ];
     }
 }

@@ -12,6 +12,9 @@ use Microsoft\PhpParser\Node\Parameter;
 use Microsoft\PhpParser\TextEdit;
 use Microsoft\PhpParser\Node\Statement\CompoundStatementNode;
 use Microsoft\PhpParser\Node\ClassMembersNode;
+use Microsoft\PhpParser\Token;
+use Microsoft\PhpParser\Node\QualifiedName;
+use Microsoft\PhpParser\Node;
 
 class CompleteConstructor implements Transformer
 {
@@ -102,7 +105,10 @@ class CompleteConstructor implements Transformer
         $indent = $members->getLeadingCommentAndWhitespaceText();
         $indent = strlen(substr($indent, strrpos($indent, PHP_EOL) + 1)) + $this->indentation;
 
-        foreach ($parameters as $parameter) {
+        foreach ($parameters as $index => $parameter) {
+            if ($parameter->typeDeclaration) {
+                $properties[] = ($index > 0 ? PHP_EOL : '') . $this->indent($indent, $this->docBlockFromType($members, $parameter->typeDeclaration));
+            }
             $properties[] = sprintf('%sprivate $%s;', str_repeat(' ', $indent), $parameter->getName());
         }
 
@@ -120,5 +126,29 @@ class CompleteConstructor implements Transformer
         }
 
         return $assigns;
+    }
+
+    private function docBlockFromType(Node $node, $tokenOrName)
+    {
+        $type = $tokenOrName->getText();
+        if ($tokenOrName instanceof Token) {
+            $type = $tokenOrName->getText($node->getFileContents());
+        }
+        return <<<EOT
+/**
+ * @var {$type}
+ */
+EOT
+        ;
+    }
+
+    private function indent(int $spaces, string $text)
+    {
+        $text = explode(PHP_EOL, $text);
+        $text = array_map(function ($line) use ($spaces) {
+            return str_repeat(' ', $spaces) . $line;
+        }, $text);
+
+        return implode(PHP_EOL, $text);
     }
 }
