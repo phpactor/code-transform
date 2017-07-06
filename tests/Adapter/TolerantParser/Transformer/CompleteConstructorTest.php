@@ -178,6 +178,49 @@ class Foobar
 EOT
 
             ],
+            'It is updates missing' => [
+                <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    private $foo;
+
+    public function __construct(string $foo, Acme $acme)
+    {
+        $this->foo = $foo;
+    }
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+class Foobar
+{
+
+    /**
+     * @var Acme
+     */
+    private $acme;
+
+    /**
+     * @var string
+     */
+    private $foo;
+
+    public function __construct(string $foo, Acme $acme)
+    {
+        $this->acme = $acme;
+        $this->foo = $foo;
+    }
+}
+EOT
+
+            ],
         ];
     }
 }

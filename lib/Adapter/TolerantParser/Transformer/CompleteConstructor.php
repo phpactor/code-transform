@@ -36,7 +36,6 @@ class CompleteConstructor implements Transformer
         $edits = $this->generateTextEdits($node);
         $code = SourceCode::fromString(TextEdit::applyEdits($edits, (string) $code));
 
-        var_dump($code);die();;
         return $code;
     }
 
@@ -76,8 +75,14 @@ class CompleteConstructor implements Transformer
         $existingAssigns = $this->existingAssigns($statementNode, $parameters);
         $assigns = $this->generateAssigns($statementNode, $parameters, $existingAssigns);
 
-        $edits[] = new TextEdit($classPos, 0, PHP_EOL . implode(PHP_EOL, $properties) . PHP_EOL);
-        $edits[] = new TextEdit($assignPos, 0, PHP_EOL . implode(PHP_EOL, $assigns));
+        $edits = [];
+        if ($properties) {
+            $edits[] = new TextEdit($classPos, 0, PHP_EOL . implode(PHP_EOL, $properties) . PHP_EOL);
+        }
+
+        if ($assigns) {
+            $edits[] = new TextEdit($assignPos, 0, PHP_EOL . implode(PHP_EOL, $assigns));
+        }
 
         return $edits;
     }
