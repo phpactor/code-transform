@@ -1,5 +1,5 @@
 {
-    "name": "code-transform/type-inference",
+    "name": "phpactor/code-transform",
     "description": "Applies introspective transformations on source code",
     "license": "MIT",
     "authors": [
