@@ -1,11 +1,11 @@
 <?php
 
-namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Transformer;
+namespace Phpactor\CodeTransform\Tests\Adapter\TolerantParser\Transformer;
 
 use Phpactor\CodeTransform\Domain\SourceCode;
 
 use PHPUnit\Framework\TestCase;
-use Phpactor\CodeTransform\Adapter\WorseReflection\Transformer\CompleteConstructor;
+use Phpactor\CodeTransform\Adapter\TolerantParser\Transformer\CompleteConstructor;
 
 class CompleteConstructorTest extends TestCase
 {
@@ -55,6 +55,24 @@ class Foobar
     public function __construct()
     {
     }
+}
+EOT
+
+            ],
+            'It does nothing with no constructor' => [
+                <<<'EOT'
+<?php
+
+class Foobar
+{
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+class Foobar
+{
 }
 EOT
 
