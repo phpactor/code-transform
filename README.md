@@ -1,11 +1,7 @@
-Type Inference
-==============
+Class Transform
+===============
 
-[![Build Status](https://travis-ci.org/phpactor/type-inference.svg?branch=master)](https://travis-ci.org/phpactor/type-inference)
+[![Build Status](https://travis-ci.org/phpactor/class-transform.svg?branch=master)](https://travis-ci.org/phpactor/class-transform)
 
-Source code type inference library.
+Generate classes or transform them.
 
-The ultimate aim of this library is to be able to determine the type of a variable or
-qualified name at any given offset.
-
-Currently it will simply resolve a qualified name.
