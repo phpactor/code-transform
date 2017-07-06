@@ -22,6 +22,7 @@ class CodeTransform
     public function transform(string $code, array $transformations): SourceCode
     {
         $transformers = $this->transformers->in($transformations);
+
         return $transformers->applyTo(SourceCode::fromString($code));
     }
 }

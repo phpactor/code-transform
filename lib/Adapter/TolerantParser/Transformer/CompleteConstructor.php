@@ -15,6 +15,9 @@ use Microsoft\PhpParser\Node\ClassMembersNode;
 use Microsoft\PhpParser\Token;
 use Microsoft\PhpParser\Node\QualifiedName;
 use Microsoft\PhpParser\Node;
+use Microsoft\PhpParser\Node\Expression\AssignmentExpression;
+use Microsoft\PhpParser\Node\Statement\ExpressionStatement;
+use Microsoft\PhpParser\Node\PropertyDeclaration;
 
 class CompleteConstructor implements Transformer
 {
@@ -33,6 +36,7 @@ class CompleteConstructor implements Transformer
         $edits = $this->generateTextEdits($node);
         $code = SourceCode::fromString(TextEdit::applyEdits($edits, (string) $code));
 
+        var_dump($code);die();;
         return $code;
     }
 
@@ -56,8 +60,6 @@ class CompleteConstructor implements Transformer
             return [];
         }
 
-        //$existingProperties = $this->getClassProperties($class);
-        //$existingAssigns = $this->getClassProperties($class);
         $parameters = $this->getParameters($constructor);
 
         if (empty($parameters)) {
@@ -66,16 +68,18 @@ class CompleteConstructor implements Transformer
 
         $classMembers = $class->classMembers;
         $classPos = $classMembers->openBrace->start + 1;
-        $properties = $this->generateProperties($classMembers, $parameters);
+        $existingProperties = $this->existingProperties($classMembers, $parameters);
+        $properties = $this->generateProperties($classMembers, $parameters, $existingProperties);
 
         $statementNode = $constructor->getFirstDescendantNode(CompoundStatementNode::class);
         $assignPos = $statementNode->openBrace->start + 1;
-        $assigns = $this->generateAssigns($statementNode, $parameters);
+        $existingAssigns = $this->existingAssigns($statementNode, $parameters);
+        $assigns = $this->generateAssigns($statementNode, $parameters, $existingAssigns);
 
-        return [
-            new TextEdit($classPos, 0, PHP_EOL . implode(PHP_EOL, $properties) . PHP_EOL),
-            new TextEdit($assignPos, 0, PHP_EOL . implode(PHP_EOL, $assigns)),
-        ];
+        $edits[] = new TextEdit($classPos, 0, PHP_EOL . implode(PHP_EOL, $properties) . PHP_EOL);
+        $edits[] = new TextEdit($assignPos, 0, PHP_EOL . implode(PHP_EOL, $assigns));
+
+        return $edits;
     }
 
     private function getConstructor(ClassDeclaration $class)
@@ -98,7 +102,7 @@ class CompleteConstructor implements Transformer
         });
     }
 
-    private function generateProperties(ClassMembersNode $members, array $parameters)
+    private function generateProperties(ClassMembersNode $members, array $parameters, array $existing)
     {
         $properties = [];
 
@@ -106,6 +110,9 @@ class CompleteConstructor implements Transformer
         $indent = strlen(substr($indent, strrpos($indent, PHP_EOL) + 1)) + $this->indentation;
 
         foreach ($parameters as $index => $parameter) {
+            if (in_array($parameter->getName(), $existing)) {
+                continue;
+            }
             if ($parameter->typeDeclaration) {
                 $properties[] = ($index > 0 ? PHP_EOL : '') . $this->indent($indent, $this->docBlockFromType($members, $parameter->typeDeclaration));
             }
@@ -115,13 +122,47 @@ class CompleteConstructor implements Transformer
         return $properties;
     }
 
-    private function generateAssigns(CompoundStatementNode $node, array $parameters)
+    private function existingProperties(ClassMembersNode $node, array $parameters)
+    {
+        /** @var $node Node */
+        return array_reduce($node->classMemberDeclarations, function ($list, $node) use ($parameters) {
+            if (!$node instanceof PropertyDeclaration) {
+                return $list;
+            }
+
+            foreach ($node->propertyElements->getChildNodes() as $variable) {
+                $list[] = $variable->getName();
+            }
+
+            return $list;
+        }, []);
+    }
+
+    private function existingAssigns(CompoundStatementNode $node, array $parameters)
+    {
+        /** @var $node Node */
+        return array_reduce($node->statements, function ($list, $node) use ($parameters) {
+            if ($node instanceof ExpressionStatement && $node->expression instanceof AssignmentExpression) {
+
+                $varName = $node->expression->rightOperand->getText();
+                $list[] = ltrim($varName, '$');
+            }
+
+            return $list;
+        }, []);
+    }
+
+    private function generateAssigns(CompoundStatementNode $node, array $parameters, array $existing)
     {
         $assigns = [];
         $assignPos = $node->openBrace->start + 1;
         $indent = $node->getLeadingCommentAndWhitespaceText();
         $indent = strlen(substr($indent, strrpos($indent, PHP_EOL) + 1)) + $this->indentation;
         foreach ($parameters as $parameter) {
+            if (in_array($parameter->getName(), $existing)) {
+                continue;
+            }
+
             $assigns[] = sprintf('%s$this->%s = $%s;', str_repeat(' ', $indent), $parameter->getName(), $parameter->getName());
         }
 

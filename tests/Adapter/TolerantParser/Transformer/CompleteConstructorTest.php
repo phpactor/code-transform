@@ -142,6 +142,42 @@ class Foobar
 EOT
 
             ],
+            'It is idempotent' => [
+                <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    private $foo;
+
+    public function __construct(string $foo)
+    {
+        $this->foo = $foo;
+    }
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    private $foo;
+
+    public function __construct(string $foo)
+    {
+        $this->foo = $foo;
+    }
+}
+EOT
+
+            ],
         ];
     }
 }
