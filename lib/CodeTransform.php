@@ -1,19 +1,27 @@
 <?php
 
-namespace Phpactor\CodeTransform\Domain;
+namespace Phpactor\CodeTransform;
 
-class ClassTransformer
+use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\CodeTransform\Domain\Transformers;
+
+class CodeTransform
 {
     private $transformers;
 
-    public function __construct(Transformers $transformers, Generators $generators)
+    private function __construct(Transformers $transformers)
     {
         $this->transformers = $transformers;
     }
 
-    public function transform(SourceCode $code, array $transformationNames): SourceCode
+    public static function fromTransformers(Transformers $transformers): CodeTransform
+    {
+        return new self($transformers);
+    }
+
+    public function transform(string $code, array $transformations): SourceCode
     {
         $transformers = $this->transformers->in($transformations);
-        return $transformers->applyTo($code);
+        return $transformers->applyTo(SourceCode::fromString($code));
     }
 }
