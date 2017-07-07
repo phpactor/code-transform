@@ -141,7 +141,7 @@ interface Bird
     /**
      * Emit chirping sound.
      */
-    public functio chirp();
+    public function chirp();
 }
 
 class Foobar implements Bird
@@ -163,7 +163,7 @@ interface Bird
 class Foobar implements Bird
 {
     /**
-     * Emit chirping sound.
+     * {@inheritDoc}
      */
     public function chirp()
     {
