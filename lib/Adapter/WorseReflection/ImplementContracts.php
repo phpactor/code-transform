@@ -33,7 +33,7 @@ class ImplementContracts implements Transformer
 
             $pos = $class->memberListPosition()->end();
             if ($class->properties()->last()) {
-                $pos = $class->properties()->last()->position()->end();
+                $pos = $class->methods()->last()->position()->end() + 1;
             }
 
             $missingMethods = $this->missingClassMethods($class);
