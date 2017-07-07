@@ -7,6 +7,9 @@ use Phpactor\CodeTransform\Domain\Transformers;
 
 class CodeTransform
 {
+    /**
+     * @var Transformers
+     */
     private $transformers;
 
     private function __construct(Transformers $transformers)
@@ -26,3 +29,4 @@ class CodeTransform
         return $transformers->applyTo(SourceCode::fromString($code));
     }
 }
+
