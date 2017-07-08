@@ -7,7 +7,7 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\SourceCode as WorseSourceCode;
 use Phpactor\WorseReflection\Reflection\ReflectionClass;
-use Microsoft\PhpParser\TextEdit;
+use Phpactor\CodeTransform\Adapter\TolerantParser\TextEdit;
 
 class ImplementContracts implements Transformer
 {
