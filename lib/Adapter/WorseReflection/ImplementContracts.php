@@ -8,9 +8,15 @@ use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\SourceCode as WorseSourceCode;
 use Phpactor\WorseReflection\Reflection\ReflectionClass;
 use Phpactor\CodeTransform\Adapter\TolerantParser\TextEdit;
+use Phpactor\CodeTransform\Domain\Editor;
 
 class ImplementContracts implements Transformer
 {
+    /**
+     * @var Editor
+     */
+    private $editor;
+
     /**
      * @var Reflector
      */
@@ -18,6 +24,7 @@ class ImplementContracts implements Transformer
 
     public function __construct(Reflector $reflector, Editor $editor = null)
     {
+        $this->editor = $editor ?: new Editor();
         $this->reflector = $reflector;
     }
 
@@ -55,11 +62,10 @@ EOT
                     ;
                 }
 
-                $header = trim((string) $missingMethod->header());
-
-                $header = preg_replace('{^abstract }', '', $header);
-
-                $methodStr[] = '    ' . $header;
+                $methodStr[] = (string) $this->editor->edit($missingMethod->header())
+                    ->trim()
+                    ->pregReplace('{^abstract }', '')
+                    ->indent(2);
 
                 $methodStr[] = PHP_EOL;
                 $methodStr[] = '    {';
@@ -100,4 +106,5 @@ EOT
         return $methods;
     }
 }
+
 
