@@ -21,13 +21,20 @@ use Microsoft\PhpParser\Node\PropertyDeclaration;
 
 class CompleteConstructor implements Transformer
 {
+    /**
+     * @var Parser
+     */
     private $parser;
+
+    /**
+     * @var int
+     */
     private $indentation;
 
     public function __construct(Parser $parser = null, int $indentation = 4)
     {
         $this->parser = $parser ?: new Parser();
-        $this->indentation = 4;
+        $this->indentation = $indentation;
     }
 
     public function transform(SourceCode $code): SourceCode
@@ -177,9 +184,11 @@ class CompleteConstructor implements Transformer
     private function docBlockFromType(Node $node, $tokenOrName)
     {
         $type = $tokenOrName->getText();
+
         if ($tokenOrName instanceof Token) {
             $type = $tokenOrName->getText($node->getFileContents());
         }
+
         return <<<EOT
 /**
  * @var {$type}
@@ -198,3 +207,4 @@ EOT
         return implode(PHP_EOL, $text);
     }
 }
+

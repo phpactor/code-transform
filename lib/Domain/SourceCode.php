@@ -4,6 +4,9 @@ namespace Phpactor\CodeTransform\Domain;
 
 final class SourceCode
 {
+    /**
+     * @var string
+     */
     private $code;
 
     private function __construct(string $code)
@@ -21,3 +24,4 @@ final class SourceCode
         return $this->code;
     }
 }
+

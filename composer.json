@@ -2,6 +2,7 @@
     "name": "phpactor/code-transform",
     "description": "Applies introspective transformations on source code",
     "license": "MIT",
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Daniel Leech",
