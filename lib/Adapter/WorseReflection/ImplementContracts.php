@@ -26,11 +26,7 @@ class ImplementContracts implements Transformer
         $classes = $this->reflector->reflectClassesIn(WorseSourceCode::fromString((string) $source));
         $edits = [];
 
-        foreach ($classes as $class) {
-            if (!$class instanceof ReflectionClass) {
-                continue;
-            }
-
+        foreach ($classes->concrete() as $class) {
             $pos = $class->memberListPosition()->end();
 
             $missingMethods = $this->missingClassMethods($class);
@@ -39,8 +35,9 @@ class ImplementContracts implements Transformer
                 continue;
             }
 
-            if ($class->methods()->last()) {
-                $pos = $class->methods()->last()->position()->end() + 1;
+            $last = $class->methods()->belongingTo($class->name())->last();
+            if ($last) {
+                $pos = $last->position()->end() + 1;
                 $edits[] = new TextEdit($pos, 0, PHP_EOL);
             }
 
@@ -58,7 +55,11 @@ EOT
                     ;
                 }
 
-                $methodStr[] = '    ' . (string) $missingMethod->header();
+                $header = trim((string) $missingMethod->header());
+
+                $header = preg_replace('{^abstract }', '', $header);
+
+                $methodStr[] = '    ' . $header;
 
                 $methodStr[] = PHP_EOL;
                 $methodStr[] = '    {';
@@ -87,6 +88,12 @@ EOT
                 if (!$class->methods()->has($method->name())) {
                     $methods[] = $method;
                 }
+            }
+        }
+
+        foreach ($class->methods() as $method) {
+            if ($method->class()->name() != $class->name()) {
+                $methods[] = $method;
             }
         }
 

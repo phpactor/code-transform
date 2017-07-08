@@ -272,6 +272,36 @@ class Foobar implements Bird
 }
 EOT
             ],
+            'It implements abstract functions' => [
+                <<<'EOT'
+<?php
+
+abstract class Bird
+{
+    abstract public function chirp();
+}
+
+class Foobar extends Bird
+{
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+abstract class Bird
+{
+    abstract public function chirp();
+}
+
+class Foobar extends Bird
+{
+    public function chirp()
+    {
+    }
+}
+EOT
+            ],
         ];
     }
 }
