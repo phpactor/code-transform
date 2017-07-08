@@ -39,6 +39,18 @@ class EditorTest extends TestCase
         $this->assertEquals('        Bear', (string) $this->edit('Bear', '    ')->indent(2));
     }
 
+    /**
+     * @testdox It indents multiple lines
+     */
+    public function testIndentMultipleLines()
+    {
+        $this->assertEquals(<<<EOT
+    Hello
+    This
+EOT
+        , (string) $this->edit("Hello\nThis")->indent(2));
+    }
+
     private function edit(string $text, $indentation = '  ')
     {
         return (new Editor($indentation))->edit($text);

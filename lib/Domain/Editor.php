@@ -11,7 +11,7 @@ final class Editor
      */
     private $indentString;
 
-    public function __construct(string $indentString = '  ')
+    public function __construct(string $indentString = '    ')
     {
         $this->indentString = $indentString;
     }

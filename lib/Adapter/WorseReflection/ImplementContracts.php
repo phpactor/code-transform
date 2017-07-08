@@ -65,7 +65,7 @@ EOT
                 $methodStr[] = (string) $this->editor->edit($missingMethod->header())
                     ->trim()
                     ->pregReplace('{^abstract }', '')
-                    ->indent(2);
+                    ->indent(1);
 
                 $methodStr[] = PHP_EOL;
                 $methodStr[] = '    {';

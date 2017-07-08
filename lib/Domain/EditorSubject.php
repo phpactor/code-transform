@@ -34,7 +34,11 @@ final class EditorSubject
 
     public function indent(int $amount)
     {
-        return $this->spawn(str_repeat($this->editor->indentString(), $amount) . $this->text);
+        $lines = explode(PHP_EOL, $this->text);
+
+        return implode(PHP_EOL, array_map(function ($line) use ($amount) {
+            return str_repeat($this->editor->indentString(), $amount) . $line;
+        }, $lines));
     }
 
     public function pregReplace(string $pattern, string $replacement)

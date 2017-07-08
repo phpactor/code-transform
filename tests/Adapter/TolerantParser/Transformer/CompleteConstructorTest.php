@@ -5,7 +5,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\TolerantParser\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 
 use PHPUnit\Framework\TestCase;
-use Phpactor\CodeTransform\Adapter\TolerantParser\Transformer\CompleteConstructor;
+use Phpactor\CodeTransform\Adapter\TolerantParser\CompleteConstructor;
 
 class CompleteConstructorTest extends TestCase
 {

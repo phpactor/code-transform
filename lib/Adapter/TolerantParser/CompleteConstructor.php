@@ -1,6 +1,6 @@
 <?php
 
-namespace Phpactor\CodeTransform\Adapter\TolerantParser\Transformer;
+namespace Phpactor\CodeTransform\Adapter\TolerantParser;
 
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
@@ -18,23 +18,24 @@ use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\Expression\AssignmentExpression;
 use Microsoft\PhpParser\Node\Statement\ExpressionStatement;
 use Microsoft\PhpParser\Node\PropertyDeclaration;
+use Phpactor\CodeTransform\Domain\Editor;
 
 class CompleteConstructor implements Transformer
 {
+    /**
+     * @var Editor
+     */
+    private $editor;
+
     /**
      * @var Parser
      */
     private $parser;
 
-    /**
-     * @var int
-     */
-    private $indentation;
-
-    public function __construct(Parser $parser = null, int $indentation = 4)
+    public function __construct(Parser $parser = null, Editor $editor = null)
     {
+        $this->editor = $editor ?: new Editor();
         $this->parser = $parser ?: new Parser();
-        $this->indentation = $indentation;
     }
 
     public function transform(SourceCode $code): SourceCode
@@ -118,17 +119,18 @@ class CompleteConstructor implements Transformer
     {
         $properties = [];
 
-        $indent = $members->getLeadingCommentAndWhitespaceText();
-        $indent = strlen(substr($indent, strrpos($indent, PHP_EOL) + 1)) + $this->indentation;
-
         foreach ($parameters as $index => $parameter) {
             if (in_array($parameter->getName(), $existing)) {
                 continue;
             }
             if ($parameter->typeDeclaration) {
-                $properties[] = ($index > 0 ? PHP_EOL : '') . $this->indent($indent, $this->docBlockFromType($members, $parameter->typeDeclaration));
+                $properties[] = 
+                    ($index > 0 ? PHP_EOL : '') . 
+                    $this->editor->edit(
+                        $this->docBlockFromType($members, $parameter->typeDeclaration)
+                    )->indent(1);
             }
-            $properties[] = sprintf('%sprivate $%s;', str_repeat(' ', $indent), $parameter->getName());
+            $properties[] = $this->editor->edit(sprintf('private $%s;', $parameter->getName()))->indent(1);
         }
 
         return $properties;
@@ -168,14 +170,16 @@ class CompleteConstructor implements Transformer
     {
         $assigns = [];
         $assignPos = $node->openBrace->start + 1;
-        $indent = $node->getLeadingCommentAndWhitespaceText();
-        $indent = strlen(substr($indent, strrpos($indent, PHP_EOL) + 1)) + $this->indentation;
         foreach ($parameters as $parameter) {
             if (in_array($parameter->getName(), $existing)) {
                 continue;
             }
 
-            $assigns[] = sprintf('%s$this->%s = $%s;', str_repeat(' ', $indent), $parameter->getName(), $parameter->getName());
+            $assigns[] = (string) $this->editor->edit(sprintf(
+                '$this->%s = $%s;',
+                $parameter->getName(),
+                $parameter->getName()
+            ))->indent(2);
         }
 
         return $assigns;
@@ -196,15 +200,6 @@ class CompleteConstructor implements Transformer
 EOT
         ;
     }
-
-    private function indent(int $spaces, string $text)
-    {
-        $text = explode(PHP_EOL, $text);
-        $text = array_map(function ($line) use ($spaces) {
-            return str_repeat(' ', $spaces) . $line;
-        }, $text);
-
-        return implode(PHP_EOL, $text);
-    }
 }
+
 
