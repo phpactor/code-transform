@@ -62,7 +62,7 @@ EOT
 
 interface Rabbit
 {
-    public function dig(int $depth = 5): Dirt
+    public function dig(int $depth = 5): Dirt;
 }
 
 class Foobar implements Rabbit
@@ -75,7 +75,7 @@ EOT
 
 interface Rabbit
 {
-    public function dig(int $depth = 5): Dirt
+    public function dig(int $depth = 5): Dirt;
 }
 
 class Foobar implements Rabbit
@@ -198,6 +198,77 @@ interface Bird
 class Foobar implements Bird
 {
     public function chirp() {}
+}
+EOT
+            ],
+            'It is adds after the last method' => [
+                <<<'EOT'
+<?php
+
+interface Bird
+{
+    public function chirp();
+}
+
+class Foobar implements Bird
+{
+    public function hello()
+    {
+    }
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+interface Bird
+{
+    public function chirp();
+}
+
+class Foobar implements Bird
+{
+    public function hello()
+    {
+    }
+
+    public function chirp()
+    {
+    }
+}
+EOT
+            ],
+            'It uses the short names' => [
+                <<<'EOT'
+<?php
+
+use Animals\Sound;
+
+interface Bird
+{
+    public function chirp(): Sound;
+}
+
+class Foobar implements Bird
+{
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+use Animals\Sound;
+
+interface Bird
+{
+    public function chirp(): Sound;
+}
+
+class Foobar implements Bird
+{
+    public function chirp(): Sound
+    {
+    }
 }
 EOT
             ],

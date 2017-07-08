@@ -32,11 +32,18 @@ class ImplementContracts implements Transformer
             }
 
             $pos = $class->memberListPosition()->end();
-            if ($class->properties()->last()) {
-                $pos = $class->methods()->last()->position()->end() + 1;
-            }
 
             $missingMethods = $this->missingClassMethods($class);
+
+            if (0 === count($missingMethods)) {
+                continue;
+            }
+
+            if ($class->methods()->last()) {
+                $pos = $class->methods()->last()->position()->end() + 1;
+                $edits[] = new TextEdit($pos, 0, PHP_EOL);
+            }
+
             $index = 0;
             foreach ($missingMethods as $missingMethod) {
                 $methodStr = [];
@@ -51,33 +58,7 @@ EOT
                     ;
                 }
 
-                $methodStr[] = sprintf(
-                    '    %s function %s',
-                    (string) $missingMethod->visibility(),
-                    (string) $missingMethod->name()
-                );
-
-                $paramStrs = [];
-                foreach ($missingMethod->parameters() as $param) {
-                    $paramStr = [];
-                    if (false === $param->type()->isUnknown()) {
-                        $paramStr[] = (string) $param->type();
-                    }
-
-                    $paramStr[] = '$' . $param->name();
-
-                    if ($param->hasDefault()) {
-                        $paramStr[] = '= ' . var_export($param->default(), true);
-                    }
-
-                    $paramStrs[] = implode(' ', $paramStr);
-                }
-
-                $methodStr[] = '(' . implode(', ', $paramStrs) . ')';
-
-                if (false === $missingMethod->type()->isUnknown()) {
-                    $methodStr[] = ': ' . (string) $missingMethod->type();
-                }
+                $methodStr[] = '    ' . (string) $missingMethod->header();
 
                 $methodStr[] = PHP_EOL;
                 $methodStr[] = '    {';
