@@ -1,6 +1,6 @@
 <?php
 
-namespace Phpactor\CodeTransform\Adapter\TolerantParser;
+namespace Phpactor\CodeTransform\Adapter\TolerantParser\Transformer;
 
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
