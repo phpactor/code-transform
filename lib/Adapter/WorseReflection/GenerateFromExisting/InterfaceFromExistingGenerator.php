@@ -12,7 +12,7 @@ use Phpactor\WorseReflection\Reflection\ReflectionMethod;
 use Phpactor\WorseReflection\Reflection\ReflectionParameter;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 
-final class InterfaceGenerator implements GenerateFromExisting
+final class InterfaceFromExistingGenerator implements GenerateFromExisting
 {
     /**
      * @var Reflector
@@ -44,7 +44,7 @@ final class InterfaceGenerator implements GenerateFromExisting
 
         /** @var $method ReflectionMethod */
         foreach ($existingClass->methods() as $method) {
-            $methodBuilder = $interfaceBuilder->method($method->getName());
+            $methodBuilder = $interfaceBuilder->method($method->name());
             $methodBuilder->visibility((string) $method->visibility());
 
             /** @var $parameter ReflectionParameter */
