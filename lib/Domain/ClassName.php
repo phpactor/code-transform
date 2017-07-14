@@ -8,6 +8,11 @@ final class ClassName
 
     private function __construct(string $name)
     {
+        if (empty($name)) {
+            throw new \InvalidArgumentException(
+                'Class name cannot be empty'
+            );
+        }
         $this->name = $name;
     }
 
@@ -19,5 +24,23 @@ final class ClassName
     public function __toString()
     {
         return $this->name;
+    }
+
+    public function namespace(): string
+    {
+        if (false === $pos = strrpos($this->name, '\\')) {
+            return '';
+        }
+
+        return substr($this->name, 0, $pos);
+    }
+
+    public function short(): string
+    {
+        if (false === $pos = strrpos($this->name, '\\')) {
+            return $this->name;
+        }
+
+        return substr($this->name, $pos + 1);
     }
 }

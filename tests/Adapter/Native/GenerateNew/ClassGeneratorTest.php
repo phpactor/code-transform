@@ -15,7 +15,17 @@ class ClassGeneratorTest extends AdapterTestCase
     {
         $className = ClassName::fromString('Acme\\Blog\\Post');
         $generator = new ClassGenerator($this->renderer());
-        $code = $generator->generate($className);
-        var_dump($code);die();;
+        $code = $generator->generateNew($className);
+
+        $this->assertEquals(<<<'EOT'
+<?php
+
+namespace Acme\Blog;
+
+class Post
+{
+}
+EOT
+        , (string) $code);
     }
 }

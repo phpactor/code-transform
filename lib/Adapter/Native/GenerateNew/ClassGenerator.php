@@ -27,10 +27,10 @@ class ClassGenerator implements GenerateNew
     {
         $builder = SourceCodeBuilder::create();
         $builder->namespace($targetName->namespace());
-        $classPrototype = $builder->class($targetName->short())->build();
+        $classPrototype = $builder->class($targetName->short());
 
         return SourceCode::fromString(
-            (string) $this->renderer->render($classPrototype)
+            (string) $this->renderer->render($builder->build())
         );
     }
 }
