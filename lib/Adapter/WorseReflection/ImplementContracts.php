@@ -30,28 +30,60 @@ class ImplementContracts implements Transformer
 
     public function transform(SourceCode $source): SourceCode
     {
-        $sourceBuilder = $this->sourceBuilder->create();
         $classes = $this->reflector->reflectClassesIn(WorseSourceCode::fromString((string) $source));
+        $edits = [];
 
         foreach ($classes->concrete() as $class) {
-            
-            $classBuilder = $sourceBuilder->class((string) $class->name());
+            $pos = $class->memberListPosition()->end();
+
             $missingMethods = $this->missingClassMethods($class);
 
-            foreach ($missingMethods as $missingMethod) {
-                $method = $prototype->method($missingMethod->name())
-                    ->position(\PHP_INT_MAX);
+            if (0 === count($missingMethods)) {
+                continue;
+            }
 
-                foreach ($missingMethod->parameters() as $parameter) {
-                    $method->parameter((string) $parameter->name())
-                        ->type((string) $parameter->type())
-                        ->defaultValue((string) $parameter->defaultValue());
+            $last = $class->methods()->belongingTo($class->name())->last();
+            if ($last) {
+                $pos = $last->position()->end() + 1;
+                $edits[] = new TextEdit($pos, 0, PHP_EOL);
+            }
+
+            $index = 0;
+            foreach ($missingMethods as $missingMethod) {
+                $methodStr = [];
+
+                if (!empty($missingMethod->docblock()->formatted())) {
+                    $methodStr[] = <<<'EOT'
+    /**
+     * {@inheritDoc}
+     */
+
+EOT
+                    ;
                 }
 
+                $methodStr[] = (string) $this->editor->edit($missingMethod->header())
+                    ->trim()
+                    ->pregReplace('{^abstract }', '')
+                    ->indent(1);
+
+                $methodStr[] = PHP_EOL;
+                $methodStr[] = '    {';
+                $methodStr[] = PHP_EOL;
+                $methodStr[] = '    }';
+                $methodStr[] = PHP_EOL;
+
+                if (++$index < count($missingMethods)) {
+                    $methodStr[] = PHP_EOL;
+                }
+
+                $edits[] = new TextEdit($pos, 0, implode('', $methodStr));
             }
         }
 
-        return $this->editor->apply($sourceBuilder->build(), $source);
+        $source = SourceCode::fromString(TextEdit::applyEdits($edits, (string) $source));
+
+        return $source;
     }
 
     private function missingClassMethods(ReflectionClass $class): array

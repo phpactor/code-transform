@@ -5,7 +5,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection;
 use Phpactor\CodeTransform\Domain\SourceCode;
 
 use PHPUnit\Framework\TestCase;
-use Phpactor\CodeTransform\Adapter\WorseReflection\Transformer\ImplementContracts;
+use Phpactor\CodeTransform\Adapter\WorseReflection\ImplementContracts;
 use Phpactor\WorseReflection\SourceCodeLocator\StringSourceLocator;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\SourceCode as WorseSourceCode;
