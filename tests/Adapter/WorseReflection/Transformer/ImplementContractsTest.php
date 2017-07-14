@@ -1,16 +1,12 @@
 <?php
 
-namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection;
+namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Transformer;
 
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\CodeTransform\Adapter\WorseReflection\Transformer\ImplementContracts;
+use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 
-use PHPUnit\Framework\TestCase;
-use Phpactor\CodeTransform\Adapter\WorseReflection\ImplementContracts;
-use Phpactor\WorseReflection\SourceCodeLocator\StringSourceLocator;
-use Phpactor\WorseReflection\Reflector;
-use Phpactor\WorseReflection\SourceCode as WorseSourceCode;
-
-class ImplementContractsTest extends TestCase
+class ImplementContractsTest extends WorseTestCase
 {
     /**
      * @dataProvider provideCompleteConstructor
@@ -18,7 +14,7 @@ class ImplementContractsTest extends TestCase
     public function testImplementContracts(string $example, string $expected)
     {
         $source = SourceCode::fromString($example);
-        $transformer = new ImplementContracts(new Reflector(new StringSourceLocator(WorseSourceCode::fromString((string) $source))));
+        $transformer = new ImplementContracts($this->reflectorFor($example));
         $source = $transformer->transform($source);
         $this->assertEquals((string) $expected, (string) $source);
     }

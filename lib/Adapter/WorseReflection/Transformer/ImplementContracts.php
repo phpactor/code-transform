@@ -1,6 +1,6 @@
 <?php
 
-namespace Phpactor\CodeTransform\Adapter\WorseReflection;
+namespace Phpactor\CodeTransform\Adapter\WorseReflection\Transformer;
 
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
