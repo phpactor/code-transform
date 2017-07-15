@@ -38,7 +38,7 @@ class Beat
     /**
      * This is some documentation.
      */
-    public function play(Snare $snare)
+    public function play(Snare $snare = null, int $bar = "boo")
     {
         $snare->hit();
     }
@@ -64,7 +64,7 @@ interface BeatInterface
     /**
      * This is some documentation.
      */
-    public function play(Snare $snare);
+    public function play(Snare $snare = null, int $bar = 'boo');
 }
 EOT
 

@@ -54,8 +54,13 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
             foreach ($method->parameters() as $parameter) {
                 $parameterBuilder = $methodBuilder->parameter((string) $parameter->name());
                 if (false === $parameter->type()->isUnknown()) {
-                    $parameterBuilder->type((string) $parameter->type()->className()->short());
-                    $useClasses[$parameter->type()->className()->__toString()] = true;
+                    if ($parameter->type()->isPrimitive()) {
+                        $parameterBuilder->type($parameter->type()->primitive());
+                    } else {
+                        $parameterBuilder->type((string) $parameter->type()->className()->short());
+                        $useClasses[$parameter->type()->className()->__toString()] = true;
+                    }
+
                     if ($parameter->hasDefault()) {
                         $parameterBuilder->defaultValue($parameter->default());
                     }
