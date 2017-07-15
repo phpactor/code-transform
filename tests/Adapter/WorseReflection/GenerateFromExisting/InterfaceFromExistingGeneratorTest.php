@@ -48,7 +48,7 @@ namespace Music;
 
 use Sound\Snare;
 
-interface Beat
+interface BeatInterface
 {
     public function play(Snare $snare);
 }

@@ -39,7 +39,8 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
 
         /** @var $sourceBuilder SourceCodeBuilder */
         $sourceBuilder = SourceCodeBuilder::create();
-        $interfaceBuilder = $sourceBuilder->class((string) $targetName);
+        $sourceBuilder->namespace((string) $targetName->namespace());
+        $interfaceBuilder = $sourceBuilder->interface((string) $targetName->short());
         $useClasses = [];
 
         /** @var $method ReflectionMethod */
