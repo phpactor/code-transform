@@ -17,11 +17,16 @@
         {
             "type": "vcs",
             "url": "https://github.com/phpactor/worse-reflection"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/phpactor/code-builder"
         }
     ],
     "require": {
         "microsoft/tolerant-php-parser": "dev-master",
-        "phpactor/worse-reflection": "dev-master"
+        "phpactor/worse-reflection": "dev-master",
+        "phpactor/code-builder": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.2"
