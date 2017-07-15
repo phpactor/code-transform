@@ -23,6 +23,11 @@ final class Generators implements \IteratorAggregate
         return new \ArrayIterator($this->generators);
     }
 
+    public function names()
+    {
+        return array_keys($this->generators);
+    }
+
     public function get(string $name)
     {
         if (!isset($this->generators[$name])) {
