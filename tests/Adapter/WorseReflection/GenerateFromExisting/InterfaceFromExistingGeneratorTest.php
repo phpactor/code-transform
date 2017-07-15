@@ -23,7 +23,7 @@ class InterfaceFromExistingGeneratorTest extends WorseTestCase
     public function provideGenerateInterface()
     {
         return [
-            [
+            'Generates interface' => [
                 'Music\Beat',
                 'Music\BeatInterface',
                 <<<'EOT'
@@ -35,9 +35,20 @@ use Sound\Snare;
 
 class Beat
 {
+    /**
+     * This is some documentation.
+     */
     public function play(Snare $snare)
     {
         $snare->hit();
+    }
+
+    private function something()
+    {
+    }
+
+    protected function somethingElse()
+    {
     }
 }
 EOT
@@ -50,6 +61,9 @@ use Sound\Snare;
 
 interface BeatInterface
 {
+    /**
+     * This is some documentation.
+     */
     public function play(Snare $snare);
 }
 EOT

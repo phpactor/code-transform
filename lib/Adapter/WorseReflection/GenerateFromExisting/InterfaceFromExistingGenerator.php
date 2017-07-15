@@ -11,6 +11,7 @@ use Phpactor\CodeBuilder\Domain\Renderer;
 use Phpactor\WorseReflection\Reflection\ReflectionMethod;
 use Phpactor\WorseReflection\Reflection\ReflectionParameter;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
+use Phpactor\WorseReflection\Visibility;
 
 final class InterfaceFromExistingGenerator implements GenerateFromExisting
 {
@@ -33,7 +34,7 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
     /**
      * {@inheritDoc}
      */
-    public function generateFromExisting(ClassName $existingClass, ClassName $targetName): SourceCode
+    public function generateFromExisting(ClassName $existingClass, ClassName $targetName, string $variant = null): SourceCode
     {
         $existingClass = $this->reflector->reflectClass(ReflectionClassName::fromString((string) $existingClass));
 
@@ -44,9 +45,10 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
         $useClasses = [];
 
         /** @var $method ReflectionMethod */
-        foreach ($existingClass->methods() as $method) {
+        foreach ($existingClass->methods()->byVisibilities([ Visibility::public() ]) as $method) {
             $methodBuilder = $interfaceBuilder->method($method->name());
             $methodBuilder->visibility((string) $method->visibility());
+            $methodBuilder->docblock($method->docblock()->formatted());
 
             /** @var $parameter ReflectionParameter */
             foreach ($method->parameters() as $parameter) {
@@ -65,6 +67,6 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
             $sourceBuilder->use((string) $useClass);
         }
 
-        return SourceCode::fromString($this->renderer->render($sourceBuilder->build()));
+        return SourceCode::fromString($this->renderer->render($sourceBuilder->build(), $variant));
     }
 }

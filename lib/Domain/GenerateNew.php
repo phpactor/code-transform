@@ -10,5 +10,5 @@ interface GenerateNew extends Generator
      * - New class
      * - Interface from existing class
      */
-    public function generateNew(ClassName $targetName): SourceCode;
+    public function generateNew(ClassName $targetName, string $variant = null): SourceCode;
 }

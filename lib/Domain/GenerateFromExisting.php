@@ -8,5 +8,5 @@ interface GenerateFromExisting extends Generator
      * - Test for existing class
      * - Trait from existing
      */
-    public function generateFromExisting(ClassName $existingClass, ClassName $targetName): SourceCode;
+    public function generateFromExisting(ClassName $existingClass, ClassName $targetName, string $variant = null): SourceCode;
 }
