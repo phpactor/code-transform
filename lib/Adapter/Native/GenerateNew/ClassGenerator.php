@@ -15,24 +15,31 @@ class ClassGenerator implements GenerateNew
      */
     private $renderer;
 
-    public function __construct(Renderer $renderer)
+    /**
+     * @var string
+     */
+    private $variant;
+
+    public function __construct(Renderer $renderer, string $variant = null)
     {
+        $this->variant = $variant;
         $this->renderer = $renderer;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function generateNew(ClassName $targetName, string $variant = null): SourceCode
+    public function generateNew(ClassName $targetName): SourceCode
     {
         $builder = SourceCodeBuilder::create();
         $builder->namespace($targetName->namespace());
         $classPrototype = $builder->class($targetName->short());
 
         return SourceCode::fromString(
-            (string) $this->renderer->render($builder->build(), $variant)
+            (string) $this->renderer->render($builder->build(), $this->variant)
         );
     }
 }
+
 
 

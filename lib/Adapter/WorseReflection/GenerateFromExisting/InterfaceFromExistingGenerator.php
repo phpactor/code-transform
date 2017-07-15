@@ -34,7 +34,7 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
     /**
      * {@inheritDoc}
      */
-    public function generateFromExisting(ClassName $existingClass, ClassName $targetName, string $variant = null): SourceCode
+    public function generateFromExisting(ClassName $existingClass, ClassName $targetName): SourceCode
     {
         $existingClass = $this->reflector->reflectClass(ReflectionClassName::fromString((string) $existingClass));
 
@@ -72,6 +72,6 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
             $sourceBuilder->use((string) $useClass);
         }
 
-        return SourceCode::fromString($this->renderer->render($sourceBuilder->build(), $variant));
+        return SourceCode::fromString($this->renderer->render($sourceBuilder->build()));
     }
 }
