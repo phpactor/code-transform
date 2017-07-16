@@ -46,9 +46,16 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
 
         /** @var $method ReflectionMethod */
         foreach ($existingClass->methods()->byVisibilities([ Visibility::public() ]) as $method) {
+            if ($method->name() === '__construct') {
+                continue;
+            }
+
             $methodBuilder = $interfaceBuilder->method($method->name());
             $methodBuilder->visibility((string) $method->visibility());
-            $methodBuilder->docblock($method->docblock()->formatted());
+
+            if ($method->docblock()->formatted()) {
+                $methodBuilder->docblock($method->docblock()->formatted());
+            }
 
             /** @var $parameter ReflectionParameter */
             foreach ($method->parameters() as $parameter) {

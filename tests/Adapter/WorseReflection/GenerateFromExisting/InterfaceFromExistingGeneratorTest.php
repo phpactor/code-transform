@@ -35,12 +35,23 @@ use Sound\Snare;
 
 class Beat
 {
+    private $foobar;
+
+    public function __construct(string $foobar)
+    {
+        $this->foobar = $foobar;
+    }
+
     /**
      * This is some documentation.
      */
     public function play(Snare $snare = null, int $bar = "boo")
     {
         $snare->hit();
+    }
+
+    public function empty()
+    {
     }
 
     private function something()
@@ -65,6 +76,8 @@ interface BeatInterface
      * This is some documentation.
      */
     public function play(Snare $snare = null, int $bar = 'boo');
+
+    public function empty();
 }
 EOT
 
