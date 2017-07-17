@@ -83,7 +83,11 @@ class ImplementContracts implements Transformer
         $methods = [];
         foreach ($class->interfaces() as $interface) {
             foreach ($interface->methods() as $method) {
-                if (!$class->methods()->has($method->name())) {
+                // TODO: support static methods (requires changes to code builder)
+                if ($method->isStatic()) {
+                    continue;
+                }
+                if (false === $class->methods()->has($method->name())) {
                     $methods[] = $method;
                 }
             }

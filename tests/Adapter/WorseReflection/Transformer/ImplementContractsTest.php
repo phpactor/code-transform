@@ -296,6 +296,51 @@ class Foobar extends Bird
 }
 EOT
             ],
+            'It ignores methods that already exist' => [
+                <<<'EOT'
+<?php
+
+interface Rabbit
+{
+    public function dig(int $depth = 5): Dirt;
+
+    public function foobar();
+}
+
+class Foobar implements Rabbit
+{
+    public function dig(int $depth = 5): Dirt
+    {
+    }
+
+    public function foobar()
+    {
+    }
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+interface Rabbit
+{
+    public function dig(int $depth = 5): Dirt;
+
+    public function foobar();
+}
+
+class Foobar implements Rabbit
+{
+    public function dig(int $depth = 5): Dirt
+    {
+    }
+
+    public function foobar()
+    {
+    }
+}
+EOT
+            ]
         ];
     }
 }
