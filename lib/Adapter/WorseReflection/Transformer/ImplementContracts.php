@@ -81,22 +81,25 @@ class ImplementContracts implements Transformer
     private function missingClassMethods(ReflectionClass $class): array
     {
         $methods = [];
+        $reflectionMethods = $class->methods();
         foreach ($class->interfaces() as $interface) {
             foreach ($interface->methods() as $method) {
                 // TODO: support static methods (requires changes to code builder)
                 if ($method->isStatic()) {
                     continue;
                 }
-                if (false === $class->methods()->has($method->name())) {
+                if (false === $reflectionMethods->has($method->name())) {
                     $methods[] = $method;
                 }
             }
         }
 
-        foreach ($class->methods() as $method) {
-            if ($method->class()->name() != $class->name()) {
-                $methods[] = $method;
+        foreach ($class->methods()->abstract() as $method) {
+            if ($method->class()->name() == $class->name()) {
+                continue;
             }
+
+            $methods[] = $method;
         }
 
         return $methods;
