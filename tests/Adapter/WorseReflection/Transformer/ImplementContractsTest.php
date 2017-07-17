@@ -14,7 +14,7 @@ class ImplementContractsTest extends WorseTestCase
     public function testImplementContracts(string $example, string $expected)
     {
         $source = SourceCode::fromString($example);
-        $transformer = new ImplementContracts($this->reflectorFor($example));
+        $transformer = new ImplementContracts($this->reflectorFor($example), $this->updater());
         $source = $transformer->transform($source);
         $this->assertEquals((string) $expected, (string) $source);
     }
@@ -25,12 +25,10 @@ class ImplementContractsTest extends WorseTestCase
             'It does nothing on source with no classes' => [
                 <<<'EOT'
 <?php
-
 EOT
                 , 
                 <<<'EOT'
 <?php
-
 EOT
 
             ],
