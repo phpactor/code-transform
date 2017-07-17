@@ -7,8 +7,8 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\SourceCode as WorseSourceCode;
 use Phpactor\WorseReflection\Reflection\ReflectionClass;
-use Phpactor\CodeTransform\Adapter\TolerantParser\TextEdit;
 use Phpactor\CodeTransform\Domain\Editor;
+use Microsoft\PhpParser\TextEdit;
 
 class ImplementContracts implements Transformer
 {
@@ -106,5 +106,3 @@ EOT
         return $methods;
     }
 }
-
-
