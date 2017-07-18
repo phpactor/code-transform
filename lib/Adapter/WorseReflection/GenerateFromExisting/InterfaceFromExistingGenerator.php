@@ -60,7 +60,7 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
             /** @var $parameter ReflectionParameter */
             foreach ($method->parameters() as $parameter) {
                 $parameterBuilder = $methodBuilder->parameter((string) $parameter->name());
-                if (false === $parameter->type()->isUnknown()) {
+                if ($parameter->type()->isDefined()) {
                     if ($parameter->type()->isPrimitive()) {
                         $parameterBuilder->type($parameter->type()->primitive());
                     } else {
@@ -68,8 +68,8 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
                         $useClasses[$parameter->type()->className()->__toString()] = true;
                     }
 
-                    if ($parameter->hasDefault()) {
-                        $parameterBuilder->defaultValue($parameter->default());
+                    if ($parameter->default()->isDefined()) {
+                        $parameterBuilder->defaultValue($parameter->default()->value());
                     }
                 }
             }

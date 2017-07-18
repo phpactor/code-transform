@@ -13,6 +13,7 @@ use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\WorseReflection\Type;
+use Phpactor\WorseReflection\Reflection\ReflectionMethod;
 
 class ImplementContracts implements Transformer
 {
@@ -42,32 +43,35 @@ class ImplementContracts implements Transformer
             $classBuilder = $sourceCodeBuilder->class($class->name()->short());
             $missingMethods = $this->missingClassMethods($class);
 
-            if (0 === count($missingMethods)) {
+            if (empty($missingMethods)) {
                 continue;
             }
 
+            /** @var $missingMethod ReflectionMethod */
             foreach ($missingMethods as $missingMethod) {
                 $methodBuilder = $classBuilder->method($missingMethod->name());
-                if ($missingMethod->type() != Type::unknown()) {
-                    $methodBuilder->returnType($missingMethod->type()->className() ? $missingMethod->type()->className()->short() : (string) $missingMethod->type());
+
+                if ($missingMethod->returnType()->isDefined()) {
+                    $methodBuilder->returnType($missingMethod->returnType()->short());
                 }
 
-                if (trim($missingMethod->docblock()->raw())) {
+                if ($missingMethod->docblock()->isDefined()) {
                     $methodBuilder->docblock('{@inheritDoc}');
                 }
 
                 foreach ($missingMethod->parameters() as $parameter) {
                     $parameterBuilder = $methodBuilder->parameter($parameter->name());
-                    if ($parameter->hasType()) {
-                        $parameterBuilder->type($parameter->type()->className() ? $parameter->type()->className()->short() : (string) $parameter->type());
 
-                        if (false === $parameter->type()->isPrimitive()) {
+                    if ($parameter->type()->isDefined()) {
+                        $parameterBuilder->type($parameter->type()->short());
+
+                        if ($parameter->type()->isClass()) {
                             $sourceCodeBuilder->use((string) $parameter->type());
                         }
                     }
 
-                    if ($parameter->hasDefault()) {
-                        $parameterBuilder->defaultValue($parameter->default());
+                    if ($parameter->default()->isDefined()) {
+                        $parameterBuilder->defaultValue($parameter->default()->value());
                     }
                 }
             }
