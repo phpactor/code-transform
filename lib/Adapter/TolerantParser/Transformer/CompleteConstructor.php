@@ -159,7 +159,9 @@ class CompleteConstructor implements Transformer
             if ($node instanceof ExpressionStatement && $node->expression instanceof AssignmentExpression) {
 
                 $varName = $node->expression->rightOperand->getText();
-                $list[] = ltrim($varName, '$');
+                $memberName = $node->expression->leftOperand->memberName->getText($node->getFileContents());
+
+                $list[] = $memberName;
             }
 
             return $list;
@@ -201,5 +203,3 @@ EOT
         ;
     }
 }
-
-

@@ -221,6 +221,42 @@ class Foobar
 EOT
 
             ],
+            'It does not redeclare' => [
+                <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    private $foo;
+
+    public function __construct(string $foo)
+    {
+        $this->foo = $foo ?: null;
+    }
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    private $foo;
+
+    public function __construct(string $foo)
+    {
+        $this->foo = $foo ?: null;
+    }
+}
+EOT
+
+            ],
         ];
     }
 }
