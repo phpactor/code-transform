@@ -81,6 +81,38 @@ interface BeatInterface
 }
 EOT
 
+            ],
+            'Generates interface with return types' => [
+                'Music\Beat',
+                'Music\BeatInterface',
+                <<<'EOT'
+<?php
+
+namespace Music;
+
+use Sound\Snare;
+
+class Beat
+{
+    public function play(Snare $snare = null, int $bar = "boo"): Music
+    {
+    }
+}
+EOT
+                , <<<'EOT'
+<?php
+
+namespace Music;
+
+use Music\Music;
+use Sound\Snare;
+
+interface BeatInterface
+{
+    public function play(Snare $snare = null, int $bar = 'boo'): Music;
+}
+EOT
+
             ]
         ];
     }

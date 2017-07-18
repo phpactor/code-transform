@@ -57,6 +57,11 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
                 $methodBuilder->docblock($method->docblock()->formatted());
             }
 
+            if ($method->returnType()->isDefined()) {
+                $methodBuilder->returnType((string) $method->returnType()->short());
+                $sourceBuilder->use((string) $method->returnType());
+            }
+
             /** @var $parameter ReflectionParameter */
             foreach ($method->parameters() as $parameter) {
                 $parameterBuilder = $methodBuilder->parameter((string) $parameter->name());
