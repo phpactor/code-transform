@@ -55,6 +55,10 @@ class ImplementContracts implements Transformer
                     $methodBuilder->returnType($missingMethod->returnType()->short());
                 }
 
+                if ($missingMethod->isStatic()) {
+                    $methodBuilder->static();
+                }
+
                 if ($missingMethod->docblock()->isDefined()) {
                     $methodBuilder->docblock('{@inheritDoc}');
                 }
@@ -88,10 +92,6 @@ class ImplementContracts implements Transformer
         $reflectionMethods = $class->methods();
         foreach ($class->interfaces() as $interface) {
             foreach ($interface->methods() as $method) {
-                // TODO: support static methods (requires changes to code builder)
-                if ($method->isStatic()) {
-                    continue;
-                }
                 if (false === $reflectionMethods->has($method->name())) {
                     $methods[] = $method;
                 }

@@ -56,7 +56,7 @@ EOT
 
 interface Rabbit
 {
-    public function dig(int $depth = 5): Dirt;
+    public function dig(int $depth = 5);
 }
 
 class Foobar implements Rabbit
@@ -69,12 +69,43 @@ EOT
 
 interface Rabbit
 {
-    public function dig(int $depth = 5): Dirt;
+    public function dig(int $depth = 5);
 }
 
 class Foobar implements Rabbit
 {
-    public function dig(int $depth = 5): Dirt
+    public function dig(int $depth = 5)
+    {
+    }
+}
+EOT
+
+            ],
+            'It implements a static methods' => [
+                <<<'EOT'
+<?php
+
+interface Rabbit
+{
+    public static function dig(int $depth = 5): Dirt;
+}
+
+class Foobar implements Rabbit
+{
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+interface Rabbit
+{
+    public static function dig(int $depth = 5): Dirt;
+}
+
+class Foobar implements Rabbit
+{
+    public static function dig(int $depth = 5): Dirt
     {
     }
 }

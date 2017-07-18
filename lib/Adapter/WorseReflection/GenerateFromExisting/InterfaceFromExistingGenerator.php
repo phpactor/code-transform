@@ -53,7 +53,7 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
             $methodBuilder = $interfaceBuilder->method($method->name());
             $methodBuilder->visibility((string) $method->visibility());
 
-            if ($method->docblock()->formatted()) {
+            if ($method->docblock()->isDefined()) {
                 $methodBuilder->docblock($method->docblock()->formatted());
             }
 
