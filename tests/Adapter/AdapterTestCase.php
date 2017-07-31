@@ -2,9 +2,9 @@
 
 namespace Phpactor\CodeTransform\Tests\Adapter;
 
-use PHPUnit\Framework\TestCase;
 use Phpactor\CodeBuilder\Adapter\Twig\TwigRenderer;
 use Phpactor\CodeBuilder\Adapter\TolerantParser\TolerantUpdater;
+use PHPUnit\Framework\TestCase;
 
 class AdapterTestCase extends TestCase
 {

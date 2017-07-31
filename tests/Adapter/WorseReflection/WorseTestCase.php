@@ -11,6 +11,6 @@ class WorseTestCase extends AdapterTestCase
 {
     public function reflectorFor(string $source)
     {
-        return new Reflector(new StringSourceLocator(WorseSourceCode::fromString((string) $source)));
+        return Reflector::create(new StringSourceLocator(WorseSourceCode::fromString((string) $source)));
     }
 }
