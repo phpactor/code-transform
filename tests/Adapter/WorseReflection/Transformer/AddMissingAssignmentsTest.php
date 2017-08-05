@@ -275,6 +275,41 @@ class Foobar extends Dodo
 }
 EOT
             ],
+            'It adds missing assignments using the imported type' => [
+                <<<'EOT'
+<?php
+
+use MyLibrary\Hello;
+
+class Foobar
+{
+    public function hello()
+    {
+        $this->hello = new Hello();
+    }
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+use MyLibrary\Hello;
+
+class Foobar
+{
+    /**
+     * @var Hello
+     */
+    private $hello;
+
+    public function hello()
+    {
+        $this->hello = new Hello();
+    }
+}
+EOT
+
+            ],
         ];
     }
 }

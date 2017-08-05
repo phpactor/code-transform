@@ -40,6 +40,3 @@ class ClassGenerator implements GenerateNew
         );
     }
 }
-
-
-
