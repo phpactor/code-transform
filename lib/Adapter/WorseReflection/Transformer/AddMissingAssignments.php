@@ -10,6 +10,7 @@ use Phpactor\WorseReflection\Reflection\ReflectionMethod;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
+use Phpactor\WorseReflection\Reflection\ReflectionClass;
 
 class AddMissingAssignments  implements Transformer
 {
@@ -34,10 +35,16 @@ class AddMissingAssignments  implements Transformer
         $classes = $this->reflector->reflectClassesIn(
             WorseSourceCode::fromString((string) $code)
         );
+
+        if ($classes->count() === 0) {
+            return $code;
+        }
+
         $sourceBuilder = SourceCodeBuilder::create();
 
+        /** @var $class ReflectionClass */
         foreach ($classes as $class) {
-            $classBuilder = $sourceBuilder->class($class->name());
+            $classBuilder = $sourceBuilder->class($class->name()->short());
 
             foreach ($class->methods() as $method) {
                 $frame = $method->frame();
@@ -50,6 +57,8 @@ class AddMissingAssignments  implements Transformer
                 }
             }
         }
+
+        $sourceBuilder->namespace((string) $class->name()->namespace());
 
         $code = $this->updater->apply(
             $sourceBuilder->build(),

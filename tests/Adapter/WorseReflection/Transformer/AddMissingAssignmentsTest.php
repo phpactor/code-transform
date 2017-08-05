@@ -175,6 +175,51 @@ class Foobar
 }
 EOT
             ],
+            'It appends new assignments in a namespaced class' => [
+                <<<'EOT'
+<?php
+
+namespace Hello;
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    public $hello;
+
+    public function hello()
+    {
+        $this->foobar = 1234;
+    }
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+namespace Hello;
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    public $hello;
+
+    /**
+     * @var int
+     */
+    private $foobar;
+
+
+    public function hello()
+    {
+        $this->foobar = 1234;
+    }
+}
+EOT
+            ],
         ];
     }
 }
