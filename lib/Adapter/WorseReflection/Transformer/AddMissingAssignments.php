@@ -46,7 +46,7 @@ class AddMissingAssignments  implements Transformer
         foreach ($classes as $class) {
             $classBuilder = $sourceBuilder->class($class->name()->short());
 
-            foreach ($class->methods() as $method) {
+            foreach ($class->methods()->belongingTo($class->name()) as $method) {
                 $frame = $method->frame();
 
                 foreach ($frame->properties() as $variable) {

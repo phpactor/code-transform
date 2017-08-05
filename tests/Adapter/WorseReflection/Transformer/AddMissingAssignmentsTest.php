@@ -220,6 +220,61 @@ class Foobar
 }
 EOT
             ],
+            'Assignments should only be taken from current class' => [
+                <<<'EOT'
+<?php
+
+namespace Hello;
+
+class Dodo
+{
+    public function goodbye()
+    {
+        $this->dodo = 'string';
+    }
+}
+
+class Foobar extends Dodo
+{
+    public function hello()
+    {
+        $this->foobar = 1234;
+    }
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+namespace Hello;
+
+class Dodo
+{
+    /**
+     * @var string
+     */
+    private $dodo;
+
+    public function goodbye()
+    {
+        $this->dodo = 'string';
+    }
+}
+
+class Foobar extends Dodo
+{
+    /**
+     * @var int
+     */
+    private $foobar;
+
+    public function hello()
+    {
+        $this->foobar = 1234;
+    }
+}
+EOT
+            ],
         ];
     }
 }
