@@ -1,13 +1,14 @@
 <?php
 
-namespace Phpactor\CodeTransform\Tests\Adapter\TolerantParser\Transformer;
+namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Transformer;
 
 use Phpactor\CodeTransform\Domain\SourceCode;
 
 use PHPUnit\Framework\TestCase;
-use Phpactor\CodeTransform\Adapter\TolerantParser\Transformer\CompleteConstructor;
+use Phpactor\CodeTransform\Adapter\WorseReflection\Transformer\CompleteConstructor;
+use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 
-class CompleteConstructorTest extends TestCase
+class CompleteConstructorTest extends WorseTestCase
 {
     /**
      * @dataProvider provideCompleteConstructor
@@ -15,7 +16,7 @@ class CompleteConstructorTest extends TestCase
     public function testCompleteConstructor(string $example, string $expected)
     {
         $source = SourceCode::fromString($example);
-        $transformer = new CompleteConstructor();
+        $transformer = new CompleteConstructor($this->reflectorFor($example), $this->updater());
         $source = $transformer->transform($source);
         $this->assertEquals((string) $expected, (string) $source);
     }
@@ -26,12 +27,10 @@ class CompleteConstructorTest extends TestCase
             'It does nothing on source with no classes' => [
                 <<<'EOT'
 <?php
-
 EOT
                 , 
                 <<<'EOT'
 <?php
-
 EOT
 
             ],
@@ -127,7 +126,6 @@ class Foobar
      * @var string
      */
     private $foo;
-
     /**
      * @var Foobar
      */
@@ -201,21 +199,21 @@ EOT
 
 class Foobar
 {
+    /**
+     * @var string
+     */
+    private $foo;
 
     /**
      * @var Acme
      */
     private $acme;
 
-    /**
-     * @var string
-     */
-    private $foo;
 
     public function __construct(string $foo, Acme $acme)
     {
-        $this->acme = $acme;
         $this->foo = $foo;
+        $this->acme = $acme;
     }
 }
 EOT

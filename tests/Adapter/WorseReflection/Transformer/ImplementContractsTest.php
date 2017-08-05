@@ -327,6 +327,44 @@ class Foobar extends Bird
 }
 EOT
             ],
+            'It implements methods from abstract class which implements an interface' => [
+                <<<'EOT'
+<?php
+
+interface Animal
+{
+    abstract public function jump();
+}
+
+abstract class Bird implements Animal
+{
+}
+
+class Foobar extends Bird
+{
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+interface Animal
+{
+    abstract public function jump();
+}
+
+abstract class Bird implements Animal
+{
+}
+
+class Foobar extends Bird
+{
+    public function jump()
+    {
+    }
+}
+EOT
+            ],
             'It ignores methods that already exist' => [
                 <<<'EOT'
 <?php
