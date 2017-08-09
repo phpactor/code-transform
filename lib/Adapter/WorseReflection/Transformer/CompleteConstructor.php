@@ -5,15 +5,15 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Transformer;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Reflector;
-use Phpactor\WorseReflection\SourceCode as WorseSourceCode;
-use Phpactor\WorseReflection\Reflection\ReflectionClass;
+use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\CodeTransform\Domain\Editor;
 use Microsoft\PhpParser\TextEdit;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
-use Phpactor\WorseReflection\Type;
-use Phpactor\WorseReflection\Reflection\ReflectionMethod;
+use Phpactor\WorseReflection\Core\Type;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 
 class CompleteConstructor implements Transformer
 {

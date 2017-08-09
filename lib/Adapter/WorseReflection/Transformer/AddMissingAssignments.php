@@ -5,12 +5,12 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Transformer;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Reflector;
-use Phpactor\WorseReflection\SourceCode as WorseSourceCode;
-use Phpactor\WorseReflection\Reflection\ReflectionMethod;
+use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
-use Phpactor\WorseReflection\Reflection\ReflectionClass;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 
 class AddMissingAssignments  implements Transformer
 {
