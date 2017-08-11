@@ -14,6 +14,7 @@ use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\WorseReflection\Core\Type;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionParameter;
 
 class ImplementContracts implements Transformer
 {
@@ -39,6 +40,7 @@ class ImplementContracts implements Transformer
         $edits = [];
         $sourceCodeBuilder = SourceCodeBuilder::create();
 
+        /** @var $class ReflectionClass */
         foreach ($classes->concrete() as $class) {
             $classBuilder = $sourceCodeBuilder->class($class->name()->short());
             $missingMethods = $this->missingClassMethods($class);
@@ -52,6 +54,10 @@ class ImplementContracts implements Transformer
                 $methodBuilder = $classBuilder->method($missingMethod->name());
 
                 if ($missingMethod->returnType()->isDefined()) {
+                    if ($missingMethod->returnType()->isClass() && $missingMethod->returnType()->className()->namespace() != $class->name()->namespace()) {
+                        $sourceCodeBuilder->use((string) $missingMethod->returnType());
+                    }
+
                     $methodBuilder->returnType($missingMethod->returnType()->short());
                 }
 
@@ -63,10 +69,16 @@ class ImplementContracts implements Transformer
                     $methodBuilder->docblock('{@inheritDoc}');
                 }
 
+                /** @var $parameter ReflectionParameter */
                 foreach ($missingMethod->parameters() as $parameter) {
+
                     $parameterBuilder = $methodBuilder->parameter($parameter->name());
 
                     if ($parameter->type()->isDefined()) {
+                        if ($parameter->type()->isClass() && $parameter->type()->className()->namespace() != $class->name()->namespace()) {
+                            $sourceCodeBuilder->use((string) $parameter->type());
+                        }
+
                         $parameterBuilder->type($parameter->type()->short());
 
                         if ($parameter->type()->isClass()) {

@@ -284,6 +284,7 @@ EOT
 
 use Animals\Sound;
 
+
 interface Bird
 {
     public function chirp(): Sound;
@@ -405,6 +406,39 @@ class Foobar implements Rabbit
     }
 
     public function foobar()
+    {
+    }
+}
+EOT
+            ],
+            'It imports use statements outside of the current namespace' => [
+                <<<'EOT'
+<?php
+
+interface Rabbit
+{
+    public function dig(Arg\Barg $depth = 5): Barfoo\Dirt;
+}
+
+class Foobar implements Rabbit
+{
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+use Barfoo\Dirt;
+use Arg\Barg;
+
+interface Rabbit
+{
+    public function dig(Arg\Barg $depth = 5): Barfoo\Dirt;
+}
+
+class Foobar implements Rabbit
+{
+    public function dig(Barg $depth = 5): Dirt
     {
     }
 }
