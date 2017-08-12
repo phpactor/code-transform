@@ -11,6 +11,7 @@ use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
+use Phpactor\WorseReflection\Core\Reflection\Inference\Variable;
 
 class AddMissingAssignments  implements Transformer
 {
@@ -49,11 +50,14 @@ class AddMissingAssignments  implements Transformer
             foreach ($class->methods()->belongingTo($class->name()) as $method) {
                 $frame = $method->frame();
 
+                /** @var $variable Variable */
                 foreach ($frame->properties() as $variable) {
-                    $classBuilder
+                    $propertyBuilder = $classBuilder
                         ->property($variable->name())
-                        ->visibility('private')
-                        ->type((string) $variable->value()->type()->short());
+                        ->visibility('private');
+                    if ($variable->value()->type()->isDefined()) {
+                        $propertyBuilder->type((string) $variable->value()->type()->short());
+                    }
                 }
             }
         }

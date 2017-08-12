@@ -310,6 +310,38 @@ class Foobar
 EOT
 
             ],
+            'It missing assignments with an untyped parameter' => [
+                <<<'EOT'
+<?php
+
+use MyLibrary\Hello;
+
+class Foobar
+{
+    public function hello($string)
+    {
+        $this->hello = $string;
+    }
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+use MyLibrary\Hello;
+
+class Foobar
+{
+    private $hello;
+
+    public function hello($string)
+    {
+        $this->hello = $string;
+    }
+}
+EOT
+
+            ],
         ];
     }
 }
