@@ -55,8 +55,8 @@ class AddMissingAssignments  implements Transformer
                     $propertyBuilder = $classBuilder
                         ->property($variable->name())
                         ->visibility('private');
-                    if ($variable->value()->type()->isDefined()) {
-                        $propertyBuilder->type((string) $variable->value()->type()->short());
+                    if ($variable->symbolInformation()->type()->isDefined()) {
+                        $propertyBuilder->type((string) $variable->symbolInformation()->type()->short());
                     }
                 }
             }

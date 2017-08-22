@@ -255,6 +255,43 @@ class Foobar
 EOT
 
             ],
+            'Existing property with assignment' => [
+                <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    private $foo = false;
+
+    public function __construct($bar)
+    {
+    }
+}
+EOT
+                , 
+                <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    private $foo = false;
+    private $bar;
+
+
+    public function __construct($bar)
+    {
+        $this->bar = $bar;
+    }
+}
+EOT
+
+            ],
         ];
     }
 }
