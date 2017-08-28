@@ -12,10 +12,6 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/phpactor/worse-reflection"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/phpactor/code-builder"
         }
     ],
