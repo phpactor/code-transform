@@ -22,6 +22,11 @@ class CodeTransform
         return new self($transformers);
     }
 
+    public function transformers(): Transformers
+    {
+        return $this->transformers;
+    }
+
     public function transform(string $code, array $transformations): SourceCode
     {
         $transformers = $this->transformers->in($transformations);

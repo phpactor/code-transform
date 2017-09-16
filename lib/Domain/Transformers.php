@@ -23,6 +23,11 @@ final class Transformers implements \IteratorAggregate
         return new \ArrayIterator($this->transformers);
     }
 
+    public function names(): array
+    {
+        return array_keys($this->transformers);
+    }
+
     public function applyTo(SourceCode $code)
     {
         foreach ($this as $transformer) {
