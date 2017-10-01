@@ -2,32 +2,8 @@
 
 namespace Phpactor\CodeTransform\Domain;
 
-final class Transformers implements \IteratorAggregate
+final class Transformers extends AbstractCollection
 {
-    private $transformers = [];
-
-    public function __construct(array $transformers)
-    {
-        foreach ($transformers as $name => $transformer) {
-            $this->add($name, $transformer);
-        }
-    }
-
-    public static function fromArray(array $transformers)
-    {
-        return new self($transformers);
-    }
-
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->transformers);
-    }
-
-    public function names(): array
-    {
-        return array_keys($this->transformers);
-    }
-
     public function applyTo(SourceCode $code)
     {
         foreach ($this as $transformer) {
@@ -35,18 +11,6 @@ final class Transformers implements \IteratorAggregate
         }
 
         return $code;
-    }
-
-    public function get(string $name)
-    {
-        if (!isset($this->transformers[$name])) {
-            throw new \InvalidArgumentException(sprintf(
-                'Transformer "%s" not known, known transformers: "%s"',
-                $name, implode('", "', array_keys($this->transformers))
-            ));
-        }
-
-        return $this->transformers[$name];
     }
 
     public function in(array $transformerNames)
@@ -60,8 +24,8 @@ final class Transformers implements \IteratorAggregate
         return new self($transformers);
     }
 
-    private function add(string $name, Transformer $transformer)
+    protected function type(): string
     {
-        $this->transformers[$name] = $transformer;
+        return Transformer::class;
     }
 }
