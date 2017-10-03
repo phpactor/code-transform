@@ -34,15 +34,25 @@ class ExtractConstantTest extends WorseTestCase
                 83,
                 'HELLO_WORLD'
             ],
-//            'array_key' => [
-//                'extractConstant3',
-//                83,
-//                'HELLO_WORLD'
-//            ],
+            'array_key' => [
+                'extractConstant3',
+                83,
+                'HELLO_WORLD'
+            ],
             'namespaced' => [
                 'extractConstant4',
                 102,
                 'HELLO_WORLD'
+            ],
+            'replace all' => [
+                'extractConstant5',
+                83,
+                'HELLO_WORLD'
+            ],
+            'replace all numeric' => [
+                'extractConstant6',
+                79,
+                'HOUR'
             ],
         ];
     }

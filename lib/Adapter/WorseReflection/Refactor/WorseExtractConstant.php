@@ -12,6 +12,13 @@ use Phpactor\CodeBuilder\Domain\Prototype\Prototype;
 use Phpactor\CodeBuilder\SourceBuilder;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\WorseReflection\Core\Reflection\Inference\Symbol;
+use Microsoft\PhpParser\Parser;
+use Microsoft\PhpParser\ClassLike;
+use Microsoft\PhpParser\Node\StringLiteral;
+use Microsoft\PhpParser\Node\NumericLiteral;
+use Microsoft\PhpParser\Node;
+use Microsoft\PhpParser\TextEdit;
+use Phpactor\WorseReflection\Core\Reflection\Inference\SymbolInformation;
 
 class WorseExtractConstant implements ExtractConstant
 {
@@ -25,20 +32,33 @@ class WorseExtractConstant implements ExtractConstant
      */
     private $updater;
 
+    /**
+     * @var Parser
+     */
+    private $parser;
 
-    public function __construct(Reflector $reflector, Updater $updater)
+    public function __construct(Reflector $reflector, Updater $updater, Parser $parser = null)
     {
         $this->reflector = $reflector;
         $this->updater = $updater;
+        $this->parser = $parser ?: new Parser();
     }
 
     public function extractConstant(string $sourceCode, int $offset, string $constantName)
     {
-        $offset = $this->reflector->reflectOffset(SourceCode::fromString($sourceCode), Offset::fromInt($offset));
-        $symbolInformation = $offset->symbolInformation();
-        $symbol = $symbolInformation->symbol();
+        $symbolInformation = $this->reflector
+            ->reflectOffset(SourceCode::fromString($sourceCode), Offset::fromInt($offset))
+            ->symbolInformation();
 
-        $sourceCode = $this->replaceValueWithConstant($sourceCode, $symbol, $constantName);
+        $sourceCode = $this->replaceValues($sourceCode, $offset, $constantName);
+        $sourceCode = $this->addConstant($sourceCode, $symbolInformation, $constantName);
+
+        return $sourceCode;
+    }
+
+    private function addConstant(string $sourceCode, SymbolInformation $symbolInformation, string $constantName)
+    {
+        $symbol = $symbolInformation->symbol();
 
         $builder = SourceCodeBuilder::create();
         $builder->namespace((string) $symbolInformation->containerType()->className()->namespace());
@@ -52,13 +72,49 @@ class WorseExtractConstant implements ExtractConstant
         return $sourceCode;
     }
 
-    private function replaceValueWithConstant(string $sourceCode, Symbol $symbol, $constantName)
+    private function replaceValues(string $sourceCode, int $offset, string $constantName)
     {
-        return implode([
-            substr($sourceCode, 0, $symbol->position()->start()),
-            'self::',
-            $constantName,
-            substr($sourceCode, $symbol->position()->end())
-        ]);
+        $node = $this->parser->parseSourceFile($sourceCode);
+        $targetNode = $node->getDescendantNodeAtPosition($offset);
+        $targetValue = $this->getComparableValue($targetNode);
+        $classNode = $targetNode->getFirstAncestor(ClassLike::class);
+
+        if (null === $classNode) {
+            throw new \RuntimeException('Node does not belong to a class');
+        }
+
+        $textEdits = [];
+        foreach ($classNode->getDescendantNodes() as $node) {
+            if (false === $node instanceof $targetNode) {
+                continue;
+            }
+
+            if ($targetValue == $this->getComparableValue($node)) {
+                $textEdits[] = new TextEdit(
+                    $node->getStart(), $node->getEndPosition() - $node->getStart(),
+                    'self::' . $constantName
+                );
+            }
+        }
+
+        $sourceCode = TextEdit::applyEdits($textEdits, $sourceCode);
+
+        return $sourceCode;
+    }
+
+    private function getComparableValue(Node $node)
+    {
+        if ($node instanceof StringLiteral) {
+            return $node->getStringContentsText();
+        }
+
+        if ($node instanceof NumericLiteral) {
+            return $node->getText();
+        }
+
+        throw new \InvalidArgumentException(sprintf(
+            'Do not know how to replace node of type "%s"', get_class($node)
+        ));
     }
 }
+
