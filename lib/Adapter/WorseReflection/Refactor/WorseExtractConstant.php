@@ -41,8 +41,9 @@ class WorseExtractConstant implements ExtractConstant
         $sourceCode = $this->replaceValueWithConstant($sourceCode, $symbol, $constantName);
 
         $builder = SourceCodeBuilder::create();
+        $builder->namespace((string) $symbolInformation->containerType()->className()->namespace());
         $builder
-            ->class((string) $symbolInformation->containerType())
+            ->class((string) $symbolInformation->containerType()->className()->short())
                 ->constant($constantName, $symbolInformation->value())
             ->end();
 

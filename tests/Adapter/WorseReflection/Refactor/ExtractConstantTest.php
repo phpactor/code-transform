@@ -16,7 +16,7 @@ class ExtractConstantTest extends WorseTestCase
         $expected = file_get_contents(__DIR__ . '/fixtures/' . $test . '.b.php');
 
         $extractConstant = new WorseExtractConstant($this->reflectorFor($source), $this->updater());
-        $transformed = $extractConstant->extractConstant($source, 85, $name);
+        $transformed = $extractConstant->extractConstant($source, $start, $name);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -32,6 +32,16 @@ class ExtractConstantTest extends WorseTestCase
             'numeric' => [
                 'extractConstant2',
                 83,
+                'HELLO_WORLD'
+            ],
+//            'array_key' => [
+//                'extractConstant3',
+//                83,
+//                'HELLO_WORLD'
+//            ],
+            'namespaced' => [
+                'extractConstant4',
+                102,
                 'HELLO_WORLD'
             ],
         ];
