@@ -12,6 +12,9 @@ use Microsoft\PhpParser\Node\Expression\CallExpression;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\CodeBuilder\Domain\Prototype\Visibility;
+use Microsoft\PhpParser\Node\Expression\ArgumentExpression;
+use Phpactor\WorseReflection\Core\Reflection\Inference\SymbolInformation;
+use Phpactor\WorseReflection\Core\Reflection\Inference\Symbol;
 
 class WorseGenerateMethod
 {
@@ -21,14 +24,20 @@ class WorseGenerateMethod
      * @var Reflector
      */
     private $reflector;
+
     /**
      * @var Updater
      */
     private $updater;
+
     /**
      * @var Parser
      */
     private $parser;
+
+    /** @var int
+     */
+    private $methodSuffixIndex = 0;
 
     public function __construct(Reflector $reflector, Updater $updater, Parser $parser = null)
     {
@@ -39,13 +48,13 @@ class WorseGenerateMethod
 
     public function generateMethod(string $sourceCode, int $offset, $methodName = null)
     {
-        $varNames = $this->varNames($sourceCode, $offset);
-        $sourceCode = $this->addMethod($sourceCode, $offset, $varNames);
+        $parameters = $this->parameters($sourceCode, $offset);
+        $sourceCode = $this->addMethod($sourceCode, $offset, $parameters);
 
         return $sourceCode;
     }
 
-    private function varNames(string $sourceCode, int $offset)
+    private function parameters(string $sourceCode, int $offset)
     {
         $node = $this->parser->parseSourceFile($sourceCode);
         $methodNode = $node->getDescendantNodeAtPosition($offset);
@@ -75,10 +84,28 @@ class WorseGenerateMethod
             ));
         }
 
-        return [];
+        if (null === $methodNode->argumentExpressionList) {
+            return [];
+        }
+
+        $parameters = [];
+
+        /** @var ArgumentExpression $expression */
+        foreach ($methodNode->argumentExpressionList->children as $expression) {
+            // NOTE: This is _really_ inefficient, the code is parsed, and the
+            //       frames resolved for EACH parameter.
+            $offset = $this->reflector->reflectOffset(
+                SourceCode::fromString($sourceCode),
+                Offset::fromInt($expression->getEndPosition())
+            );
+
+            $parameters[] = $offset->symbolInformation();
+        }
+
+        return $parameters;
     }
 
-    private function addMethod(string $sourceCode, int $offset, array $varNames, string $methodName = null)
+    private function addMethod(string $sourceCode, int $offset, array $parameters, string $methodName = null)
     {
         $offset = $this->reflector
             ->reflectOffset(SourceCode::fromString($sourceCode), Offset::fromInt($offset));
@@ -89,10 +116,6 @@ class WorseGenerateMethod
 
         $methodName = $methodName ?: $symbol->name();
 
-        foreach ($varNames as $varName) {
-            // do some shit
-        }
-
         $thisClassVar = $frame->locals()->byName(self::VAR_NAME_THIS)->first();
         $thisClass = $this->reflector->reflectClassLike($thisClassVar->symbolInformation()->type()->className());
 
@@ -101,6 +124,29 @@ class WorseGenerateMethod
         $classBuilder = $builder->class((string) $thisClass->name()->short());
         $methodBuilder = $classBuilder->method($methodName);
         $methodBuilder->visibility(Visibility::PRIVATE);
+
+        /** @var SymbolInformation $parameter */
+        foreach ($parameters as $parameter) {
+            $type = $parameter->type();
+
+            $parameterName = $parameter->symbol()->name();
+
+            if ($parameterName === Symbol::UNKNOWN) {
+                $parameterName = sprintf('param%s', $this->methodSuffixIndex++);
+            }
+
+            $parameterBuilder = $methodBuilder->parameter($parameterName);
+
+            if ($type->isDefined()) {
+                if ($type->isPrimitive()) {
+                    $parameterBuilder->type((string) $type);
+                }
+
+                if ($type->isClass()) {
+                    $parameterBuilder->type($type->className()->short());
+                }
+            }
+        }
 
         $prototype = $builder->build();
 

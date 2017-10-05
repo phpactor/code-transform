@@ -26,7 +26,23 @@ class WorseGenerateMethodTest extends WorseTestCase
             'string' => [
                 'generateMethod1.test',
                 82,
-            ]
+            ],
+            'parameter' => [
+                'generateMethod2.test',
+                82,
+            ],
+            'typed parameter' => [
+                'generateMethod3.test',
+                90,
+            ],
+            'undeclared parameter' => [
+                'generateMethod4.test',
+                79,
+            ],
+            'expression' => [
+                'generateMethod5.test',
+                225,
+            ],
         ];
     }
 }
