@@ -12,8 +12,7 @@ class ExtractConstantTest extends WorseTestCase
      */
     public function testExtractConstant(string $test, int $start, $name)
     {
-        $source = file_get_contents(__DIR__ . '/fixtures/' . $test . '.a.php');
-        $expected = file_get_contents(__DIR__ . '/fixtures/' . $test . '.b.php');
+        list($source, $expected) = $this->splitInitialAndExpectedSource(__DIR__ . '/fixtures/' . $test);
 
         $extractConstant = new WorseExtractConstant($this->reflectorFor($source), $this->updater());
         $transformed = $extractConstant->extractConstant($source, $start, $name);
@@ -25,32 +24,32 @@ class ExtractConstantTest extends WorseTestCase
     {
         return [
             'string' => [
-                'extractConstant1',
+                'extractConstant1.test',
                 88,
                 'HELLO_WORLD'
             ],
             'numeric' => [
-                'extractConstant2',
+                'extractConstant2.test',
                 83,
                 'HELLO_WORLD'
             ],
             'array_key' => [
-                'extractConstant3',
+                'extractConstant3.test',
                 83,
                 'HELLO_WORLD'
             ],
             'namespaced' => [
-                'extractConstant4',
+                'extractConstant4.test',
                 102,
                 'HELLO_WORLD'
             ],
             'replace all' => [
-                'extractConstant5',
+                'extractConstant5.test',
                 83,
                 'HELLO_WORLD'
             ],
             'replace all numeric' => [
-                'extractConstant6',
+                'extractConstant6.test',
                 79,
                 'HOUR'
             ],

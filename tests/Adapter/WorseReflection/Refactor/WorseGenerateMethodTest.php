@@ -12,8 +12,7 @@ class WorseGenerateMethodTest extends WorseTestCase
      */
     public function testGenerateMethod(string $test, int $start, $name = null)
     {
-        $source = file_get_contents(__DIR__ . '/fixtures/' . $test . '.a.php');
-        $expected = file_get_contents(__DIR__ . '/fixtures/' . $test . '.b.php');
+        list($source, $expected) = $this->splitInitialAndExpectedSource(__DIR__ . '/fixtures/' . $test);
 
         $generateMethod = new WorseGenerateMethod($this->reflectorFor($source), $this->updater());
         $transformed = $generateMethod->generateMethod($source, $start, $name);
@@ -25,7 +24,7 @@ class WorseGenerateMethodTest extends WorseTestCase
     {
         return [
             'string' => [
-                'generateMethod1',
+                'generateMethod1.test',
                 82,
             ]
         ];

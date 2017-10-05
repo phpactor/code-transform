@@ -6,6 +6,16 @@ class generateMethod
     {
         $this->foobar();
     }
+}
+========
+<?php
+
+class generateMethod
+{
+    public function name()
+    {
+        $this->foobar();
+    }
 
     private function foobar()
     {

@@ -4,6 +4,18 @@ namespace Name_Space;
 
 class extractMethod4
 {
+    public function bigMethod()
+    {
+        'hello';
+    }
+}
+========
+<?php
+
+namespace Name_Space;
+
+class extractMethod4
+{
     const HELLO_WORLD = 'hello';
 
     public function bigMethod()
