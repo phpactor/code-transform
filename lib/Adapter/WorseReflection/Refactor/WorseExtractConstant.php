@@ -18,7 +18,7 @@ use Microsoft\PhpParser\Node\StringLiteral;
 use Microsoft\PhpParser\Node\NumericLiteral;
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\TextEdit;
-use Phpactor\WorseReflection\Core\Reflection\Inference\SymbolInformation;
+use Phpactor\WorseReflection\Core\Inference\SymbolInformation;
 
 class WorseExtractConstant implements ExtractConstant
 {
