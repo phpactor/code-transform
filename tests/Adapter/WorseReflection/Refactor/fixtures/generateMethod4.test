@@ -17,7 +17,7 @@ class generateMethod
         $this->foobar($one);
     }
 
-    private function foobar($param0)
+    private function foobar($one)
     {
     }
 }

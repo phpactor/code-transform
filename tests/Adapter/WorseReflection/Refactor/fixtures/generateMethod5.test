@@ -41,7 +41,7 @@ class generateMethod
         $this->barfoo($this->anotherClass->someMethod());
     }
 
-    private function barfoo(string $someMethod)
+    private function barfoo(string $string)
     {
     }
 }
