@@ -14,11 +14,11 @@ use Phpactor\CodeTransform\Domain\Refactor\GenerateMethod;
 use Phpactor\WorseReflection\Core\Offset;
 use Phpactor\WorseReflection\Core\Reflection\Inference\Symbol;
 use Phpactor\WorseReflection\Core\Reflection\Inference\SymbolInformation;
-use Phpactor\WorseReflection\Core\SourceCode;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\Collection\ReflectionArgumentCollection;
 use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\AbstractReflectionMethodCall;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionArgument;
+use Phpactor\CodeTransform\Domain\SourceCode;
 
 class WorseGenerateMethod implements GenerateMethod
 {
@@ -44,12 +44,14 @@ class WorseGenerateMethod implements GenerateMethod
         $this->updater = $updater;
     }
 
-    public function generateMethod(string $sourceCode, int $offset, $methodName = null)
+    public function generateMethod(string $sourceCode, int $offset, $methodName = null): SourceCode
     {
         $methodCall = $this->reflector->reflectMethodCall($sourceCode, $offset);
         $prototype = $this->generatePrototype($methodCall, $methodName);
 
-        return $this->updater->apply($prototype, Code::fromString($sourceCode));
+        return SourceCode::fromString(
+            (string) $this->updater->apply($prototype, Code::fromString($sourceCode))
+        );
     }
 
     private function generatePrototype(AbstractReflectionMethodCall $methodCall, string $methodName = null)

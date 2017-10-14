@@ -4,8 +4,6 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
 use Phpactor\CodeTransform\Domain\Refactor\ExtractConstant;
 use Phpactor\WorseReflection\Reflector;
-use Phpactor\WorseReflection\Core\SourceCode;
-use Phpactor\WorseReflection\Core\Offset;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\CodeBuilder\Domain\Prototype\Prototype;
@@ -19,6 +17,7 @@ use Microsoft\PhpParser\Node\NumericLiteral;
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\TextEdit;
 use Phpactor\WorseReflection\Core\Inference\SymbolInformation;
+use Phpactor\CodeTransform\Domain\SourceCode;
 
 class WorseExtractConstant implements ExtractConstant
 {
@@ -44,16 +43,16 @@ class WorseExtractConstant implements ExtractConstant
         $this->parser = $parser ?: new Parser();
     }
 
-    public function extractConstant(string $sourceCode, int $offset, string $constantName)
+    public function extractConstant(string $sourceCode, int $offset, string $constantName): SourceCode
     {
         $symbolInformation = $this->reflector
-            ->reflectOffset(SourceCode::fromString($sourceCode), Offset::fromInt($offset))
+            ->reflectOffset($sourceCode, $offset)
             ->symbolInformation();
 
         $sourceCode = $this->replaceValues($sourceCode, $offset, $constantName);
         $sourceCode = $this->addConstant($sourceCode, $symbolInformation, $constantName);
 
-        return $sourceCode;
+        return SourceCode::fromString((string) $sourceCode);
     }
 
     private function addConstant(string $sourceCode, SymbolInformation $symbolInformation, string $constantName)
