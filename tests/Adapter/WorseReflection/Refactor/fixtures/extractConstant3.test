@@ -2,6 +2,16 @@
 
 class extractMethod3
 {
+    public function bigMethod()
+    {
+        $foo['1234'];
+    }
+}
+========
+<?php
+
+class extractMethod3
+{
     const HELLO_WORLD = '1234';
 
     public function bigMethod()
