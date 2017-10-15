@@ -44,7 +44,7 @@ class WorseGenerateAccessor implements GenerateAccessor
         $this->upperCaseFirst = $upperCaseFirst;
     }
 
-    public function generateAccessor(string $sourceCode, int $offset, $methodName = null): SourceCode
+    public function generateAccessor(string $sourceCode, int $offset): SourceCode
     {
         $reflectionOffset = $this->reflector->reflectOffset($sourceCode, $offset);
         $info = $reflectionOffset->symbolInformation();
