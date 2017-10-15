@@ -37,6 +37,14 @@ class WorseGenerateAccessorTest extends WorseTestCase
                 'get',
                 true,
             ],
+            'return type' => [
+                'generateAccessor3.test',
+                80,
+            ],
+            'namespaced' => [
+                'generateAccessor4.test',
+                95,
+            ],
         ];
     }
 

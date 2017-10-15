@@ -60,10 +60,13 @@ class WorseGenerateAccessor implements GenerateAccessor
 
         $builder = SourceCodeBuilder::create();
         $builder->namespace((string) $info->containerType()->className()->namespace());
-        $builder
+        $method = $builder
             ->class((string) $info->containerType()->className()->short())
-                ->method($this->formatName($symbol->name()))
-            ->end();
+            ->method($this->formatName($symbol->name()));
+
+        if ($info->type()->isDefined()) {
+            $method->returnType($info->type()->isClass() ? $info->type()->className()->short() : (string) $info->type());
+        }
 
         return SourceCode::fromString((string) $this->updater->apply($builder->build(), Code::fromString($sourceCode)));
     }
