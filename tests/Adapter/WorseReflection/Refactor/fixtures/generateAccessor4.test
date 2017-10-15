@@ -23,5 +23,6 @@ class generateMethod
 
     public function method(): Type1
     {
+        return $this->method;
     }
 }

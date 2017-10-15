@@ -13,5 +13,6 @@ class generateMethod
 
     public function getMethod()
     {
+        return $this->method;
     }
 }
