@@ -26,7 +26,7 @@ class AddMissingAssignmentsTest extends WorseTestCase
                 <<<'EOT'
 <?php
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 EOT
@@ -44,7 +44,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -80,7 +80,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -116,7 +116,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -151,7 +151,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -194,7 +194,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -242,7 +242,7 @@ class Foobar extends Dodo
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -289,7 +289,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -324,7 +324,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 

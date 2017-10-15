@@ -26,7 +26,7 @@ class ImplementContractsTest extends WorseTestCase
                 <<<'EOT'
 <?php
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 EOT
@@ -40,7 +40,7 @@ class Foobar
 {
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -63,7 +63,7 @@ class Foobar implements Rabbit
 {
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -94,7 +94,7 @@ class Foobar implements Rabbit
 {
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -130,7 +130,7 @@ class Foobar implements Rabbit, Dog
 {
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -173,7 +173,7 @@ class Foobar implements Bird
 {
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -211,7 +211,7 @@ class Foobar implements Bird
     public function chirp() {}
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -242,7 +242,7 @@ class Foobar implements Bird
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -278,7 +278,7 @@ class Foobar implements Bird
 {
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -311,7 +311,7 @@ class Foobar extends Bird
 {
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -345,7 +345,7 @@ class Foobar extends Bird
 {
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -388,7 +388,7 @@ class Foobar implements Rabbit
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -424,7 +424,7 @@ class Foobar implements Rabbit
 {
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 

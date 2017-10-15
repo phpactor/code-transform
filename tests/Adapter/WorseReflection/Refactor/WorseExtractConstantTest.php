@@ -5,7 +5,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseExtractConstant;
 
-class ExtractConstantTest extends WorseTestCase
+class WorseExtractConstantTest extends WorseTestCase
 {
     /**
      * @dataProvider provideExtractMethod

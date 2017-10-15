@@ -24,4 +24,3 @@ final class SourceCode
         return $this->code;
     }
 }
-

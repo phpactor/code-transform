@@ -12,7 +12,8 @@ abstract class AbstractCollection implements \IteratorAggregate
             $type = $this->type();
             if (false === $element instanceof $type) {
                 throw new InvalidArgumentException(sprintf(
-                    'Collection element must be instanceof "%s"', $type
+                    'Collection element must be instanceof "%s"',
+                    $type
                 ));
             }
             $this->elements[$name] = $element;
@@ -39,7 +40,8 @@ abstract class AbstractCollection implements \IteratorAggregate
         if (!isset($this->elements[$name])) {
             throw new \InvalidArgumentException(sprintf(
                 'Generator "%s" not known, known elements: "%s"',
-                $name, implode('", "', array_keys($this->elements))
+                $name,
+                implode('", "', array_keys($this->elements))
             ));
         }
 
