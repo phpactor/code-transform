@@ -34,4 +34,3 @@ class CodeTransform
         return $transformers->applyTo(SourceCode::fromString($code));
     }
 }
-

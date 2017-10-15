@@ -6,14 +6,13 @@ use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
-use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\WorseReflection\Core\Reflection\Inference\Variable;
 
-class AddMissingAssignments  implements Transformer
+class AddMissingAssignments implements Transformer
 {
     /**
      * @var Reflector
@@ -72,6 +71,3 @@ class AddMissingAssignments  implements Transformer
         return SourceCode::fromString($code);
     }
 }
-
-
-

@@ -7,12 +7,9 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
-use Phpactor\CodeTransform\Domain\Editor;
-use Microsoft\PhpParser\TextEdit;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
-use Phpactor\WorseReflection\Core\Type;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionParameter;
 
@@ -71,7 +68,6 @@ class ImplementContracts implements Transformer
 
                 /** @var $parameter ReflectionParameter */
                 foreach ($missingMethod->parameters() as $parameter) {
-
                     $parameterBuilder = $methodBuilder->parameter($parameter->name());
 
                     if ($parameter->type()->isDefined()) {
@@ -121,4 +117,3 @@ class ImplementContracts implements Transformer
         return $methods;
     }
 }
-

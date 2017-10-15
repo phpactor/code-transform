@@ -4,7 +4,6 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Transformer;
 
 use Phpactor\CodeTransform\Domain\SourceCode;
 
-use PHPUnit\Framework\TestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Transformer\CompleteConstructor;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 
@@ -28,7 +27,7 @@ class CompleteConstructorTest extends WorseTestCase
                 <<<'EOT'
 <?php
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 EOT
@@ -45,7 +44,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -66,7 +65,7 @@ class Foobar
 {
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -87,7 +86,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -116,7 +115,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -157,7 +156,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -193,7 +192,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -236,7 +235,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 
@@ -271,7 +270,7 @@ class Foobar
     }
 }
 EOT
-                , 
+                ,
                 <<<'EOT'
 <?php
 

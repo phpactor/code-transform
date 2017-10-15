@@ -6,10 +6,7 @@ use Phpactor\CodeTransform\Domain\Refactor\ExtractConstant;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Code;
-use Phpactor\CodeBuilder\Domain\Prototype\Prototype;
-use Phpactor\CodeBuilder\SourceBuilder;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
-use Phpactor\WorseReflection\Core\Reflection\Inference\Symbol;
 use Microsoft\PhpParser\Parser;
 use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\Node\StringLiteral;
@@ -90,7 +87,8 @@ class WorseExtractConstant implements ExtractConstant
 
             if ($targetValue == $this->getComparableValue($node)) {
                 $textEdits[] = new TextEdit(
-                    $node->getStart(), $node->getEndPosition() - $node->getStart(),
+                    $node->getStart(),
+                    $node->getEndPosition() - $node->getStart(),
                     'self::' . $constantName
                 );
             }
@@ -112,8 +110,8 @@ class WorseExtractConstant implements ExtractConstant
         }
 
         throw new \InvalidArgumentException(sprintf(
-            'Do not know how to replace node of type "%s"', get_class($node)
+            'Do not know how to replace node of type "%s"',
+            get_class($node)
         ));
     }
 }
-

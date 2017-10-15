@@ -1,0 +1,17 @@
+<?php
+
+class generateMethod
+{
+    private $method;
+}
+========
+<?php
+
+class generateMethod
+{
+    private $method;
+
+    public function getMethod()
+    {
+    }
+}
