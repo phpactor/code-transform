@@ -9,9 +9,15 @@ final class SourceCode
      */
     private $code;
 
-    private function __construct(string $code)
+    /**
+     * @var string
+     */
+    private $path;
+
+    private function __construct(string $code, string $path = null)
     {
         $this->code = $code;
+        $this->path = $path;
     }
 
     public static function fromString(string $code)
@@ -19,8 +25,19 @@ final class SourceCode
         return new self($code);
     }
 
+    public static function fromStringAndPath(string $code, string $path = null)
+    {
+        return new self($code, $path);
+    }
+
     public function __toString()
     {
         return $this->code;
     }
+
+    public function path(): string
+    {
+        return $this->path;
+    }
 }
+

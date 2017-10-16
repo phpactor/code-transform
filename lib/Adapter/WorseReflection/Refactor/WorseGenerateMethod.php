@@ -39,8 +39,9 @@ class WorseGenerateMethod implements GenerateMethod
         $methodCall = $this->reflector->reflectMethodCall($sourceCode, $offset);
         $prototype = $this->generatePrototype($methodCall, $methodName);
 
-        return SourceCode::fromString(
-            (string) $this->updater->apply($prototype, Code::fromString($sourceCode))
+        return SourceCode::fromStringAndPath(
+            (string) $this->updater->apply($prototype, Code::fromString($sourceCode)),
+            $methodCall->class()->sourceCode()->path()
         );
     }
 
