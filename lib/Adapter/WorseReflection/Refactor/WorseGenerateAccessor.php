@@ -51,14 +51,15 @@ class WorseGenerateAccessor implements GenerateAccessor
     {
         $info = $this->getInfo($sourceCode, $offset);
         $prototype = $this->buildPrototype($info);
+        $sourceCode = $this->sourceFromSymbolInformation($info);
 
         return SourceCode::fromStringAndPath(
-            (string) $this->updater->apply($prototype, Code::fromString($sourceCode)),
-            $this->filePathFromType($info->containerType()->className())
+            (string) $this->updater->apply($prototype, Code::fromString((string) $sourceCode)),
+            $sourceCode->path()
         );
     }
 
-    private function getInfo(string $sourceCode, int $offset)
+    private function getInfo(string $sourceCode, int $offset): SymbolInformation
     {
         $reflectionOffset = $this->reflector->reflectOffset($sourceCode, $offset);
         $info = $reflectionOffset->symbolInformation();
@@ -102,5 +103,16 @@ class WorseGenerateAccessor implements GenerateAccessor
         }
 
         return $builder->build();
+    }
+
+    private function sourceFromSymbolInformation(SymbolInformation $info): SourceCode
+    {
+        $containingClass = $this->reflector->reflectClassLike($info->containerType()->className());
+        $worseSourceCode = $containingClass->sourceCode();
+
+        return SourceCode::fromStringAndPath(
+            $worseSourceCode->__toString(),
+            $worseSourceCode->path()
+        );
     }
 }

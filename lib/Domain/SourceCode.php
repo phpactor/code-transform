@@ -35,7 +35,7 @@ final class SourceCode
         return $this->code;
     }
 
-    public function path(): string
+    public function path()
     {
         return $this->path;
     }
