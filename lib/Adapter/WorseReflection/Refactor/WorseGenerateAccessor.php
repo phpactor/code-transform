@@ -75,11 +75,6 @@ class WorseGenerateAccessor implements GenerateAccessor
         return $info;
     }
 
-    private function filePathFromType(ClassName $className)
-    {
-        return $this->reflector->reflectClassLike($className)->sourceCode()->path();
-    }
-
     private function formatName(string $name)
     {
         if ($this->upperCaseFirst) {
