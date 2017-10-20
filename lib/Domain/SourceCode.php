@@ -20,12 +20,12 @@ final class SourceCode
         $this->path = $path;
     }
 
-    public static function fromString(string $code)
+    public static function fromString(string $code): SourceCode
     {
         return new self($code);
     }
 
-    public static function fromStringAndPath(string $code, string $path = null)
+    public static function fromStringAndPath(string $code, string $path = null): SourceCode
     {
         return new self($code, $path);
     }
@@ -33,6 +33,11 @@ final class SourceCode
     public function __toString()
     {
         return $this->code;
+    }
+
+    public function withSource(string $code): SourceCode
+    {
+        return new self($code, $this->path);
     }
 
     public function path()

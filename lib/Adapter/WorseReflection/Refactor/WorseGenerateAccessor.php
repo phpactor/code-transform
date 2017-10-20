@@ -53,9 +53,8 @@ class WorseGenerateAccessor implements GenerateAccessor
         $prototype = $this->buildPrototype($info);
         $sourceCode = $this->sourceFromSymbolInformation($info);
 
-        return SourceCode::fromStringAndPath(
-            (string) $this->updater->apply($prototype, Code::fromString((string) $sourceCode)),
-            $sourceCode->path()
+        return $sourceCode->withSource(
+            (string) $this->updater->apply($prototype, Code::fromString((string) $sourceCode))
         );
     }
 
