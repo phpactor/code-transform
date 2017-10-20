@@ -38,9 +38,11 @@ class WorseGenerateMethod implements GenerateMethod
     {
         $methodCall = $this->reflector->reflectMethodCall($sourceCode, $offset);
         $prototype = $this->generatePrototype($methodCall, $methodName);
+        $sourceCode = $methodCall->class()->sourceCode();
 
-        return SourceCode::fromString(
-            (string) $this->updater->apply($prototype, Code::fromString($sourceCode))
+        return SourceCode::fromStringAndPath(
+            (string) $this->updater->apply($prototype, Code::fromString((string) $sourceCode)),
+            $sourceCode->path()
         );
     }
 
@@ -73,5 +75,16 @@ class WorseGenerateMethod implements GenerateMethod
         }
 
         return $builder->build();
+    }
+
+    private function sourceFromSymbolInformation(SymbolInformation $info): SourceCode
+    {
+        $containingClass = $this->reflector->reflectClassLike($info->containerType()->className());
+        $worseSourceCode = $containingClass->sourceCode();
+
+        return SourceCode::fromStringAndPath(
+            $worseSourceCode->__toString(),
+            $worseSourceCode->path()
+        );
     }
 }
