@@ -56,20 +56,19 @@ class TolerantRenameVariable implements RenameVariable
 
     private function textEditsToRename(Node $scopeNode, Node $variable, string $newName): array
     {
+        $textEdits = [];
+
+        if ($textEdit = $this->textEditForRenameFromNode($variable, $scopeNode, $newName)) {
+            $textEdits[] = $textEdit;
+        }
+
         /** @var Node $node */
         foreach ($scopeNode->getDescendantNodes() as $node) {
-            if (
-                false === $node instanceof Variable &&
-                false === $node instanceof Parameter
-            ) {
+            if (null === $textEdit = $this->textEditForRenameFromNode($variable, $node, $newName)) {
                 continue;
             }
 
-            if ($node->getText() !== $variable->getText()) {
-                continue;
-            }
-
-            $textEdits[] = new TextEdit($node->getStart(), $node->getEndPosition() - $node->getStart(), '$' . $newName);
+            $textEdits[] = $textEdit;
         }
 
         return $textEdits;
@@ -92,4 +91,47 @@ class TolerantRenameVariable implements RenameVariable
 
         return $scopeNode;
     }
+
+    private function variableName(Node $variable)
+    {
+        if ($variable instanceof Parameter) {
+            $name = $variable->variableName->getText($variable->getFileContents());
+            return $name;
+        }
+            
+        return $variable->getText();
+    }
+
+    private function textEditForRenameFromNode(Node $variable, Node $node, string $newName)
+    {
+        if (
+            false === $node instanceof Variable &&
+            false === $node instanceof Parameter
+        ) {
+            return;
+        }
+
+        if ($this->variableName($variable) !== $this->variableName($node)) {
+            return;
+        }
+
+
+        if ($node instanceof Variable) {
+            return new TextEdit(
+                $node->getStart(),
+                $node->getEndPosition() - $node->getStart(),
+                '$' . $newName
+            );
+        }
+
+        if ($node instanceof Parameter) {
+            /** @var Parameter $node */
+            return new TextEdit(
+                $node->variableName->getStartPosition(),
+                $node->variableName->getEndPosition() - $node->variableName->getStartPosition(),
+                '$' . $newName
+            );
+        }
+    }
 }
+
