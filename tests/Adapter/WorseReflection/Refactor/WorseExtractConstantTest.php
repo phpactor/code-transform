@@ -4,6 +4,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseExtractConstant;
+use Phpactor\CodeTransform\Domain\SourceCode;
 
 class WorseExtractConstantTest extends WorseTestCase
 {
@@ -15,7 +16,7 @@ class WorseExtractConstantTest extends WorseTestCase
         list($source, $expected) = $this->splitInitialAndExpectedSource(__DIR__ . '/fixtures/' . $test);
 
         $extractConstant = new WorseExtractConstant($this->reflectorFor($source), $this->updater());
-        $transformed = $extractConstant->extractConstant($source, $start, $name);
+        $transformed = $extractConstant->extractConstant(SourceCode::fromString($source), $start, $name);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -54,5 +55,19 @@ class WorseExtractConstantTest extends WorseTestCase
                 'HOUR'
             ],
         ];
+    }
+
+    public function testNoClass()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Node does not belong to a class');
+
+        $code = <<<'EOT'
+<?php 1234;
+EOT
+        ;
+
+        $extractConstant = new WorseExtractConstant($this->reflectorFor($code), $this->updater());
+        $transformed = $extractConstant->extractConstant(SourceCode::fromString($code), 8, 'asd');
     }
 }

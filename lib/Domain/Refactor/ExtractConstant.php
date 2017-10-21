@@ -6,5 +6,5 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 
 interface ExtractConstant
 {
-    public function extractConstant(string $souceCode, int $offset, string $constantName): SourceCode;
+    public function extractConstant(SourceCode $souceCode, int $offset, string $constantName): SourceCode;
 }

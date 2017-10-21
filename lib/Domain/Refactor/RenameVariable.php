@@ -9,5 +9,5 @@ interface RenameVariable
     const SCOPE_LOCAL = 'local';
     const SCOPE_FILE = 'file';
 
-    public function renameVariable(string $source, int $offset, string $newName, string $scope = RenameVariable::SCOPE_FILE): SourceCode;
+    public function renameVariable(SourceCode $source, int $offset, string $newName, string $scope = RenameVariable::SCOPE_FILE): SourceCode;
 }

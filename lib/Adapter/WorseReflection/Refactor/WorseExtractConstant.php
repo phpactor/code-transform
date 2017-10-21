@@ -15,6 +15,7 @@ use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\TextEdit;
 use Phpactor\WorseReflection\Core\Inference\SymbolInformation;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\WorseReflection\Core\Type;
 
 class WorseExtractConstant implements ExtractConstant
 {
@@ -40,19 +41,18 @@ class WorseExtractConstant implements ExtractConstant
         $this->parser = $parser ?: new Parser();
     }
 
-    public function extractConstant(string $sourceCode, int $offset, string $constantName): SourceCode
+    public function extractConstant(SourceCode $sourceCode, int $offset, string $constantName): SourceCode
     {
         $symbolInformation = $this->reflector
-            ->reflectOffset($sourceCode, $offset)
+            ->reflectOffset($sourceCode->__toString(), $offset)
             ->symbolInformation();
 
         $sourceCode = $this->replaceValues($sourceCode, $offset, $constantName);
-        $sourceCode = $this->addConstant($sourceCode, $symbolInformation, $constantName);
 
-        return SourceCode::fromString((string) $sourceCode);
+        return $this->addConstant($sourceCode, $symbolInformation, $constantName);
     }
 
-    private function addConstant(string $sourceCode, SymbolInformation $symbolInformation, string $constantName)
+    private function addConstant(SourceCode $sourceCode, SymbolInformation $symbolInformation, string $constantName)
     {
         $symbol = $symbolInformation->symbol();
 
@@ -63,14 +63,12 @@ class WorseExtractConstant implements ExtractConstant
                 ->constant($constantName, $symbolInformation->value())
             ->end();
 
-        $sourceCode = $this->updater->apply($builder->build(), Code::fromString($sourceCode));
-
-        return $sourceCode;
+        return $sourceCode->withSource($this->updater->apply($builder->build(), Code::fromString($sourceCode)));
     }
 
-    private function replaceValues(string $sourceCode, int $offset, string $constantName)
+    private function replaceValues(SourceCode $sourceCode, int $offset, string $constantName): SourceCode
     {
-        $node = $this->parser->parseSourceFile($sourceCode);
+        $node = $this->parser->parseSourceFile($sourceCode->__toString());
         $targetNode = $node->getDescendantNodeAtPosition($offset);
         $targetValue = $this->getComparableValue($targetNode);
         $classNode = $targetNode->getFirstAncestor(ClassLike::class);
@@ -94,9 +92,7 @@ class WorseExtractConstant implements ExtractConstant
             }
         }
 
-        $sourceCode = TextEdit::applyEdits($textEdits, $sourceCode);
-
-        return $sourceCode;
+        return $sourceCode->withSource(TextEdit::applyEdits($textEdits, $sourceCode->__toString()));
     }
 
     private function getComparableValue(Node $node)

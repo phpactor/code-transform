@@ -5,6 +5,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\TolerantParser\Refactor;
 use Phpactor\CodeTransform\Tests\Adapter\TolerantParser\TolerantTestCase;
 use Phpactor\CodeTransform\Adapter\TolerantParser\Refactor\TolerantRenameVariable;
 use Phpactor\CodeTransform\Domain\Refactor\RenameVariable;
+use Phpactor\CodeTransform\Domain\SourceCode;
 
 class TolerantRenameVariableTest extends TolerantTestCase
 {
@@ -16,7 +17,7 @@ class TolerantRenameVariableTest extends TolerantTestCase
         list($source, $expected) = $this->splitInitialAndExpectedSource(__DIR__ . '/fixtures/' . $test);
 
         $renameVariable = new TolerantRenameVariable($this->parser());
-        $transformed = $renameVariable->renameVariable($source, $offset, $name, $scope);
+        $transformed = $renameVariable->renameVariable(SourceCode::fromString($source), $offset, $name, $scope);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
