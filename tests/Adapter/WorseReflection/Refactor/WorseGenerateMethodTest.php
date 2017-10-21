@@ -43,6 +43,10 @@ class WorseGenerateMethodTest extends WorseTestCase
                 'generateMethod5.test',
                 225,
             ],
+            'public accessor in another class' => [
+                'generateMethod6.test',
+                185,
+            ],
         ];
     }
 }

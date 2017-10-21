@@ -1,0 +1,40 @@
+<?php
+
+class anotherClass
+{
+}
+
+class generateMethod
+{
+    /**
+     * @var anotherClass
+     */
+    private $anotherClass;
+
+    public function name()
+    {
+        $this->anotherClass->someMethod('foobar');
+    }
+}
+========
+<?php
+
+class anotherClass
+{
+    public function someMethod(string $string)
+    {
+    }
+}
+
+class generateMethod
+{
+    /**
+     * @var anotherClass
+     */
+    private $anotherClass;
+
+    public function name()
+    {
+        $this->anotherClass->someMethod('foobar');
+    }
+}
