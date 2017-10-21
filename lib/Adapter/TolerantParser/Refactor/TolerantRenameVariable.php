@@ -20,9 +20,9 @@ class TolerantRenameVariable implements RenameVariable
      */
     private $parser;
 
-    public function __construct(Parser $parser)
+    public function __construct(Parser $parser = null)
     {
-        $this->parser = $parser;
+        $this->parser = $parser ?: new Parser();
     }
 
     public function renameVariable(string $source, int $offset, string $newName, string $scope = self::SCOPE_FILE): SourceCode
