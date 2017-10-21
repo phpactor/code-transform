@@ -16,6 +16,7 @@ use Phpactor\WorseReflection\Core\Inference\Variable;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClassLike;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethodCall;
 use Phpactor\WorseReflection\Core\Type;
+use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
 class WorseGenerateMethod implements GenerateMethod
 {
@@ -43,6 +44,7 @@ class WorseGenerateMethod implements GenerateMethod
     {
         $contextType = $this->contextType($sourceCode, $offset);
         $methodCall = $this->reflector->reflectMethodCall($sourceCode->__toString(), $offset);
+        $this->validate($methodCall);
         $visibility = $this->determineVisibility($contextType, $methodCall->class());
         $prototype = $this->generatePrototype($methodCall, $visibility, $methodName);
         $sourceCode = $this->resolveSourceCode($sourceCode, $methodCall, $visibility);
@@ -132,6 +134,16 @@ class WorseGenerateMethod implements GenerateMethod
         }
 
         return Visibility::public();
+    }
+
+    private function validate(ReflectionMethodCall $methodCall)
+    {
+        if (false === $methodCall->class()->isClass()) {
+            throw new TransformException(sprintf(
+                'Can only generate methods on classes (trying on %s)',
+                get_class($methodCall->class()->name())
+            ));
+        }
     }
 }
 

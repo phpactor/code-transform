@@ -5,6 +5,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseGenerateMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
 class WorseGenerateMethodTest extends WorseTestCase
 {
@@ -15,8 +16,7 @@ class WorseGenerateMethodTest extends WorseTestCase
     {
         list($source, $expected) = $this->splitInitialAndExpectedSource(__DIR__ . '/fixtures/' . $test);
 
-        $generateMethod = new WorseGenerateMethod($this->reflectorFor($source), $this->updater());
-        $transformed = $generateMethod->generateMethod(SourceCode::fromString($source), $start, $name);
+        $transformed = $this->generateMethod($source, $start, $name);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -50,4 +50,39 @@ class WorseGenerateMethodTest extends WorseTestCase
             ],
         ];
     }
+
+    public function testGenerateOnNonClassInterfaceException()
+    {
+        $this->expectException(TransformException::class);
+        $this->expectExceptionMessage('Can only generate methods on classes');
+        $source = <<<'EOT'
+<?php 
+interface Hello
+{
 }
+
+class Goodbye
+{
+    /**
+     * @var Hello
+     */
+    private $hello;
+
+    public function greet()
+    {
+        $this->hello->asd();
+    }
+}
+EOT
+        ;
+
+        $this->generateMethod($source, 156, 'test_name');
+    }
+
+    private function generateMethod(string $source, int $start, $name)
+    {
+        $generateMethod = new WorseGenerateMethod($this->reflectorFor($source), $this->updater());
+        return $generateMethod->generateMethod(SourceCode::fromString($source), $start, $name);
+    }
+}
+

@@ -12,6 +12,7 @@ use Phpactor\CodeTransform\Domain\Refactor\RenameVariable;
 use Microsoft\PhpParser\FunctionLike;
 use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\Node\Parameter;
+use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
 class TolerantRenameVariable implements RenameVariable
 {
@@ -45,7 +46,7 @@ class TolerantRenameVariable implements RenameVariable
         $node = $sourceNode->getDescendantNodeAtPosition($offset);
 
         if (false === $node instanceof Variable && false === $node instanceof Parameter) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new TransformException(sprintf(
                 'Expected Variable or Parameter node, got "%s"',
                 get_class($node)
             ));
@@ -83,7 +84,7 @@ class TolerantRenameVariable implements RenameVariable
         $scopeNode = $variable->getFirstAncestor(FunctionLike::class, ClassLike::class, SourceFileNode::class);
 
         if (null === $scopeNode) {
-            throw new \RuntimeException(
+            throw new TransformException(
                 'Could not determine scope node, this should not happen as ' .
                 'there should always be a SourceFileNode.'
             );

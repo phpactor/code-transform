@@ -12,6 +12,7 @@ use Phpactor\CodeTransform\Domain\Refactor\GenerateAccessor;
 use Phpactor\WorseReflection\Core\Inference\SymbolInformation;
 use Phpactor\WorseReflection\Core\Type;
 use Phpactor\WorseReflection\Core\ClassName;
+use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
 class WorseGenerateAccessor implements GenerateAccessor
 {
@@ -64,7 +65,7 @@ class WorseGenerateAccessor implements GenerateAccessor
         $info = $reflectionOffset->symbolInformation();
 
         if ($info->symbol()->symbolType() !== Symbol::PROPERTY) {
-            throw new \RuntimeException(sprintf(
+            throw new TransformException(sprintf(
                 'Symbol at offset "%s" is not a property, it is a symbol of type "%s"',
                 $offset,
                 $info->symbol()->symbolType()

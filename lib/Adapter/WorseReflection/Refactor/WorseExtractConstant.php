@@ -16,6 +16,7 @@ use Microsoft\PhpParser\TextEdit;
 use Phpactor\WorseReflection\Core\Inference\SymbolInformation;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Core\Type;
+use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
 class WorseExtractConstant implements ExtractConstant
 {
@@ -74,7 +75,7 @@ class WorseExtractConstant implements ExtractConstant
         $classNode = $targetNode->getFirstAncestor(ClassLike::class);
 
         if (null === $classNode) {
-            throw new \RuntimeException('Node does not belong to a class');
+            throw new TransformException('Node does not belong to a class');
         }
 
         $textEdits = [];
@@ -105,7 +106,7 @@ class WorseExtractConstant implements ExtractConstant
             return $node->getText();
         }
 
-        throw new \InvalidArgumentException(sprintf(
+        throw new TransformException(sprintf(
             'Do not know how to replace node of type "%s"',
             get_class($node)
         ));

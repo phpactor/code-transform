@@ -5,6 +5,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseExtractConstant;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
 class WorseExtractConstantTest extends WorseTestCase
 {
@@ -59,7 +60,7 @@ class WorseExtractConstantTest extends WorseTestCase
 
     public function testNoClass()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(TransformException::class);
         $this->expectExceptionMessage('Node does not belong to a class');
 
         $code = <<<'EOT'

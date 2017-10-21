@@ -5,6 +5,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseGenerateAccessor;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
 class WorseGenerateAccessorTest extends WorseTestCase
 {
@@ -51,7 +52,7 @@ class WorseGenerateAccessorTest extends WorseTestCase
 
     public function testNonProperty()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(TransformException::class);
         $this->expectExceptionMessage('Symbol at offset "9" is not a property');
         $source = '<?php echo "hello";';
 
