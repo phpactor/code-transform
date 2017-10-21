@@ -1,0 +1,45 @@
+<?php
+
+$foo;
+
+class MyClass
+{
+    public function thisIsSparta()
+    {
+        $foo = some_thing();
+
+        if ($foo == $bar) {
+            return $bar;
+        }
+
+        return $foo;
+    }
+
+    public function thisIsNothing()
+    {
+        $foo;
+    }
+}
+========
+<?php
+
+$foo;
+
+class MyClass
+{
+    public function thisIsSparta()
+    {
+        $newName = some_thing();
+
+        if ($newName == $bar) {
+            return $bar;
+        }
+
+        return $newName;
+    }
+
+    public function thisIsNothing()
+    {
+        $foo;
+    }
+}
