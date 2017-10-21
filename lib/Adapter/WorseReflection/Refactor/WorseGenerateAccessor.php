@@ -47,20 +47,20 @@ class WorseGenerateAccessor implements GenerateAccessor
         $this->upperCaseFirst = $upperCaseFirst;
     }
 
-    public function generateAccessor(string $sourceCode, int $offset): SourceCode
+    public function generateAccessor(SourceCode $sourceCode, int $offset): SourceCode
     {
         $info = $this->getInfo($sourceCode, $offset);
         $prototype = $this->buildPrototype($info);
-        $sourceCode = $this->sourceFromSymbolInformation($info);
+        $sourceCode = $this->sourceFromSymbolInformation($sourceCode, $info);
 
         return $sourceCode->withSource(
             (string) $this->updater->apply($prototype, Code::fromString((string) $sourceCode))
         );
     }
 
-    private function getInfo(string $sourceCode, int $offset): SymbolInformation
+    private function getInfo(SourceCode $sourceCode, int $offset): SymbolInformation
     {
-        $reflectionOffset = $this->reflector->reflectOffset($sourceCode, $offset);
+        $reflectionOffset = $this->reflector->reflectOffset($sourceCode->__toString(), $offset);
         $info = $reflectionOffset->symbolInformation();
 
         if ($info->symbol()->symbolType() !== Symbol::PROPERTY) {
@@ -99,10 +99,14 @@ class WorseGenerateAccessor implements GenerateAccessor
         return $builder->build();
     }
 
-    private function sourceFromSymbolInformation(SymbolInformation $info): SourceCode
+    private function sourceFromSymbolInformation(SourceCode $sourceCode, SymbolInformation $info): SourceCode
     {
         $containingClass = $this->reflector->reflectClassLike($info->containerType()->className());
         $worseSourceCode = $containingClass->sourceCode();
+
+        if ($worseSourceCode->path() == $sourceCode->path()) {
+            return $sourceCode;
+        }
 
         return SourceCode::fromStringAndPath(
             $worseSourceCode->__toString(),

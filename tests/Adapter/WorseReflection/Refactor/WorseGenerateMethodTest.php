@@ -4,6 +4,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseGenerateMethod;
+use Phpactor\CodeTransform\Domain\SourceCode;
 
 class WorseGenerateMethodTest extends WorseTestCase
 {
@@ -15,7 +16,7 @@ class WorseGenerateMethodTest extends WorseTestCase
         list($source, $expected) = $this->splitInitialAndExpectedSource(__DIR__ . '/fixtures/' . $test);
 
         $generateMethod = new WorseGenerateMethod($this->reflectorFor($source), $this->updater());
-        $transformed = $generateMethod->generateMethod($source, $start, $name);
+        $transformed = $generateMethod->generateMethod(SourceCode::fromString($source), $start, $name);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }

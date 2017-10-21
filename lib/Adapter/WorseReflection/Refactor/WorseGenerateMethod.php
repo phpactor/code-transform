@@ -39,10 +39,10 @@ class WorseGenerateMethod implements GenerateMethod
         $this->updater = $updater;
     }
 
-    public function generateMethod(string $sourceCode, int $offset, $methodName = null): SourceCode
+    public function generateMethod(SourceCode $sourceCode, int $offset, $methodName = null): SourceCode
     {
         $contextType = $this->contextType($sourceCode, $offset);
-        $methodCall = $this->reflector->reflectMethodCall($sourceCode, $offset);
+        $methodCall = $this->reflector->reflectMethodCall($sourceCode->__toString(), $offset);
         $visibility = $this->determineVisibility($contextType, $methodCall->class());
         $prototype = $this->generatePrototype($methodCall, $visibility, $methodName);
         $sourceCode = $this->resolveSourceCode($sourceCode, $methodCall, $visibility);
@@ -53,24 +53,26 @@ class WorseGenerateMethod implements GenerateMethod
         );
     }
 
-    private function resolveSourceCode(string $sourceCode, ReflectionMethodCall $methodCall, $visibility)
+    private function resolveSourceCode(SourceCode $sourceCode, ReflectionMethodCall $methodCall, $visibility)
     {
-        if ($visibility === Visibility::public()) {
-            $sourceCode = SourceCode::fromStringAndPath(
-                (string) $methodCall->class()->sourceCode(),
-                $methodCall->class()->sourceCode()->path()
-            );
+        $containerSourceCode = SourceCode::fromStringAndPath(
+            (string) $methodCall->class()->sourceCode(),
+            $methodCall->class()->sourceCode()->path()
+        );
+
+        if ($sourceCode->path() != $containerSourceCode->path()) {
+            return $containerSourceCode;
         }
 
-        return SourceCode::fromString($sourceCode);
+        return $sourceCode;
     }
 
     /**
      * @return ReflectionClassLike
      */
-    private function contextType(string $sourceCode, int $offset): Type
+    private function contextType(SourceCode $sourceCode, int $offset): Type
     {
-        $reflectionOffset = $this->reflector->reflectOffset($sourceCode, $offset);
+        $reflectionOffset = $this->reflector->reflectOffset($sourceCode->__toString(), $offset);
 
         /**
          * @var Variable $variable

@@ -4,6 +4,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseGenerateAccessor;
+use Phpactor\CodeTransform\Domain\SourceCode;
 
 class WorseGenerateAccessorTest extends WorseTestCase
 {
@@ -19,7 +20,7 @@ class WorseGenerateAccessorTest extends WorseTestCase
         list($source, $expected) = $this->splitInitialAndExpectedSource(__DIR__ . '/fixtures/' . $test);
 
         $generateAccessor = new WorseGenerateAccessor($this->reflectorFor($source), $this->updater(), $prefix, $upperCaseFirst);
-        $transformed = $generateAccessor->generateAccessor($source, $start);
+        $transformed = $generateAccessor->generateAccessor(SourceCode::fromString($source), $start);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -55,6 +56,6 @@ class WorseGenerateAccessorTest extends WorseTestCase
         $source = '<?php echo "hello";';
 
         $generateAccessor = new WorseGenerateAccessor($this->reflectorFor(''), $this->updater());
-        $generateAccessor->generateAccessor($source, 9);
+        $generateAccessor->generateAccessor(SourceCode::fromString($source), 9);
     }
 }
