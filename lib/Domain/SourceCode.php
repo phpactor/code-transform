@@ -2,6 +2,8 @@
 
 namespace Phpactor\CodeTransform\Domain;
 
+use Webmozart\PathUtil\Path;
+
 final class SourceCode
 {
     /**
@@ -17,7 +19,14 @@ final class SourceCode
     private function __construct(string $code, string $path = null)
     {
         $this->code = $code;
-        $this->path = $path;
+
+        if ($path && false === Path::isAbsolute($path)) {
+            throw new \RuntimeException(sprintf(
+                'Path "%s" must be absolute', $path
+            ));
+        }
+
+        $this->path = $path ? Path::canonicalize($path) : null;
     }
 
     public static function fromString(string $code): SourceCode

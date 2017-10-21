@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "phpactor/code-builder": "dev-master"
+        "phpactor/code-builder": "dev-master",
+        "webmozart/path-util": "^2.3@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.2",
