@@ -11,6 +11,7 @@ use Microsoft\PhpParser\Node;
 use Phpactor\CodeTransform\Domain\Refactor\RenameVariable;
 use Microsoft\PhpParser\FunctionLike;
 use Microsoft\PhpParser\ClassLike;
+use Microsoft\PhpParser\Node\Parameter;
 
 class TolerantRenameVariable implements RenameVariable
 {
@@ -27,7 +28,7 @@ class TolerantRenameVariable implements RenameVariable
     public function renameVariable(string $source, int $offset, string $newName, string $scope = self::SCOPE_FILE): SourceCode
     {
         $sourceNode = $this->sourceNode($source);
-        $variable = $this->variableFromSource($sourceNode, $offset);
+        $variable = $this->variableNodeFromSource($sourceNode, $offset);
         $scopeNode = $this->scopeNode($variable, $scope);
         $textEdits = $this->textEditsToRename($scopeNode, $variable, $newName);
 
@@ -39,16 +40,28 @@ class TolerantRenameVariable implements RenameVariable
         return $this->parser->parseSourceFile($source);
     }
 
-    private function variableFromSource(SourceFileNode $sourceNode, int $offset): Variable
+    private function variableNodeFromSource(SourceFileNode $sourceNode, int $offset): Node
     {
-        return $sourceNode->getDescendantNodeAtPosition($offset);
+        $node = $sourceNode->getDescendantNodeAtPosition($offset);
+
+        if (false === $node instanceof Variable && false === $node instanceof Parameter) {
+            throw new \InvalidArgumentException(sprintf(
+                'Expected Variable or Parameter node, got "%s"',
+                get_class($node)
+            ));
+        }
+
+        return $node;
     }
 
-    private function textEditsToRename(Node $scopeNode, Variable $variable, string $newName): array
+    private function textEditsToRename(Node $scopeNode, Node $variable, string $newName): array
     {
         /** @var Node $node */
         foreach ($scopeNode->getDescendantNodes() as $node) {
-            if (false === $node instanceof Variable) {
+            if (
+                false === $node instanceof Variable &&
+                false === $node instanceof Parameter
+            ) {
                 continue;
             }
 
@@ -62,7 +75,7 @@ class TolerantRenameVariable implements RenameVariable
         return $textEdits;
     }
 
-    private function scopeNode(Variable $variable, string $scope): Node
+    private function scopeNode(Node $variable, string $scope): Node
     {
         if ($scope === RenameVariable::SCOPE_FILE) {
             return $variable->getRoot();

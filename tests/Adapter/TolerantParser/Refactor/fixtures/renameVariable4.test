@@ -1,0 +1,19 @@
+<?php
+
+class MyClass
+{
+    public function thisIsSparta($foo)
+    {
+        $foo = some_thing();
+    }
+}
+========
+<?php
+
+class MyClass
+{
+    public function thisIsSparta($newName)
+    {
+        $newName = some_thing();
+    }
+}
