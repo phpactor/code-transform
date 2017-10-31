@@ -1,0 +1,8 @@
+<?php
+
+new Foobar();
+========
+<?php
+
+use Foobar;
+new Foobar();

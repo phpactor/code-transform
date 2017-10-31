@@ -11,7 +11,7 @@ abstract class AbstractCollection implements \IteratorAggregate
         foreach ($elements as $name => $element) {
             $type = $this->type();
             if (false === $element instanceof $type) {
-                throw new InvalidArgumentException(sprintf(
+                throw new \InvalidArgumentException(sprintf(
                     'Collection element must be instanceof "%s"',
                     $type
                 ));

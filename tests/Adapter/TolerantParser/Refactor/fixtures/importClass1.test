@@ -1,0 +1,16 @@
+<?php
+
+use DateTime;
+use Foo;
+use Bar;
+
+new Foobar();
+========
+<?php
+
+use DateTime;
+use Foo;
+use Bar;
+use Foobar;
+
+new Foobar();

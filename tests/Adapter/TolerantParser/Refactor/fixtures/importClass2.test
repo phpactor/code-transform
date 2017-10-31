@@ -1,0 +1,13 @@
+<?php
+
+namespace Barbar;
+
+new Foobar();
+========
+<?php
+
+namespace Barbar;
+
+use Foobar;
+
+new Foobar();
