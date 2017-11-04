@@ -12,7 +12,7 @@ use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\WorseReflection\Core\Reflection\Inference\Variable;
 
-class AddMissingAssignments implements Transformer
+class AddMissingProperties implements Transformer
 {
     /**
      * @var Reflector

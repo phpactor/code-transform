@@ -3,18 +3,18 @@
 namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Transformer;
 
 use Phpactor\CodeTransform\Domain\SourceCode;
-use Phpactor\CodeTransform\Adapter\WorseReflection\Transformer\AddMissingAssignments;
+use Phpactor\CodeTransform\Adapter\WorseReflection\Transformer\AddMissingProperties;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 
-class AddMissingAssignmentsTest extends WorseTestCase
+class AddMissingPropertiesTest extends WorseTestCase
 {
     /**
      * @dataProvider provideCompleteConstructor
      */
-    public function testAddMissingAssignments(string $example, string $expected)
+    public function testAddMissingProperties(string $example, string $expected)
     {
         $source = SourceCode::fromString($example);
-        $transformer = new AddMissingAssignments($this->reflectorFor($example), $this->updater());
+        $transformer = new AddMissingProperties($this->reflectorFor($example), $this->updater());
         $source = $transformer->transform($source);
         $this->assertEquals((string) $expected, (string) $source);
     }
@@ -32,7 +32,7 @@ EOT
 EOT
 
             ],
-            'It adds missing assignments' => [
+            'It adds missing properties' => [
                 <<<'EOT'
 <?php
 
@@ -63,7 +63,7 @@ class Foobar
 EOT
 
             ],
-            'It ignores existing assignments' => [
+            'It ignores existing properties' => [
                 <<<'EOT'
 <?php
 
@@ -99,7 +99,7 @@ class Foobar
 EOT
 
             ],
-            'It ignores existing assignments of a different visibility' => [
+            'It ignores existing properties of a different visibility' => [
                 <<<'EOT'
 <?php
 
@@ -134,7 +134,7 @@ class Foobar
 }
 EOT
             ],
-            'It appends new assignments' => [
+            'It appends new properties' => [
                 <<<'EOT'
 <?php
 
@@ -175,7 +175,7 @@ class Foobar
 }
 EOT
             ],
-            'It appends new assignments in a namespaced class' => [
+            'It appends new properties in a namespaced class' => [
                 <<<'EOT'
 <?php
 
@@ -220,7 +220,7 @@ class Foobar
 }
 EOT
             ],
-            'Assignments should only be taken from current class' => [
+            'Properties should only be taken from current class' => [
                 <<<'EOT'
 <?php
 
@@ -275,7 +275,7 @@ class Foobar extends Dodo
 }
 EOT
             ],
-            'It adds missing assignments using the imported type' => [
+            'It adds missing properties using the imported type' => [
                 <<<'EOT'
 <?php
 
@@ -310,7 +310,7 @@ class Foobar
 EOT
 
             ],
-            'It missing assignments with an untyped parameter' => [
+            'It missing properties with an untyped parameter' => [
                 <<<'EOT'
 <?php
 

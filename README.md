@@ -5,7 +5,7 @@ Class Transform
 
 Generate classes or transform them.
 
-- Add missing assignments.
+- Add missing properties.
 - Implement contracts.
 - Generate interface from class.
 - Complete constructor.

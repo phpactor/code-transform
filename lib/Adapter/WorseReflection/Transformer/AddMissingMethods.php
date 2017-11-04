@@ -11,7 +11,7 @@ use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 
-class AddMissingAssignments implements Transformer
+class AddMissingProperties implements Transformer
 {
     /**
      * @var Reflector
