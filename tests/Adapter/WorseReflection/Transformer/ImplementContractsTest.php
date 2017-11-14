@@ -284,7 +284,6 @@ EOT
 
 use Animals\Sound;
 
-
 interface Bird
 {
     public function chirp(): Sound;
@@ -430,6 +429,7 @@ EOT
 
 use Barfoo\Dirt;
 use Arg\Barg;
+
 
 interface Rabbit
 {

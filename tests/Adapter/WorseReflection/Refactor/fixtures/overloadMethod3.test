@@ -1,0 +1,29 @@
+<?php
+
+class ParentClass
+{
+    protected function barbar(string $foo, int $int)
+    {
+    }
+}
+
+class ChildClass extends ParentClass
+{
+}
+========
+<?php
+
+class ParentClass
+{
+    protected function barbar(string $foo, int $int)
+    {
+    }
+}
+
+class ChildClass extends ParentClass
+{
+    protected function barbar(string $foo, int $int)
+    {
+    }
+}
+
