@@ -13,33 +13,45 @@ use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
+use Phpactor\CodeBuilder\Domain\BuilderFactory;
 
 class WorseOverloadMethod implements OverloadMethod
 {
+    /**
+     * @var Updater
+     */
+    private $updater;
+
     /**
      * @var Reflector
      */
     private $reflector;
 
     /**
-     * @var Updater
+     * @var BuilderFactory
      */
-    private $updater;
+    private $factory;
 
-    public function __construct(Reflector $reflector, Updater $updater)
+    public function __construct(Reflector $reflector, BuilderFactory $factory, Updater $updater)
     {
-        $this->reflector = $reflector;
+        $this->factory = $factory;
         $this->updater = $updater;
+        $this->reflector = $reflector;
     }
 
     public function overloadMethod(SourceCode $source, string $className, string $methodName)
     {
-        $prototype = $this->getPrototype($className, $methodName);
+        $methodBuilder = $this->getMethodPrototype($className, $methodName);
+
+        $sourceBuilder = $this->factory->fromSource((string) $source);
+        $sourceBuilder->class($className)->add($methodBuilder);
+
+        $prototype = $sourceBuilder->build();
 
         return $this->updater->apply($prototype, Code::fromString((string) $source));
     }
 
-    private function getPrototype(string $className, string $methodName)
+    private function getMethodPrototype(string $className, string $methodName)
     {
         $class = $this->reflector->reflectClass($className);
 
@@ -50,41 +62,12 @@ class WorseOverloadMethod implements OverloadMethod
             ));
         }
 
+        $method = $class->methods()->get($methodName);
+
         /** @var ReflectionMethod $method */
-        $method = $class->parent()->methods()->get($methodName);
+        $builder = $this->factory->fromSource((string) $method->class()->sourceCode());
+        $methodBuilder = $builder->class($className)->method($methodName);
 
-        $builder = SourceCodeBuilder::create();
-        $classPrototype = $builder
-            ->namespace((string) $class->name()->namespace())
-            ->class($class->name()->short());
-
-        $methodPrototype = $classPrototype->method($methodName);
-        $methodPrototype->visibility((string) $method->visibility());
-
-        /** @var ReflectionParameter $parameter */
-        foreach ($method->parameters() as $parameter) {
-            $parameterPrototype = $methodPrototype->parameter($parameter->name());
-
-            if ($parameter->default()->isDefined()) {
-                $parameterPrototype->defaultValue($parameter->default()->value());
-            }
-
-            if ($parameter->type()->isDefined()) {
-                if ($parameter->type()->isClass() && $parameter->type()->className()->namespace() != $class->name()->namespace()) {
-                    $builder->use((string) $parameter->type());
-                }
-
-                $parameterPrototype->type((string) $parameter->type()->short());
-            }
-        }
-
-        if ($method->returnType()->isDefined()) {
-            if ($method->returnType()->isClass() && $method->returnType()->className()->namespace() != $class->name()->namespace()) {
-                $builder->use((string) $method->returnType());
-            }
-            $methodPrototype->returnType($method->returnType()->short());
-        }
-
-        return $builder->build();
+        return $methodBuilder;
     }
 }

@@ -7,6 +7,7 @@ use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseGenerateMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseOverloadMethod;
+use Phpactor\CodeBuilder\Adapter\WorseReflection\WorseBuilderFactory;
 
 class WorseOverloadMethodTest extends WorseTestCase
 {
@@ -56,7 +57,9 @@ class WorseOverloadMethodTest extends WorseTestCase
 
     private function overloadMethod($source, string $className, $methodName)
     {
-        $overload = new WorseOverloadMethod($this->reflectorFor($source), $this->updater());
+        $reflector = $this->reflectorFor($source);
+        $factory = new WorseBuilderFactory($reflector);
+        $overload = new WorseOverloadMethod($reflector, $factory, $this->updater());
         return $overload->overloadMethod(SourceCode::fromString($source), $className, $methodName);
     }
 }
