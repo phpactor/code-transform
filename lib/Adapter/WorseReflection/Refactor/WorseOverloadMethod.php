@@ -41,24 +41,23 @@ class WorseOverloadMethod implements OverloadMethod
 
     public function overloadMethod(SourceCode $source, string $className, string $methodName)
     {
-        $methodBuilder = $this->getMethodPrototype($className, $methodName);
+        $class = $this->reflector->reflectClass($className);
+        $methodBuilder = $this->getMethodPrototype($class, $methodName);
 
         $sourceBuilder = $this->factory->fromSource((string) $source);
-        $sourceBuilder->class($className)->add($methodBuilder);
+        $sourceBuilder->class($class->name()->short())->add($methodBuilder);
 
         $prototype = $sourceBuilder->build();
 
         return $this->updater->apply($prototype, Code::fromString((string) $source));
     }
 
-    private function getMethodPrototype(string $className, string $methodName)
+    private function getMethodPrototype(ReflectionClass $class, string $methodName)
     {
-        $class = $this->reflector->reflectClass($className);
-
         if (null === $class->parent()) {
             throw new TransformException(sprintf(
                 'Class "%s" has no parent, cannot overload anything',
-                $className
+                $class->name()
             ));
         }
 
@@ -66,7 +65,7 @@ class WorseOverloadMethod implements OverloadMethod
 
         /** @var ReflectionMethod $method */
         $builder = $this->factory->fromSource((string) $method->class()->sourceCode());
-        $methodBuilder = $builder->class($className)->method($methodName);
+        $methodBuilder = $builder->class($class->name()->short())->method($methodName);
 
         return $methodBuilder;
     }
