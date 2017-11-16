@@ -61,11 +61,11 @@ class WorseOverloadMethod implements OverloadMethod
             ));
         }
 
-        $method = $class->methods()->get($methodName);
+        $method = $class->parent()->methods()->get($methodName);
 
         /** @var ReflectionMethod $method */
         $builder = $this->factory->fromSource((string) $method->class()->sourceCode());
-        $methodBuilder = $builder->class($class->name()->short())->method($methodName);
+        $methodBuilder = $builder->class($class->parent()->name()->short())->method($methodName);
 
         return $methodBuilder;
     }

@@ -46,6 +46,11 @@ class WorseOverloadMethodTest extends WorseTestCase
                 'ChildClass',
                 'barbar'
             ],
+            'parent class with > 1 method' => [
+                'overloadMethod5.test',
+                'ChildClass',
+                'barbar'
+            ],
         ];
     }
 
