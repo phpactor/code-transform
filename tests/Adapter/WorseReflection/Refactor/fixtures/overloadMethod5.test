@@ -1,0 +1,37 @@
+<?php
+
+class ParentClass
+{
+    protected function booboo()
+    {
+    }
+
+    protected function barbar()
+    {
+    }
+}
+
+class ChildClass extends ParentClass
+{
+}
+========
+<?php
+
+class ParentClass
+{
+    protected function booboo()
+    {
+    }
+
+    protected function barbar()
+    {
+    }
+}
+
+class ChildClass extends ParentClass
+{
+    protected function barbar()
+    {
+    }
+}
+
