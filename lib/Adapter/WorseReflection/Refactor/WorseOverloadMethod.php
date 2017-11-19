@@ -41,18 +41,35 @@ class WorseOverloadMethod implements OverloadMethod
 
     public function overloadMethod(SourceCode $source, string $className, string $methodName)
     {
-        $class = $this->reflector->reflectClass($className);
-        $methodBuilder = $this->getMethodPrototype($class, $methodName);
+        $class = $this->getReflectionClass($className);
+        $method = $this->getAncestorReflectionMethod($class, $methodName);
 
-        $sourceBuilder = $this->factory->fromSource((string) $source);
-        $sourceBuilder->class($class->name()->short())->add($methodBuilder);
+        $methodBuilder = $this->getMethodPrototype($class, $method, $methodName);
+        $sourcePrototype = $this->getSourcePrototype($class, $method, $source, $methodBuilder);
 
-        $prototype = $sourceBuilder->build();
-
-        return $this->updater->apply($prototype, Code::fromString((string) $source));
+        return $this->updater->apply($sourcePrototype, Code::fromString((string) $source));
     }
 
-    private function getMethodPrototype(ReflectionClass $class, string $methodName)
+    private function getReflectionClass(string $className): ReflectionClass
+    {
+        $class = $this->reflector->reflectClass($className);
+
+        return $class;
+    }
+
+    private function getMethodPrototype(ReflectionClass $class, ReflectionMethod $method)
+    {
+        /** @var ReflectionMethod $method */
+        $builder = $this->factory->fromSource(
+            (string) $method->class()->sourceCode()
+        );
+
+        $methodBuilder = $builder->class($method->declaringClass()->name()->short())->method($method->name());
+
+        return $methodBuilder;
+    }
+
+    private function getAncestorReflectionMethod(ReflectionClass $class, string $methodName): ReflectionMethod
     {
         if (null === $class->parent()) {
             throw new TransformException(sprintf(
@@ -61,12 +78,42 @@ class WorseOverloadMethod implements OverloadMethod
             ));
         }
 
-        $method = $class->parent()->methods()->get($methodName);
+        return $class->parent()->methods()->get($methodName);
+    }
 
-        /** @var ReflectionMethod $method */
-        $builder = $this->factory->fromSource((string) $method->class()->sourceCode());
-        $methodBuilder = $builder->class($class->parent()->name()->short())->method($methodName);
+    private function getSourcePrototype(ReflectionClass $class, ReflectionMethod $method, SourceCode $source, $methodBuilder)
+    {
+        $sourceBuilder = $this->factory->fromSource((string) $source);
+        $sourceBuilder->class($class->name()->short())->add($methodBuilder);
+        $this->importClasses($class, $method, $sourceBuilder);
 
-        return $methodBuilder;
+        return $sourceBuilder->build();
+    }
+
+    private function importClasses(ReflectionClass $class, ReflectionMethod $method, SourceCodeBuilder $sourceBuilder)
+    {
+        $usedClasses = [];
+
+        if ($method->returnType()->isDefined() && $method->returnType()->isClass()) {
+            $usedClasses[] = $method->returnType();
+        }
+
+        /**
+         * @var ReflectionParameter $parameter */
+        foreach ($method->parameters() as $parameter) {
+            if (false === $parameter->type()->isDefined() || false === $parameter->type()->isClass()) {
+                continue;
+            }
+
+            $usedClasses[] = $parameter->type();
+        }
+
+        foreach ($usedClasses as $usedClass) {
+            if ($class->name()->namespace() == $usedClass->className()->namespace()) {
+                continue;
+            }
+
+            $sourceBuilder->use((string) $usedClass);
+        }
     }
 }
