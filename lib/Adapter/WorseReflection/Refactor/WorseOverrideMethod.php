@@ -2,7 +2,7 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
-use Phpactor\CodeTransform\Domain\Refactor\OverloadMethod;
+use Phpactor\CodeTransform\Domain\Refactor\OverrideMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\ClassName;
 use Phpactor\WorseReflection\Reflector;
@@ -15,7 +15,7 @@ use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
 
-class WorseOverloadMethod implements OverloadMethod
+class WorseOverrideMethod implements OverrideMethod
 {
     /**
      * @var Updater
@@ -39,7 +39,7 @@ class WorseOverloadMethod implements OverloadMethod
         $this->reflector = $reflector;
     }
 
-    public function overloadMethod(SourceCode $source, string $className, string $methodName)
+    public function overrideMethod(SourceCode $source, string $className, string $methodName)
     {
         $class = $this->getReflectionClass($className);
         $method = $this->getAncestorReflectionMethod($class, $methodName);
@@ -73,7 +73,7 @@ class WorseOverloadMethod implements OverloadMethod
     {
         if (null === $class->parent()) {
             throw new TransformException(sprintf(
-                'Class "%s" has no parent, cannot overload anything',
+                'Class "%s" has no parent, cannot override any method',
                 $class->name()
             ));
         }
