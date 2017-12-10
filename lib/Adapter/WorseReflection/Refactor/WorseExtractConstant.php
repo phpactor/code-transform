@@ -13,7 +13,7 @@ use Microsoft\PhpParser\Node\StringLiteral;
 use Microsoft\PhpParser\Node\NumericLiteral;
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\TextEdit;
-use Phpactor\WorseReflection\Core\Inference\SymbolInformation;
+use Phpactor\WorseReflection\Core\Inference\SymbolContext;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Core\Type;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
@@ -53,7 +53,7 @@ class WorseExtractConstant implements ExtractConstant
         return $this->addConstant($sourceCode, $symbolInformation, $constantName);
     }
 
-    private function addConstant(SourceCode $sourceCode, SymbolInformation $symbolInformation, string $constantName)
+    private function addConstant(SourceCode $sourceCode, SymbolContext $symbolInformation, string $constantName)
     {
         $symbol = $symbolInformation->symbol();
 

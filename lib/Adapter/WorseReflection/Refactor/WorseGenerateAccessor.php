@@ -9,7 +9,7 @@ use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\CodeTransform\Domain\Refactor\GenerateAccessor;
-use Phpactor\WorseReflection\Core\Inference\SymbolInformation;
+use Phpactor\WorseReflection\Core\Inference\SymbolContext;
 use Phpactor\WorseReflection\Core\Type;
 use Phpactor\WorseReflection\Core\ClassName;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
@@ -59,7 +59,7 @@ class WorseGenerateAccessor implements GenerateAccessor
         );
     }
 
-    private function getInfo(SourceCode $sourceCode, int $offset): SymbolInformation
+    private function getInfo(SourceCode $sourceCode, int $offset): SymbolContext
     {
         $reflectionOffset = $this->reflector->reflectOffset($sourceCode->__toString(), $offset);
         $info = $reflectionOffset->symbolInformation();
@@ -84,7 +84,7 @@ class WorseGenerateAccessor implements GenerateAccessor
         return $this->prefix . $name;
     }
 
-    private function buildPrototype(SymbolInformation $info)
+    private function buildPrototype(SymbolContext $info)
     {
         $builder = SourceCodeBuilder::create();
         $builder->namespace($info->containerType()->className()->namespace());
@@ -100,7 +100,7 @@ class WorseGenerateAccessor implements GenerateAccessor
         return $builder->build();
     }
 
-    private function sourceFromSymbolInformation(SourceCode $sourceCode, SymbolInformation $info): SourceCode
+    private function sourceFromSymbolInformation(SourceCode $sourceCode, SymbolContext $info): SourceCode
     {
         $containingClass = $this->reflector->reflectClassLike($info->containerType()->className());
         $worseSourceCode = $containingClass->sourceCode();
