@@ -105,7 +105,12 @@ class WorseGenerateMethod implements GenerateMethod
         $methodName = $methodName ?: $methodCall->name();
 
         $reflectionClass = $methodCall->class();
-        $classBuilder = $builder->class($reflectionClass->name());
+
+        if ($reflectionClass->isClass()) {
+            $classBuilder = $builder->class($reflectionClass->name());
+        } else {
+            $classBuilder = $builder->interface($reflectionClass->name());
+        }
 
         $methodBuilder = $classBuilder->method($methodName);
         $methodBuilder->visibility((string) $visibility);
@@ -152,9 +157,9 @@ class WorseGenerateMethod implements GenerateMethod
 
     private function validate(ReflectionMethodCall $methodCall)
     {
-        if (false === $methodCall->class()->isClass()) {
+        if (false === $methodCall->class()->isClass() && false === $methodCall->class()->isInterface()) {
             throw new TransformException(sprintf(
-                'Can only generate methods on classes (trying on %s)',
+                'Can only generate methods on classes or intefaces (trying on %s)',
                 get_class($methodCall->class()->name())
             ));
         }

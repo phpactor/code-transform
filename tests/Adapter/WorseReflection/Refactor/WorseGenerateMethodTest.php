@@ -49,10 +49,10 @@ class WorseGenerateMethodTest extends WorseTestCase
                 'generateMethod6.test',
                 185,
             ],
-//            'public accessor on interface' => [
-//                'generateMethod7.test',
-//                190,
-//            ],
+            'public accessor on interface' => [
+                'generateMethod7.test',
+                190,
+            ],
         ];
     }
 
@@ -62,7 +62,7 @@ class WorseGenerateMethodTest extends WorseTestCase
         $this->expectExceptionMessage('Can only generate methods on classes');
         $source = <<<'EOT'
 <?php 
-interface Hello
+trait Hello
 {
 }
 
@@ -81,7 +81,7 @@ class Goodbye
 EOT
         ;
 
-        $this->generateMethod($source, 156, 'test_name');
+        $this->generateMethod($source, 152, 'test_name');
     }
 
     private function generateMethod(string $source, int $start, $name)
