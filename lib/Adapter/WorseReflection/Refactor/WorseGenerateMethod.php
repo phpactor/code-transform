@@ -52,9 +52,7 @@ class WorseGenerateMethod implements GenerateMethod
         $this->validate($methodCall);
         $visibility = $this->determineVisibility($contextType, $methodCall->class());
 
-        $builder = $this->factory->fromSource((string) $sourceCode);
-
-        $prototype = $this->addMethodCallToBuilder($builder, $methodCall, $visibility, $methodName);
+        $prototype = $this->addMethodCallToBuilder($methodCall, $visibility, $methodName);
         $sourceCode = $this->resolveSourceCode($sourceCode, $methodCall, $visibility);
 
         return SourceCode::fromStringAndPath(
@@ -93,14 +91,15 @@ class WorseGenerateMethod implements GenerateMethod
     }
 
     private function addMethodCallToBuilder(
-        SourceCodeBuilder $builder,
         ReflectionMethodCall $methodCall,
         Visibility $visibility,
         $methodName
     ) {
+
         $methodName = $methodName ?: $methodCall->name();
 
         $reflectionClass = $methodCall->class();
+        $builder = $this->factory->fromSource((string) $reflectionClass->sourceCode());
 
         if ($reflectionClass->isClass()) {
             $classBuilder = $builder->class($reflectionClass->name()->short());
