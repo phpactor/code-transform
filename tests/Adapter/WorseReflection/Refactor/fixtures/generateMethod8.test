@@ -1,0 +1,28 @@
+<?php
+
+namespace Foobar;
+
+class generateMethod
+{
+    public function name()
+    {
+        $this->foobar();
+    }
+}
+========
+<?php
+
+namespace Foobar;
+
+class generateMethod
+{
+    public function name()
+    {
+        $this->foobar();
+    }
+
+    private function foobar()
+    {
+    }
+}
+

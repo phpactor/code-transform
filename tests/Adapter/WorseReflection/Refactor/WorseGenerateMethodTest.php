@@ -53,6 +53,10 @@ class WorseGenerateMethodTest extends WorseTestCase
                 'generateMethod7.test',
                 190,
             ],
+            'public accessor on interface with namespace' => [
+                'generateMethod8.test',
+                98,
+            ],
         ];
     }
 
