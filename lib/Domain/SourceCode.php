@@ -22,7 +22,8 @@ final class SourceCode
 
         if ($path && false === Path::isAbsolute($path)) {
             throw new \RuntimeException(sprintf(
-                'Path "%s" must be absolute', $path
+                'Path "%s" must be absolute',
+                $path
             ));
         }
 
@@ -54,4 +55,3 @@ final class SourceCode
         return $this->path;
     }
 }
-

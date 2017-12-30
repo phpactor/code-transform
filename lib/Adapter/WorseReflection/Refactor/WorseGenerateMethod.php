@@ -8,17 +8,14 @@ use Phpactor\CodeBuilder\Domain\Prototype\Visibility;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeTransform\Domain\Refactor\GenerateMethod;
 use Phpactor\WorseReflection\Reflector;
-use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\AbstractReflectionMethodCall;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionArgument;
 use Phpactor\CodeTransform\Domain\SourceCode;
-use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\WorseReflection\Core\Inference\Variable;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClassLike;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethodCall;
 use Phpactor\WorseReflection\Core\Type;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
-use Phpactor\CodeBuilder\Domain\Builder\Builder;
 
 class WorseGenerateMethod implements GenerateMethod
 {
@@ -100,8 +97,7 @@ class WorseGenerateMethod implements GenerateMethod
         ReflectionMethodCall $methodCall,
         Visibility $visibility,
         $methodName
-    )
-    {
+    ) {
         $methodName = $methodName ?: $methodCall->name();
 
         $reflectionClass = $methodCall->class();
