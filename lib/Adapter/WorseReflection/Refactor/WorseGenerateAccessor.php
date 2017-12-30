@@ -11,7 +11,6 @@ use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\CodeTransform\Domain\Refactor\GenerateAccessor;
 use Phpactor\WorseReflection\Core\Inference\SymbolContext;
 use Phpactor\WorseReflection\Core\Type;
-use Phpactor\WorseReflection\Core\ClassName;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
 class WorseGenerateAccessor implements GenerateAccessor

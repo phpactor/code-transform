@@ -8,15 +8,14 @@ use Phpactor\CodeBuilder\Domain\Prototype\Visibility;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeTransform\Domain\Refactor\GenerateMethod;
 use Phpactor\WorseReflection\Reflector;
-use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\AbstractReflectionMethodCall;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionArgument;
 use Phpactor\CodeTransform\Domain\SourceCode;
-use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\WorseReflection\Core\Inference\Variable;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClassLike;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethodCall;
 use Phpactor\WorseReflection\Core\Type;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
+use Phpactor\CodeBuilder\Domain\BuilderFactory;
 
 class WorseGenerateMethod implements GenerateMethod
 {
@@ -34,10 +33,16 @@ class WorseGenerateMethod implements GenerateMethod
      */
     private $methodSuffixIndex = 0;
 
-    public function __construct(Reflector $reflector, Updater $updater)
+    /**
+     * @var BuilderFactory
+     */
+    private $factory;
+
+    public function __construct(Reflector $reflector, BuilderFactory $factory, Updater $updater)
     {
         $this->reflector = $reflector;
         $this->updater = $updater;
+        $this->factory = $factory;
     }
 
     public function generateMethod(SourceCode $sourceCode, int $offset, $methodName = null): SourceCode
@@ -46,7 +51,10 @@ class WorseGenerateMethod implements GenerateMethod
         $methodCall = $this->reflector->reflectMethodCall($sourceCode->__toString(), $offset);
         $this->validate($methodCall);
         $visibility = $this->determineVisibility($contextType, $methodCall->class());
-        $prototype = $this->generatePrototype($methodCall, $visibility, $methodName);
+
+        $builder = $this->factory->fromSource((string) $sourceCode);
+
+        $prototype = $this->addMethodCallToBuilder($builder, $methodCall, $visibility, $methodName);
         $sourceCode = $this->resolveSourceCode($sourceCode, $methodCall, $visibility);
 
         return SourceCode::fromStringAndPath(
@@ -84,15 +92,22 @@ class WorseGenerateMethod implements GenerateMethod
         }
     }
 
-    private function generatePrototype(ReflectionMethodCall $methodCall, Visibility $visibility, $methodName)
-    {
+    private function addMethodCallToBuilder(
+        SourceCodeBuilder $builder,
+        ReflectionMethodCall $methodCall,
+        Visibility $visibility,
+        $methodName
+    ) {
         $methodName = $methodName ?: $methodCall->name();
 
         $reflectionClass = $methodCall->class();
-        $builder = SourceCodeBuilder::create();
-        $builder->namespace((string) $reflectionClass->name()->namespace());
 
-        $classBuilder = $builder->class((string) $reflectionClass->name()->short());
+        if ($reflectionClass->isClass()) {
+            $classBuilder = $builder->class($reflectionClass->name());
+        } else {
+            $classBuilder = $builder->interface($reflectionClass->name());
+        }
+
         $methodBuilder = $classBuilder->method($methodName);
         $methodBuilder->visibility((string) $visibility);
 
@@ -138,12 +153,11 @@ class WorseGenerateMethod implements GenerateMethod
 
     private function validate(ReflectionMethodCall $methodCall)
     {
-        if (false === $methodCall->class()->isClass()) {
+        if (false === $methodCall->class()->isClass() && false === $methodCall->class()->isInterface()) {
             throw new TransformException(sprintf(
-                'Can only generate methods on classes (trying on %s)',
+                'Can only generate methods on classes or intefaces (trying on %s)',
                 get_class($methodCall->class()->name())
             ));
         }
     }
 }
-
