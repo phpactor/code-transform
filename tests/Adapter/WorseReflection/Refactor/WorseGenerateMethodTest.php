@@ -6,6 +6,7 @@ use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseGenerateMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
+use Phpactor\CodeBuilder\Adapter\WorseReflection\WorseBuilderFactory;
 
 class WorseGenerateMethodTest extends WorseTestCase
 {
@@ -48,6 +49,10 @@ class WorseGenerateMethodTest extends WorseTestCase
                 'generateMethod6.test',
                 185,
             ],
+//            'public accessor on interface' => [
+//                'generateMethod7.test',
+//                190,
+//            ],
         ];
     }
 
@@ -81,7 +86,9 @@ EOT
 
     private function generateMethod(string $source, int $start, $name)
     {
-        $generateMethod = new WorseGenerateMethod($this->reflectorFor($source), $this->updater());
+        $reflector = $this->reflectorFor($source);
+        $factory = new WorseBuilderFactory($reflector);
+        $generateMethod = new WorseGenerateMethod($reflector, $factory, $this->updater());
         return $generateMethod->generateMethod(SourceCode::fromString($source), $start, $name);
     }
 }
