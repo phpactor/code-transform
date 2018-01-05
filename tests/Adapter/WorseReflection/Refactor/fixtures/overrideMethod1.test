@@ -1,3 +1,5 @@
+// File: source
+
 <?php
 
 class ParentClass
@@ -10,7 +12,7 @@ class ParentClass
 class ChildClass extends ParentClass
 {
 }
-========
+// File: expected
 <?php
 
 class ParentClass

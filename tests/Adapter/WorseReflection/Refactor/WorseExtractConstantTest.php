@@ -6,18 +6,19 @@ use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseExtractConstant;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
+use Phpactor\TestUtils\ExtractOffset;
 
 class WorseExtractConstantTest extends WorseTestCase
 {
     /**
      * @dataProvider provideExtractMethod
      */
-    public function testExtractConstant(string $test, int $start, $name)
+    public function testExtractConstant(string $test, $name)
     {
-        list($source, $expected) = $this->splitInitialAndExpectedSource(__DIR__ . '/fixtures/' . $test);
+        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
         $extractConstant = new WorseExtractConstant($this->reflectorFor($source), $this->updater());
-        $transformed = $extractConstant->extractConstant(SourceCode::fromString($source), $start, $name);
+        $transformed = $extractConstant->extractConstant(SourceCode::fromString($source), $offset, $name);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -27,32 +28,26 @@ class WorseExtractConstantTest extends WorseTestCase
         return [
             'string' => [
                 'extractConstant1.test',
-                88,
                 'HELLO_WORLD'
             ],
             'numeric' => [
                 'extractConstant2.test',
-                83,
                 'HELLO_WORLD'
             ],
             'array_key' => [
                 'extractConstant3.test',
-                83,
                 'HELLO_WORLD'
             ],
             'namespaced' => [
                 'extractConstant4.test',
-                102,
                 'HELLO_WORLD'
             ],
             'replace all' => [
                 'extractConstant5.test',
-                83,
                 'HELLO_WORLD'
             ],
             'replace all numeric' => [
                 'extractConstant6.test',
-                79,
                 'HOUR'
             ],
         ];

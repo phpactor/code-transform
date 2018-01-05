@@ -1,10 +1,11 @@
+// File: source
 <?php
 
 class extractMethod5
 {
     public function bigMethod()
     {
-        3600;
+        36<>00;
     }
 
     public function smallMethod()
@@ -13,7 +14,7 @@ class extractMethod5
         3600;
     }
 }
-========
+// File: expected
 <?php
 
 class extractMethod5

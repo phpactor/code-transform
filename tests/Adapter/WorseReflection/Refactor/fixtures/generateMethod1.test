@@ -1,13 +1,15 @@
+// File: source
+
 <?php
 
 class generateMethod
 {
     public function name()
     {
-        $this->foobar();
+        $this->f<>oobar();
     }
 }
-========
+// File: expected
 <?php
 
 class generateMethod

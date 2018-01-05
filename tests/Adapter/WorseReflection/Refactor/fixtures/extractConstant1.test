@@ -1,13 +1,14 @@
+// File: source
 <?php
 
 class extractMethod1
 {
     public function bigMethod()
     {
-        echo 'hello_world';
+        echo '<>hello_world';
     }
 }
-========
+// File: expected
 <?php
 
 class extractMethod1

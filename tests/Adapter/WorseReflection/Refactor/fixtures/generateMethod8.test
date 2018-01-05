@@ -1,3 +1,5 @@
+// File: source
+
 <?php
 
 namespace Foobar;
@@ -6,10 +8,10 @@ class generateMethod
 {
     public function name()
     {
-        $this->foobar();
+        $this->fo<>obar();
     }
 }
-========
+// File: expected
 <?php
 
 namespace Foobar;

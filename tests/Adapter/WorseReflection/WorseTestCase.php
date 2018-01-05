@@ -6,6 +6,7 @@ use Phpactor\CodeTransform\Tests\Adapter\AdapterTestCase;
 use Phpactor\WorseReflection\Core\SourceCode;
 use Phpactor\WorseReflection\Core\SourceCodeLocator\StringSourceLocator;
 use Phpactor\WorseReflection\Reflector;
+use Phpactor\TestUtils\Workspace;
 
 class WorseTestCase extends AdapterTestCase
 {

@@ -1,13 +1,14 @@
+// File: source
 <?php
 
 class extractMethod3
 {
     public function bigMethod()
     {
-        $foo['1234'];
+        $foo['12<>34'];
     }
 }
-========
+// File: expected
 <?php
 
 class extractMethod3

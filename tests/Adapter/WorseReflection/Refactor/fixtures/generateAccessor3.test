@@ -1,3 +1,5 @@
+// File: source
+
 <?php
 
 class generateMethod
@@ -5,9 +7,9 @@ class generateMethod
     /**
      * @var Type1
      */
-    private $method;
+    private $met<>hod;
 }
-========
+// File: expected
 <?php
 
 class generateMethod

@@ -13,11 +13,11 @@ class WorseGenerateMethodTest extends WorseTestCase
     /**
      * @dataProvider provideExtractMethod
      */
-    public function testGenerateMethod(string $test, int $start, $name = null)
+    public function testGenerateMethod(string $test, $name = null)
     {
-        list($source, $expected) = $this->splitInitialAndExpectedSource(__DIR__ . '/fixtures/' . $test);
+        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
-        $transformed = $this->generateMethod($source, $start, $name);
+        $transformed = $this->generateMethod($source, $offset, $name);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -27,35 +27,27 @@ class WorseGenerateMethodTest extends WorseTestCase
         return [
             'string' => [
                 'generateMethod1.test',
-                82,
             ],
             'parameter' => [
                 'generateMethod2.test',
-                82,
             ],
             'typed parameter' => [
                 'generateMethod3.test',
-                90,
             ],
             'undeclared parameter' => [
                 'generateMethod4.test',
-                79,
             ],
             'expression' => [
                 'generateMethod5.test',
-                225,
             ],
             'public accessor in another class' => [
                 'generateMethod6.test',
-                185,
             ],
             'public accessor on interface' => [
                 'generateMethod7.test',
-                190,
             ],
             'public accessor on interface with namespace' => [
                 'generateMethod8.test',
-                98,
             ],
         ];
     }

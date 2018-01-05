@@ -1,3 +1,5 @@
+// File: source
+
 <?php
 
 class anotherClass
@@ -16,10 +18,10 @@ class generateMethod
 
     public function name()
     {
-        $this->barfoo($this->anotherClass->someMethod());
+        $this->b<>arfoo($this->anotherClass->someMethod());
     }
 }
-========
+// File: expected
 <?php
 
 class anotherClass

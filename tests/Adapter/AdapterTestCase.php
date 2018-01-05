@@ -5,6 +5,8 @@ namespace Phpactor\CodeTransform\Tests\Adapter;
 use Phpactor\CodeBuilder\Adapter\Twig\TwigRenderer;
 use Phpactor\CodeBuilder\Adapter\TolerantParser\TolerantUpdater;
 use PHPUnit\Framework\TestCase;
+use Phpactor\TestUtils\Workspace;
+use Phpactor\TestUtils\ExtractOffset;
 
 class AdapterTestCase extends TestCase
 {
@@ -18,26 +20,27 @@ class AdapterTestCase extends TestCase
         return new TolerantUpdater($this->renderer());
     }
 
-    protected function splitInitialAndExpectedSource($sourceFile)
+    protected function workspace(): Workspace
     {
-        $files = [
-            0 => [],
-            1 => [],
-        ];
-        $index = 0;
-        $contents = explode(PHP_EOL, file_get_contents($sourceFile));
-        foreach ($contents as $line) {
-            if ($line === '========') {
-                $index++;
-                continue;
-            }
+        return Workspace::create(__DIR__ . '/../Workspace');
+    }
 
-            $files[$index][] = $line;
-        }
+    protected function sourceExpected($manifestPath)
+    {
+        $workspace = $this->workspace();
+        $workspace->reset();
+        $workspace->loadManifest(file_get_contents($manifestPath));
+        $source = $workspace->getContents('source');
+        $expected = $workspace->getContents('expected');
 
-        return [
-            implode(PHP_EOL, $files[0]),
-            implode(PHP_EOL, $files[1]),
-        ];
+        return [ $source, $expected ];
+    }
+
+    protected function sourceExpectedAndOffset($manifestPath)
+    {
+        list($source, $expected) = $this->sourceExpected($manifestPath);
+        list($source, $offset) = ExtractOffset::fromSource($source);
+
+        return [ $source, $expected, $offset ];
     }
 }

@@ -1,3 +1,4 @@
+// File: source
 <?php
 
 class extractMethod5
@@ -5,7 +6,7 @@ class extractMethod5
     public function bigMethod()
     {
         'hello';
-        'hello';
+        'h<>ello';
         'hello';
     }
 
@@ -17,7 +18,7 @@ class extractMethod5
 }
 
 'hello';
-========
+// File: expected
 <?php
 
 class extractMethod5

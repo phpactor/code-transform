@@ -1,10 +1,11 @@
+// File: source
 <?php
 
 class generateMethod
 {
-    private $method;
+    private $met<>hod;
 }
-========
+// File: expected
 <?php
 
 class generateMethod

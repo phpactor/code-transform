@@ -1,3 +1,4 @@
+// File: source
 <?php
 
 namespace Name_Space;
@@ -6,10 +7,10 @@ class extractMethod4
 {
     public function bigMethod()
     {
-        'hello';
+        'hel<>lo';
     }
 }
-========
+// File: expected
 <?php
 
 namespace Name_Space;

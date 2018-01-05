@@ -1,3 +1,5 @@
+// File: source
+
 <?php
 
 interface anotherClass
@@ -13,10 +15,10 @@ class generateMethod
 
     public function name()
     {
-        $this->anotherClass->someMethod('foobar');
+        $this->anotherClass->so<>meMethod('foobar');
     }
 }
-========
+// File: expected
 <?php
 
 interface anotherClass

@@ -1,13 +1,14 @@
+// File: source
 <?php
 
 class extractMethod2
 {
     public function bigMethod()
     {
-        echo 1234;
+        echo 123<>4;
     }
 }
-========
+// File: expected
 <?php
 
 class extractMethod2

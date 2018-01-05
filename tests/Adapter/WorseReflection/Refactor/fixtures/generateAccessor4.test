@@ -1,3 +1,5 @@
+// File: source
+
 <?php
 
 namespace Acme;
@@ -7,9 +9,9 @@ class generateMethod
     /**
      * @var Type1
      */
-    private $method;
+    private $met<>hod;
 }
-========
+// File: expected
 <?php
 
 namespace Acme;
