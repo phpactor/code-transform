@@ -1,3 +1,5 @@
+// File: source
+
 <?php
 
 $foo;
@@ -6,7 +8,7 @@ class MyClass
 {
     public function thisIsSparta()
     {
-        $foo = some_thing();
+        $f<>oo = some_thing();
 
         if ($foo == $bar) {
             return $bar;
@@ -20,7 +22,7 @@ class MyClass
         $foo;
     }
 }
-========
+// File: expected
 <?php
 
 $foo;

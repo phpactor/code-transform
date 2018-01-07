@@ -12,9 +12,9 @@ class TolerantRenameVariableTest extends TolerantTestCase
     /**
      * @dataProvider provideRenameMethod
      */
-    public function testRenameVariable(string $test, int $offset, $name, string $scope = RenameVariable::SCOPE_FILE)
+    public function testRenameVariable(string $test, $name, string $scope = RenameVariable::SCOPE_FILE)
     {
-        list($source, $expected) = $this->splitInitialAndExpectedSource(__DIR__ . '/fixtures/' . $test);
+        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
         $renameVariable = new TolerantRenameVariable($this->parser());
         $transformed = $renameVariable->renameVariable(SourceCode::fromString($source), $offset, $name, $scope);
@@ -27,34 +27,28 @@ class TolerantRenameVariableTest extends TolerantTestCase
         return [
             'one instance no context' => [
                 'renameVariable1.test',
-                9,
                 'newName'
             ],
             'two instances no context' => [
                 'renameVariable2.test',
-                9,
                 'newName'
             ],
             'local scope' => [
                 'renameVariable3.test',
-                83,
                 'newName',
                 RenameVariable::SCOPE_LOCAL
             ],
             'parameters from declaration' => [
                 'renameVariable4.test',
-                58,
                 'newName'
             ],
             'local parameter from body' => [
                 'renameVariable4.test',
-                79,
                 'newName',
                 RenameVariable::SCOPE_LOCAL
             ],
             'typed parameter' => [
                 'renameVariable5.test',
-                65,
                 'newName',
                 RenameVariable::SCOPE_LOCAL
             ],

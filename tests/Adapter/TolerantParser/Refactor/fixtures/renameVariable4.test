@@ -1,13 +1,15 @@
+// File: source
+
 <?php
 
 class MyClass
 {
     public function thisIsSparta($foo)
     {
-        $foo = some_thing();
+        $f<>oo = some_thing();
     }
 }
-========
+// File: expected
 <?php
 
 class MyClass
