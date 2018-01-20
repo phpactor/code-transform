@@ -68,8 +68,12 @@ class WorseExtractMethod implements ExtractMethod
             $parameterBuilder = $methodBuilder->parameter($freeVariable->name());
 
             $variableType = $freeVariable->symbolInformation()->type();
+
             if ($variableType->isDefined()) {
                 $parameterBuilder->type($variableType->short());
+                if ($variableType->isClass()) {
+                    $builder->use((string) $variableType);
+                }
             }
 
             $args[] = '$' . $freeVariable->name();
