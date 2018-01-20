@@ -16,6 +16,7 @@ use Phpactor\CodeTransform\Domain\Refactor\ExtractMethod;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Builder\MethodBuilder;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
+use Phpactor\CodeTransform\Domain\Utils\TextUtils;
 
 class WorseExtractMethod implements ExtractMethod
 {
@@ -109,31 +110,7 @@ class WorseExtractMethod implements ExtractMethod
 
     private function removeIndentation(string $selection)
     {
-        $indentation = null;
-        $lines = explode(PHP_EOL, $selection);
-
-        if (empty($lines)) {
-            return $selection;
-        }
-
-        foreach ($lines as $line) {
-            preg_match('{^\s+$}', $line, $matches);
-
-            if (false === isset($matches[0])) {
-                continue;
-            }
-
-            $count = mb_strlen($matches[0]);
-            if (null === $indentation || $count < $indentation) {
-                $indentation = $count;
-            }
-        }
-
-        foreach ($lines as &$line) {
-            $line = substr($line, $indentation);
-        }
-
-        return trim(implode(PHP_EOL, $lines), PHP_EOL);
+        TextUtils::removeIndentation($selection);
     }
 
     private function createMethodBuilder(SourceCode $source, int $offsetEnd, SourceCodeBuilder $builder, string $name): MethodBuilder
