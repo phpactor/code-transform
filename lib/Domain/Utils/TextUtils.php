@@ -13,7 +13,11 @@ class TextUtils
             return $string;
         }
 
-        foreach ($lines as $line) {
+        foreach ($lines as $i => $line) {
+            if (empty($line)) {
+                continue;
+            }
+
             preg_match('{^(\s+).*$}', $line, $matches);
 
             if (false === isset($matches[1])) {
@@ -22,6 +26,7 @@ class TextUtils
             }
 
             $count = mb_strlen($matches[1]);
+
             if (null === $indentation || $count < $indentation) {
                 $indentation = $count;
             }
