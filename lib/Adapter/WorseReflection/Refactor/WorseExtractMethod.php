@@ -12,8 +12,9 @@ use Microsoft\PhpParser\Token;
 use Microsoft\PhpParser\TokenKind;
 use Phpactor\WorseReflection\Core\Inference\Assignments;
 use Phpactor\WorseReflection\Core\Inference\Variable;
+use Phpactor\CodeTransform\Domain\Refactor\ExtractMethod;
 
-class WorseExtractMethod
+class WorseExtractMethod implements ExtractMethod
 {
     /**
      * @var Reflector
