@@ -203,6 +203,10 @@ class WorseExtractMethod implements ExtractMethod
 
     private function addReturnAndGetAssignment(array $returnVariables, MethodBuilder $methodBuilder)
     {
+        $returnVariables = array_filter($returnVariables, function (Variable $variable) {
+            return false === in_array($variable->name(), ['self', 'this']);
+        });
+
         if (empty($returnVariables)) {
             return null;
         }

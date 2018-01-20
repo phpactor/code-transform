@@ -55,6 +55,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod7.test',
                 'newMethod'
             ],
+            'multiple return value with incoming variables' => [
+                'extractMethod8.test',
+                'newMethod'
+            ],
         ];
     }
 }
