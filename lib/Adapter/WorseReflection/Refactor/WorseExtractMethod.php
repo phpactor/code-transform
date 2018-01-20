@@ -55,41 +55,55 @@ class WorseExtractMethod implements ExtractMethod
         $methodBuilder->body()->line($this->removeIndentation($selection));
 
         $locals = $this->scopeLocalVariables($source, $offsetStart, $offsetEnd);
-        $freeVariables = $this->freeVariablesFrom($locals, $selection);
 
-        $args = $this->addParametersAndGetArgs($freeVariables, $methodBuilder, $builder);
+        // TODO: Add lessThan method
+        $parameterVariables = $this->parameterVariables($locals->lessThanOrEqualTo($offsetStart - 1), $selection, $offsetStart);
+        $args = $this->addParametersAndGetArgs($parameterVariables, $methodBuilder, $builder);
+
+        $returnVariables = $this->returnVariables($locals, (string) $source, $offsetEnd);
+        $returnAssignment = $this->addReturnAndGetAssignment($returnVariables, $methodBuilder);
 
         $prototype = $builder->build();
-        $source = $source->replaceSelection('$this->'  . $name . '(' . implode(', ', $args) . ');', $offsetStart, $offsetEnd);
+        $source = $source->replaceSelection(
+            $this->replacement($name, $args, $returnAssignment),
+            $offsetStart,
+            $offsetEnd
+        );
 
         return $source->withSource(
             (string) $this->updater->apply($prototype, Code::fromString((string) $source))
         );
     }
 
-    private function freeVariablesFrom(Assignments $locals, string $selection)
+    private function parameterVariables(Assignments $locals, string $selection, int $offsetStart)
     {
-        $code = '<?php ' . $selection;
-        $node = $this->parser->parseSourceFile($code);
-        $variables = [];
+        $variableNames = $this->variableNames($selection);
 
-        /** @var Token $token */
-        foreach ($node->getDescendantTokens() as $token) {
-            if ($token->kind == TokenKind::VariableName) {
-                $variables[] = substr($token->getText($code), 1);
+        $parameterVariables = [];
+        foreach ($variableNames as $variable) {
+            $variables = $locals->lessThanOrEqualTo($offsetStart)->byName($variable);
+            if ($variables->count()) {
+                $parameterVariables[$variable] = $variables->last();
             }
         }
 
-        $frees = [];
-        foreach (array_unique($variables) as $variable) {
-            if ($variables = $locals->byName($variable)) {
-                if ($variables->count()) {
-                    $frees[] = $variables->last();
-                }
+        return $parameterVariables;
+    }
+
+    private function returnVariables(Assignments $locals, string $source, int $offsetEnd)
+    {
+        $variableNames = $this->variableNames(mb_substr($source, $offsetEnd));
+
+        $returnVariables = [];
+        foreach ($variableNames as $variable) {
+            $variables = $locals->byName($variable)->lessThanOrEqualTo($offsetEnd);
+
+            if ($variables->count()) {
+                $returnVariables[$variable] = $variables->last();
             }
         }
 
-        return $frees;
+        return $returnVariables;
     }
 
     private function removeIndentation(string $selection)
@@ -165,8 +179,46 @@ class WorseExtractMethod implements ExtractMethod
     private function scopeLocalVariables(SourceCode $source, int $offsetStart, int $offsetEnd): Assignments
     {
         return $this->reflector->reflectOffset(
-            (string) $source->replaceSelection('', $offsetStart, $offsetEnd),
+            (string) $source,
             $offsetStart
         )->frame()->locals();
+    }
+
+    private function variableNames(string $selection)
+    {
+        $code = '<?php ' . $selection;
+        $node = $this->parser->parseSourceFile($code);
+        $variables = [];
+
+        /** @var Token $token */
+        foreach ($node->getDescendantTokens() as $token) {
+            if ($token->kind == TokenKind::VariableName) {
+                $name = substr($token->getText($code), 1);
+                $variables[$name] = $name;
+            }
+        }
+
+        return array_values($variables);
+    }
+
+    private function addReturnAndGetAssignment(array $returnVariables, MethodBuilder $methodBuilder)
+    {
+        if (count($returnVariables) === 1) {
+            $variable = reset($returnVariables);
+            $methodBuilder->body()->line('return $' . $variable->name() . ';');
+
+            return '$' . $variable->name();
+        }
+    }
+
+    private function replacement(string $name, array $args, string $returnAssignment = null)
+    {
+        $callString = '$this->'  . $name . '(' . implode(', ', $args) . ');';
+
+        if (empty($returnAssignment)) {
+            return $callString;
+        }
+
+        return $returnAssignment . ' = ' . $callString;
     }
 }

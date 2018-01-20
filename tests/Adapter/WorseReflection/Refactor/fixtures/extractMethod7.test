@@ -10,7 +10,12 @@ class extractMethod
         if (true) {
             $new = true;
         }
+        $foo = 'hello';
         <>
+
+        if ($foo) {
+            return $new;
+        }
 
         return $new;
     }
@@ -22,7 +27,11 @@ class extractMethod
 {
     public function someMethod()
     {
-        $new = $this->newMethod();
+        list($new, $foo) = $this->newMethod();
+
+        if ($foo) {
+            return $new;
+        }
 
         return $new;
     }
@@ -33,6 +42,7 @@ class extractMethod
         if (true) {
             $new = true;
         }
-        return $new;
+        $foo = 'hello';
+        return [ $new, $foo ];
     }
 }
