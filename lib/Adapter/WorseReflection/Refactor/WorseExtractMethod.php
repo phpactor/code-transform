@@ -15,6 +15,7 @@ use Phpactor\WorseReflection\Core\Inference\Variable;
 use Phpactor\CodeTransform\Domain\Refactor\ExtractMethod;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Builder\MethodBuilder;
+use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
 class WorseExtractMethod implements ExtractMethod
 {
@@ -140,8 +141,20 @@ class WorseExtractMethod implements ExtractMethod
         $offset = $this->reflector->reflectOffset((string) $source, $offsetEnd);
         $thisVariable = $offset->frame()->locals()->byName('this');
 
+        if (empty($thisVariable)) {
+            throw new TransformException('Cannot extract method, not in class scope');
+        }
+
+        $className = $thisVariable->last()->symbolInformation()->type()->className();
+
+        $reflectionClass = $this->reflector->reflectClass((string) $className);
+
+        if ($reflectionClass->methods()->belongingTo($className)->has($name)) {
+            throw new TransformException(sprintf('Class "%s" already has method "%s"', (string) $className, $name));
+        }
+
         $methodBuilder = $builder->class(
-            (string) $thisVariable->last()->symbolInformation()->type()->className()->short()
+            $className->short()
         )->method($name);
         $methodBuilder->visibility('private');
 

@@ -6,15 +6,21 @@ use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseExtractMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeBuilder\Adapter\WorseReflection\WorseBuilderFactory;
+use Exception;
 
 class WorseExtractMethodTest extends WorseTestCase
 {
     /**
      * @dataProvider provideExtractMethod
      */
-    public function testExtractMethod(string $test, $name)
+    public function testExtractMethod(string $test, $name, $expectedExceptionMessage = null)
     {
         list($source, $expected, $offsetStart, $offsetEnd) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
+
+        if ($expectedExceptionMessage) {
+            $this->expectException(Exception::class);
+            $this->expectExceptionMessage($expectedExceptionMessage);
+        }
 
         $reflector = $this->reflectorFor($source);
         $factory = new WorseBuilderFactory($reflector);
@@ -58,6 +64,11 @@ class WorseExtractMethodTest extends WorseTestCase
             'multiple return value with incoming variables' => [
                 'extractMethod8.test',
                 'newMethod'
+            ],
+            'method exists' => [
+                'extractMethod9.test',
+                'newMethod',
+                'Class "extractMethod" already has method "newMethod"'
             ],
         ];
     }
