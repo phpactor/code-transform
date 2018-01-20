@@ -36,6 +36,23 @@ hello
 hello
         world
 EOT
+            ],
+            [
+                <<<'EOT'
+hello
+    hello
+        world
+    hello
+            world
+EOT
+                ,
+                <<<'EOT'
+hello
+    hello
+        world
+    hello
+            world
+EOT
             ]
         ];
     }

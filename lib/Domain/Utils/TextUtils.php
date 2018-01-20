@@ -17,7 +17,8 @@ class TextUtils
             preg_match('{^(\s+).*$}', $line, $matches);
 
             if (false === isset($matches[1])) {
-                continue;
+                $indentation = 0;
+                break;
             }
 
             $count = mb_strlen($matches[1]);
