@@ -27,8 +27,12 @@ class WorseExtractMethodTest extends WorseTestCase
     public function provideExtractMethod()
     {
         return [
-            'string' => [
+            'no free variables' => [
                 'extractMethod1.test',
+                'newMethod'
+            ],
+            'free variable' => [
+                'extractMethod2.test',
                 'newMethod'
             ],
         ];
