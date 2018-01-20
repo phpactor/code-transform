@@ -39,6 +39,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod3.test',
                 'newMethod'
             ],
+            'namespaced' => [
+                'extractMethod4.test',
+                'newMethod'
+            ],
         ];
     }
 }

@@ -51,7 +51,7 @@ class WorseExtractMethod implements ExtractMethod
 
         $offset = $this->reflector->reflectOffset((string) $source, $offsetEnd);
         $thisVariable = $offset->frame()->locals()->byName('this');
-        $methodBuilder = $builder->class((string) $thisVariable->last()->symbolInformation()->type()->className())->method($name);
+        $methodBuilder = $builder->class((string) $thisVariable->last()->symbolInformation()->type()->className()->short())->method($name);
         $methodBuilder->body()->line($this->removeIndentation($selection));
         $methodBuilder->visibility('private');
 
@@ -60,6 +60,11 @@ class WorseExtractMethod implements ExtractMethod
         $args = [];
         /** @var Variable $freeVariable */
         foreach ($freeVariables as $freeVariable) {
+
+            if (in_array($freeVariable->name(), [ 'this', 'self' ])) {
+                continue;
+            }
+
             $parameterBuilder = $methodBuilder->parameter($freeVariable->name());
 
             $variableType = $freeVariable->symbolInformation()->type();
