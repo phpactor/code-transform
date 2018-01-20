@@ -40,4 +40,10 @@ class SourceCodeTest extends TestCase
         $sourceCode = SourceCode::fromStringAndPath('asd', '/path/to/here/../');
         $this->assertEquals('/path/to', $sourceCode->path());
     }
+
+    public function testExtractSelection()
+    {
+        $sourceCode = SourceCode::fromString('12345678');
+        $this->assertEquals('234', $sourceCode->extractSelection(2, 4));
+    }
 }

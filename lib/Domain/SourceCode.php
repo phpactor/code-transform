@@ -54,4 +54,17 @@ final class SourceCode
     {
         return $this->path;
     }
+
+    public function extractSelection(int $offsetStart, int $offsetEnd)
+    {
+        return substr($this->code, $offsetStart, $offsetEnd - $offsetStart);
+    }
+
+    public function replaceSelection(string $replacement, int $offsetStart, int $offsetEnd): SourceCode
+    {
+        $start = substr($this->code, 0, $offsetStart);
+        $end = substr($this->code, $offsetEnd);
+
+        return self::withSource($start . $replacement . $end);
+    }
 }
