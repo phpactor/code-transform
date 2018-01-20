@@ -44,6 +44,12 @@ class SourceCodeTest extends TestCase
     public function testExtractSelection()
     {
         $sourceCode = SourceCode::fromString('12345678');
-        $this->assertEquals('234', $sourceCode->extractSelection(2, 4));
+        $this->assertEquals('34', $sourceCode->extractSelection(2, 4));
+    }
+
+    public function testReplaceSelection()
+    {
+        $sourceCode = SourceCode::fromString('12345678');
+        $this->assertEquals('12HE5678', (string) $sourceCode->replaceSelection('HE', 2, 4));
     }
 }

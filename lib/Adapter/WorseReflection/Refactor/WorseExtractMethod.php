@@ -63,7 +63,7 @@ class WorseExtractMethod
 
             $variableType = $freeVariable->symbolInformation()->type();
             if ($variableType->isDefined()) {
-                $parameterBuilder->type((string) $variableType);
+                $parameterBuilder->type($variableType->short());
             }
 
             $args[] = '$' . $freeVariable->name();

@@ -35,6 +35,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod2.test',
                 'newMethod'
             ],
+            'free variables' => [
+                'extractMethod3.test',
+                'newMethod'
+            ],
         ];
     }
 }
