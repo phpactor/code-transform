@@ -13,6 +13,8 @@ use Microsoft\PhpParser\TokenKind;
 use Phpactor\WorseReflection\Core\Inference\Assignments;
 use Phpactor\WorseReflection\Core\Inference\Variable;
 use Phpactor\CodeTransform\Domain\Refactor\ExtractMethod;
+use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
+use Phpactor\CodeBuilder\Domain\Builder\MethodBuilder;
 
 class WorseExtractMethod implements ExtractMethod
 {
@@ -49,35 +51,13 @@ class WorseExtractMethod implements ExtractMethod
         $selection = $source->extractSelection($offsetStart, $offsetEnd);
         $builder = $this->factory->fromSource($source);
 
-        $offset = $this->reflector->reflectOffset((string) $source, $offsetEnd);
-        $thisVariable = $offset->frame()->locals()->byName('this');
-        $methodBuilder = $builder->class((string) $thisVariable->last()->symbolInformation()->type()->className()->short())->method($name);
+        $methodBuilder = $this->createMethodBuilder($source, $offsetEnd, $builder, $name);
         $methodBuilder->body()->line($this->removeIndentation($selection));
-        $methodBuilder->visibility('private');
 
-        $locals = $this->reflector->reflectOffset((string) $source->replaceSelection('', $offsetStart, $offsetEnd), $offsetStart)->frame()->locals();
+        $locals = $this->scopeLocalVariables($source, $offsetStart, $offsetEnd);
         $freeVariables = $this->freeVariablesFrom($locals, $selection);
-        $args = [];
-        /** @var Variable $freeVariable */
-        foreach ($freeVariables as $freeVariable) {
 
-            if (in_array($freeVariable->name(), [ 'this', 'self' ])) {
-                continue;
-            }
-
-            $parameterBuilder = $methodBuilder->parameter($freeVariable->name());
-
-            $variableType = $freeVariable->symbolInformation()->type();
-
-            if ($variableType->isDefined()) {
-                $parameterBuilder->type($variableType->short());
-                if ($variableType->isClass()) {
-                    $builder->use((string) $variableType);
-                }
-            }
-
-            $args[] = '$' . $freeVariable->name();
-        }
+        $args = $this->addParametersAndGetArgs($freeVariables, $methodBuilder, $builder);
 
         $prototype = $builder->build();
         $source = $source->replaceSelection('$this->'  . $name . '(' . implode(', ', $args) . ');', $offsetStart, $offsetEnd);
@@ -139,5 +119,54 @@ class WorseExtractMethod implements ExtractMethod
         }
 
         return trim(implode(PHP_EOL, $lines), PHP_EOL);
+    }
+
+    private function createMethodBuilder(SourceCode $source, int $offsetEnd, SourceCodeBuilder $builder, string $name): MethodBuilder
+    {
+        $offset = $this->reflector->reflectOffset((string) $source, $offsetEnd);
+        $thisVariable = $offset->frame()->locals()->byName('this');
+
+        $methodBuilder = $builder->class(
+            (string) $thisVariable->last()->symbolInformation()->type()->className()->short()
+        )->method($name);
+        $methodBuilder->visibility('private');
+
+        return $methodBuilder;
+    }
+
+    private function addParametersAndGetArgs(array $freeVariables, $methodBuilder, SourceCodeBuilder $builder): array
+    {
+        $args = [];
+
+        /** @var Variable $freeVariable */
+        foreach ($freeVariables as $freeVariable) {
+
+            if (in_array($freeVariable->name(), [ 'this', 'self' ])) {
+                continue;
+            }
+
+            $parameterBuilder = $methodBuilder->parameter($freeVariable->name());
+
+            $variableType = $freeVariable->symbolInformation()->type();
+
+            if ($variableType->isDefined()) {
+                $parameterBuilder->type($variableType->short());
+                if ($variableType->isClass()) {
+                    $builder->use((string) $variableType);
+                }
+            }
+
+            $args[] = '$' . $freeVariable->name();
+        }
+
+        return $args;
+    }
+
+    private function scopeLocalVariables(SourceCode $source, int $offsetStart, int $offsetEnd): Assignments
+    {
+        return $this->reflector->reflectOffset(
+            (string) $source->replaceSelection('', $offsetStart, $offsetEnd),
+            $offsetStart
+        )->frame()->locals();
     }
 }
