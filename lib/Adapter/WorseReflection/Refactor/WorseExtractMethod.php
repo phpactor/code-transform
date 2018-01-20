@@ -110,7 +110,7 @@ class WorseExtractMethod implements ExtractMethod
 
     private function removeIndentation(string $selection)
     {
-        TextUtils::removeIndentation($selection);
+        return TextUtils::removeIndentation($selection);
     }
 
     private function createMethodBuilder(SourceCode $source, int $offsetEnd, SourceCodeBuilder $builder, string $name): MethodBuilder
