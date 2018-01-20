@@ -203,12 +203,24 @@ class WorseExtractMethod implements ExtractMethod
 
     private function addReturnAndGetAssignment(array $returnVariables, MethodBuilder $methodBuilder)
     {
+        if (empty($returnVariables)) {
+            return null;
+        }
+
         if (count($returnVariables) === 1) {
             $variable = reset($returnVariables);
             $methodBuilder->body()->line('return $' . $variable->name() . ';');
 
             return '$' . $variable->name();
         }
+
+        $names = implode(', ', array_map(function (Variable $variable) {
+            return '$' . $variable->name();
+        }, $returnVariables));
+
+        $methodBuilder->body()->line('return [' . $names . '];');
+
+        return 'list(' . $names . ')';
     }
 
     private function replacement(string $name, array $args, string $returnAssignment = null)

@@ -27,7 +27,7 @@ class extractMethod
 {
     public function someMethod()
     {
-        list($new, $foo) = $this->newMethod();
+        list($foo, $new) = $this->newMethod();
 
         if ($foo) {
             return $new;
@@ -43,6 +43,6 @@ class extractMethod
             $new = true;
         }
         $foo = 'hello';
-        return [ $new, $foo ];
+        return [$foo, $new];
     }
 }
