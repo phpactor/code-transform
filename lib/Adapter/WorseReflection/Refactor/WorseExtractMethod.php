@@ -61,7 +61,7 @@ class WorseExtractMethod implements ExtractMethod
         $args = $this->addParametersAndGetArgs($parameterVariables, $methodBuilder, $builder);
 
         $returnVariables = $this->returnVariables($locals, (string) $source, $offsetEnd);
-        $returnAssignment = $this->addReturnAndGetAssignment($returnVariables, $methodBuilder);
+        $returnAssignment = $this->addReturnAndGetAssignment($returnVariables, $methodBuilder, $args);
 
         $prototype = $builder->build();
         $source = $source->replaceSelection(
@@ -201,10 +201,14 @@ class WorseExtractMethod implements ExtractMethod
         return array_values($variables);
     }
 
-    private function addReturnAndGetAssignment(array $returnVariables, MethodBuilder $methodBuilder)
+    private function addReturnAndGetAssignment(array $returnVariables, MethodBuilder $methodBuilder, array $args)
     {
         $returnVariables = array_filter($returnVariables, function (Variable $variable) {
             return false === in_array($variable->name(), ['self', 'this']);
+        });
+
+        $returnVariables = array_filter($returnVariables, function (Variable $variable) use ($args) {
+            return false === in_array('$' . $variable->name(), $args);
         });
 
         if (empty($returnVariables)) {
