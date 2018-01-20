@@ -97,7 +97,7 @@ class WorseExtractMethod implements ExtractMethod
         }
 
         $frees = [];
-        foreach ($variables as $variable) {
+        foreach (array_unique($variables) as $variable) {
             if ($variables = $locals->byName($variable)) {
                 if ($variables->count()) {
                     $frees[] = $variables->last();

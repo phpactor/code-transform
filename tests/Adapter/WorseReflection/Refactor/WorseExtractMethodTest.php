@@ -43,6 +43,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod4.test',
                 'newMethod'
             ],
+            'duplicated vars' => [
+                'extractMethod5.test',
+                'newMethod'
+            ],
         ];
     }
 }
