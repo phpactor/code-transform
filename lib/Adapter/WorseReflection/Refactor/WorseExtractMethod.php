@@ -63,7 +63,7 @@ class WorseExtractMethod implements ExtractMethod
         $parameterVariables = $this->parameterVariables($locals->lessThan($offsetStart), $selection, $offsetStart);
         $args = $this->addParametersAndGetArgs($parameterVariables, $methodBuilder, $builder);
 
-        $returnVariables = $this->returnVariables($locals, $reflectionMethod, $source, $offsetEnd);
+        $returnVariables = $this->returnVariables($locals, $reflectionMethod, $source, $offsetStart, $offsetEnd);
         $returnAssignment = $this->addReturnAndGetAssignment($returnVariables, $methodBuilder, $args);
 
         $prototype = $builder->build();
@@ -93,7 +93,7 @@ class WorseExtractMethod implements ExtractMethod
         return $parameterVariables;
     }
 
-    private function returnVariables(Assignments $locals, ReflectionMethod $reflectionMethod, string $source, int $offsetEnd)
+    private function returnVariables(Assignments $locals, ReflectionMethod $reflectionMethod, string $source, int $offsetStart, int $offsetEnd)
     {
         // variables that are:
         //
@@ -110,7 +110,7 @@ class WorseExtractMethod implements ExtractMethod
 
         $returnVariables = [];
         foreach ($tailDependencies as $variable) {
-            $variables = $locals->byName($variable)->lessThanOrEqualTo($offsetEnd);
+            $variables = $locals->byName($variable)->greaterThanOrEqualTo($offsetStart)->lessThanOrEqualTo($offsetEnd);
 
             if ($variables->count()) {
                 $returnVariables[$variable] = $variables->last();
@@ -239,13 +239,13 @@ class WorseExtractMethod implements ExtractMethod
 
     private function replacement(string $name, array $args, string $selection, string $returnAssignment = null)
     {
-        $indentation = TextUtils::stringIndentation($selection);
-        $callString = str_repeat(' ', $indentation) . '$this->'  . $name . '(' . implode(', ', $args) . ');';
+        $indentation = str_repeat(' ', TextUtils::stringIndentation($selection));
+        $callString = '$this->'  . $name . '(' . implode(', ', $args) . ');';
 
         if (empty($returnAssignment)) {
-            return $callString;
+            return $indentation . $callString;
         }
 
-        return $returnAssignment . ' = ' . $callString;
+        return $indentation . $returnAssignment . ' = ' . $callString;
     }
 }

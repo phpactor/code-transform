@@ -41,7 +41,13 @@ class TextUtils
 
     public static function stringIndentation(string $string)
     {
-        preg_match('{^(\s+).*$}', $string, $matches);
+        $lines = explode(PHP_EOL, $string);
+
+        if (empty($lines)) {
+            return 0;
+        }
+
+        preg_match('{^(\s+).*$}m', $lines[0], $matches);
 
         if (false === isset($matches[1])) {
             return 0;
