@@ -94,10 +94,16 @@ class WorseExtractMethod implements ExtractMethod
 
     private function returnVariables(Assignments $locals, string $source, int $offsetEnd)
     {
-        $variableNames = $this->variableNames(mb_substr($source, $offsetEnd));
+        // variables that are:
+        //
+        // - defined in the selection
+        // - and used in the parent scope
+        // - after the end offset
+        //
+        $tailDependencies = $this->variableNames(mb_substr($source, $offsetEnd));
 
         $returnVariables = [];
-        foreach ($variableNames as $variable) {
+        foreach ($tailDependencies as $variable) {
             $variables = $locals->byName($variable)->lessThanOrEqualTo($offsetEnd);
 
             if ($variables->count()) {
@@ -170,7 +176,7 @@ class WorseExtractMethod implements ExtractMethod
     {
         return $this->reflector->reflectOffset(
             (string) $source,
-            $offsetStart
+            $offsetEnd
         )->frame()->locals();
     }
 

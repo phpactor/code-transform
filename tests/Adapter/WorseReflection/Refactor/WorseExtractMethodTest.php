@@ -65,6 +65,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod8.test',
                 'newMethod'
             ],
+            'multiple return value boundaries' => [
+                'extractMethod10.test',
+                'newMethod',
+            ],
             'method exists' => [
                 'extractMethod9.test',
                 'newMethod',
