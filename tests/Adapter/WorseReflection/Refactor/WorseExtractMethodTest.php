@@ -74,6 +74,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'newMethod',
                 'Class "extractMethod" already has method "newMethod"'
             ],
+            'tail variables are taken from scope' => [
+                'extractMethod11.test',
+                'newMethod',
+            ],
         ];
     }
 }

@@ -17,6 +17,7 @@ use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Builder\MethodBuilder;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeTransform\Domain\Utils\TextUtils;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 
 class WorseExtractMethod implements ExtractMethod
 {
@@ -52,8 +53,9 @@ class WorseExtractMethod implements ExtractMethod
     {
         $selection = $source->extractSelection($offsetStart, $offsetEnd);
         $builder = $this->factory->fromSource($source);
+        $reflectionMethod = $this->reflectMethod($offsetEnd, $source, $name);
 
-        $methodBuilder = $this->createMethodBuilder($source, $offsetEnd, $builder, $name);
+        $methodBuilder = $this->createMethodBuilder($reflectionMethod, $builder, $name);
         $methodBuilder->body()->line($this->removeIndentation($selection));
 
         $locals = $this->scopeLocalVariables($source, $offsetStart, $offsetEnd);
@@ -62,7 +64,7 @@ class WorseExtractMethod implements ExtractMethod
         $parameterVariables = $this->parameterVariables($locals->lessThanOrEqualTo($offsetStart - 1), $selection, $offsetStart);
         $args = $this->addParametersAndGetArgs($parameterVariables, $methodBuilder, $builder);
 
-        $returnVariables = $this->returnVariables($locals, (string) $source, $offsetEnd);
+        $returnVariables = $this->returnVariables($locals, $reflectionMethod, $source, $offsetEnd);
         $returnAssignment = $this->addReturnAndGetAssignment($returnVariables, $methodBuilder, $args);
 
         $prototype = $builder->build();
@@ -92,15 +94,20 @@ class WorseExtractMethod implements ExtractMethod
         return $parameterVariables;
     }
 
-    private function returnVariables(Assignments $locals, string $source, int $offsetEnd)
+    private function returnVariables(Assignments $locals, ReflectionMethod $reflectionMethod, string $source, int $offsetEnd)
     {
         // variables that are:
         //
         // - defined in the selection
         // - and used in the parent scope
         // - after the end offset
-        //
-        $tailDependencies = $this->variableNames(mb_substr($source, $offsetEnd));
+        $tailDependencies = $this->variableNames(
+            $tail = mb_substr(
+                $source,
+                $offsetEnd,
+                $reflectionMethod->position()->end() - $offsetEnd
+            )
+        );
 
         $returnVariables = [];
         foreach ($tailDependencies as $variable) {
@@ -119,7 +126,17 @@ class WorseExtractMethod implements ExtractMethod
         return TextUtils::removeIndentation($selection);
     }
 
-    private function createMethodBuilder(SourceCode $source, int $offsetEnd, SourceCodeBuilder $builder, string $name): MethodBuilder
+    private function createMethodBuilder(ReflectionMethod $reflectionMethod, SourceCodeBuilder $builder, string $name): MethodBuilder
+    {
+        $methodBuilder = $builder->class(
+            $reflectionMethod->class()->name()->short()
+        )->method($name);
+        $methodBuilder->visibility('private');
+
+        return $methodBuilder;
+    }
+
+    private function reflectMethod(int $offsetEnd, string $source, string $name): ReflectionMethod
     {
         $offset = $this->reflector->reflectOffset((string) $source, $offsetEnd);
         $thisVariable = $offset->frame()->locals()->byName('this');
@@ -129,19 +146,14 @@ class WorseExtractMethod implements ExtractMethod
         }
 
         $className = $thisVariable->last()->symbolInformation()->type()->className();
-
         $reflectionClass = $this->reflector->reflectClass((string) $className);
 
-        if ($reflectionClass->methods()->belongingTo($className)->has($name)) {
+        $methods = $reflectionClass->methods();
+        if ($methods->belongingTo($className)->has($name)) {
             throw new TransformException(sprintf('Class "%s" already has method "%s"', (string) $className, $name));
         }
 
-        $methodBuilder = $builder->class(
-            $className->short()
-        )->method($name);
-        $methodBuilder->visibility('private');
-
-        return $methodBuilder;
+        return $methods->atOffset($offsetEnd)->first();
     }
 
     private function addParametersAndGetArgs(array $freeVariables, $methodBuilder, SourceCodeBuilder $builder): array
@@ -156,7 +168,6 @@ class WorseExtractMethod implements ExtractMethod
             }
 
             $parameterBuilder = $methodBuilder->parameter($freeVariable->name());
-
             $variableType = $freeVariable->symbolInformation()->type();
 
             if ($variableType->isDefined()) {
@@ -180,16 +191,16 @@ class WorseExtractMethod implements ExtractMethod
         )->frame()->locals();
     }
 
-    private function variableNames(string $selection)
+    private function variableNames(string $source)
     {
-        $code = '<?php ' . $selection;
-        $node = $this->parser->parseSourceFile($code);
+        $source = '<?php ' . $source;
+        $node = $this->parser->parseSourceFile($source);
         $variables = [];
 
         /** @var Token $token */
         foreach ($node->getDescendantTokens() as $token) {
             if ($token->kind == TokenKind::VariableName) {
-                $name = substr($token->getText($code), 1);
+                $name = substr($token->getText($source), 1);
                 $variables[$name] = $name;
             }
         }
