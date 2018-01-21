@@ -1,0 +1,26 @@
+// File: source
+<?php
+
+class PhpactorRocks
+{
+    public function hello()
+    {
+<>        $new = true;
+<>
+    }
+}
+// File: expected
+<?php
+
+class PhpactorRocks
+{
+    public function hello()
+    {
+        $this->newMethod();
+    }
+
+    private function newMethod()
+    {
+        $new = true;
+    }
+}

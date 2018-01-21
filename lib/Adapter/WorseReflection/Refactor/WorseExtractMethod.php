@@ -60,8 +60,7 @@ class WorseExtractMethod implements ExtractMethod
 
         $locals = $this->scopeLocalVariables($source, $offsetStart, $offsetEnd);
 
-        // TODO: Add lessThan method
-        $parameterVariables = $this->parameterVariables($locals->lessThanOrEqualTo($offsetStart - 1), $selection, $offsetStart);
+        $parameterVariables = $this->parameterVariables($locals->lessThan($offsetStart), $selection, $offsetStart);
         $args = $this->addParametersAndGetArgs($parameterVariables, $methodBuilder, $builder);
 
         $returnVariables = $this->returnVariables($locals, $reflectionMethod, $source, $offsetEnd);
@@ -69,7 +68,7 @@ class WorseExtractMethod implements ExtractMethod
 
         $prototype = $builder->build();
         $source = $source->replaceSelection(
-            $this->replacement($name, $args, $returnAssignment),
+            $this->replacement($name, $args, $selection, $returnAssignment),
             $offsetStart,
             $offsetEnd
         );
@@ -238,9 +237,10 @@ class WorseExtractMethod implements ExtractMethod
         return 'list(' . $names . ')';
     }
 
-    private function replacement(string $name, array $args, string $returnAssignment = null)
+    private function replacement(string $name, array $args, string $selection, string $returnAssignment = null)
     {
-        $callString = '$this->'  . $name . '(' . implode(', ', $args) . ');';
+        $indentation = TextUtils::stringIndentation($selection);
+        $callString = str_repeat(' ', $indentation) . '$this->'  . $name . '(' . implode(', ', $args) . ');';
 
         if (empty($returnAssignment)) {
             return $callString;

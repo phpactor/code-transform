@@ -78,6 +78,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod11.test',
                 'newMethod',
             ],
+            'replacement indentation is preserved' => [
+                'extractMethod12.test',
+                'newMethod',
+            ],
         ];
     }
 }

@@ -38,4 +38,15 @@ class TextUtils
 
         return trim(implode(PHP_EOL, $lines), PHP_EOL);
     }
+
+    public static function stringIndentation(string $string)
+    {
+        preg_match('{^(\s+).*$}', $string, $matches);
+
+        if (false === isset($matches[1])) {
+            return 0;
+        }
+
+        return mb_strlen($matches[1]);
+    }
 }
