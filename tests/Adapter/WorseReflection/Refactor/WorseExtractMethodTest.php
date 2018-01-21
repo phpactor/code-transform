@@ -83,7 +83,11 @@ class WorseExtractMethodTest extends WorseTestCase
                 'newMethod',
             ],
             'only considers selection content for return vars' => [
-                'extractMethod1 3.test',
+                'extractMethod13.test',
+                'newMethod',
+            ],
+            'return mutated primative' => [
+                'extractMethod14.test',
                 'newMethod',
             ],
         ];

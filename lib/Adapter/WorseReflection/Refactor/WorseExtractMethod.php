@@ -110,7 +110,9 @@ class WorseExtractMethod implements ExtractMethod
 
         $returnVariables = [];
         foreach ($tailDependencies as $variable) {
-            $variables = $locals->byName($variable)->greaterThanOrEqualTo($offsetStart)->lessThanOrEqualTo($offsetEnd);
+            $variables = $locals->byName($variable)
+                ->lessThanOrEqualTo($offsetEnd)
+                ->greaterThanOrEqualTo($offsetStart);
 
             if ($variables->count()) {
                 $returnVariables[$variable] = $variables->last();
@@ -214,6 +216,10 @@ class WorseExtractMethod implements ExtractMethod
         });
 
         $returnVariables = array_filter($returnVariables, function (Variable $variable) use ($args) {
+            if ($variable->symbolInformation()->type()->isPrimitive()) {
+                return true;
+            }
+
             return false === in_array('$' . $variable->name(), $args);
         });
 
