@@ -146,7 +146,7 @@ class WorseExtractMethod implements ExtractMethod
             throw new TransformException('Cannot extract method, not in class scope');
         }
 
-        $className = $thisVariable->last()->symbolInformation()->type()->className();
+        $className = $thisVariable->last()->symbolContext()->type()->className();
         $reflectionClass = $this->reflector->reflectClass((string) $className);
 
         $methods = $reflectionClass->methods();
@@ -169,7 +169,7 @@ class WorseExtractMethod implements ExtractMethod
             }
 
             $parameterBuilder = $methodBuilder->parameter($freeVariable->name());
-            $variableType = $freeVariable->symbolInformation()->type();
+            $variableType = $freeVariable->symbolContext()->type();
 
             if ($variableType->isDefined()) {
                 $parameterBuilder->type($variableType->short());
@@ -216,7 +216,7 @@ class WorseExtractMethod implements ExtractMethod
         });
 
         $returnVariables = array_filter($returnVariables, function (Variable $variable) use ($args) {
-            if ($variable->symbolInformation()->type()->isPrimitive()) {
+            if ($variable->symbolContext()->type()->isPrimitive()) {
                 return true;
             }
 

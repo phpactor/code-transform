@@ -86,7 +86,7 @@ class WorseGenerateMethod implements GenerateMethod
          * @var Variable $variable
          */
         foreach ($reflectionOffset->frame()->locals()->byName('$this') as $variable) {
-            return $variable->symbolInformation()->type();
+            return $variable->symbolContext()->type();
         }
     }
 
@@ -130,7 +130,7 @@ class WorseGenerateMethod implements GenerateMethod
         return $builder->build();
     }
 
-    private function sourceFromSymbolInformation(SymbolInformation $info): SourceCode
+    private function sourceFromSymbolContext(SymbolContext $info): SourceCode
     {
         $containingClass = $this->reflector->reflectClassLike($info->containerType()->className());
         $worseSourceCode = $containingClass->sourceCode();

@@ -46,7 +46,7 @@ class WorseExtractConstant implements ExtractConstant
     {
         $symbolInformation = $this->reflector
             ->reflectOffset($sourceCode->__toString(), $offset)
-            ->symbolInformation();
+            ->symbolContext();
 
         $sourceCode = $this->replaceValues($sourceCode, $offset, $constantName);
 

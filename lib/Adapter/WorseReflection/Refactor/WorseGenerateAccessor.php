@@ -61,7 +61,7 @@ class WorseGenerateAccessor implements GenerateAccessor
     private function getInfo(SourceCode $sourceCode, int $offset): SymbolContext
     {
         $reflectionOffset = $this->reflector->reflectOffset($sourceCode->__toString(), $offset);
-        $info = $reflectionOffset->symbolInformation();
+        $info = $reflectionOffset->symbolContext();
 
         if ($info->symbol()->symbolType() !== Symbol::PROPERTY) {
             throw new TransformException(sprintf(
