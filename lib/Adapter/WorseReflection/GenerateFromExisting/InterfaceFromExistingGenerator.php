@@ -59,7 +59,10 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
 
             if ($method->returnType()->isDefined()) {
                 $methodBuilder->returnType((string) $method->returnType()->short());
-                $sourceBuilder->use((string) $method->returnType());
+
+                if ($method->returnType()->isClass()) {
+                    $sourceBuilder->use((string) $method->returnType());
+                }
             }
 
             /** @var $parameter ReflectionParameter */

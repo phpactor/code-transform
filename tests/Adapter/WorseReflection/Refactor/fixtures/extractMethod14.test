@@ -7,8 +7,7 @@ class PhpactorRocks
     {
         $bar = 'hahaha';
 
-<>        echo 'hello';
-        $bar = 'goodbye';
+<>        $bar = 'goodbye';
         <>
 
         return $bar;
@@ -30,7 +29,6 @@ class PhpactorRocks
 
     private function newMethod(string $bar)
     {
-        echo 'hello';
         $bar = 'goodbye';
         return $bar;
     }

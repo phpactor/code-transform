@@ -113,7 +113,34 @@ interface BeatInterface
 }
 EOT
 
-            ]
+            ],
+            'Does not import scalar types' => [
+                'Music\Beat',
+                'Music\BeatInterface',
+                <<<'EOT'
+<?php
+
+namespace Music;
+
+class Beat
+{
+    public function play(): string
+    {
+    }
+}
+EOT
+                , <<<'EOT'
+<?php
+
+namespace Music;
+
+interface BeatInterface
+{
+    public function play(): string;
+}
+EOT
+
+            ],
         ];
     }
 }
