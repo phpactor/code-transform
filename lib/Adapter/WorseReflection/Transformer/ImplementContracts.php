@@ -12,6 +12,7 @@ use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionParameter;
+use Phpactor\CodeBuilder\Domain\BuilderFactory;
 
 class ImplementContracts implements Transformer
 {
@@ -25,10 +26,16 @@ class ImplementContracts implements Transformer
      */
     private $updater;
 
-    public function __construct(Reflector $reflector, Updater $updater)
+    /**
+     * @var BuilderFactory
+     */
+    private $factory;
+
+    public function __construct(Reflector $reflector, Updater $updater, BuilderFactory $factory)
     {
         $this->updater = $updater;
         $this->reflector = $reflector;
+        $this->factory = $factory;
     }
 
     public function transform(SourceCode $source): SourceCode
@@ -48,44 +55,32 @@ class ImplementContracts implements Transformer
 
             /** @var $missingMethod ReflectionMethod */
             foreach ($missingMethods as $missingMethod) {
-                $methodBuilder = $classBuilder->method($missingMethod->name());
 
-                if ($missingMethod->returnType()->isDefined()) {
-                    if ($missingMethod->returnType()->isClass() && $missingMethod->returnType()->className()->namespace() != $class->name()->namespace()) {
-                        $sourceCodeBuilder->use((string) $missingMethod->returnType());
-                    }
+                $builder = $this->factory->fromSource((string) $missingMethod->declaringClass()->sourceCode());
 
-                    $methodBuilder->returnType($missingMethod->returnType()->short());
-                }
-
-                if ($missingMethod->isStatic()) {
-                    $methodBuilder->static();
-                }
+                $methodBuilder = $builder->classLike(
+                    $missingMethod->declaringClass()->name()->short()
+                )->method($missingMethod->name());
 
                 if ($missingMethod->docblock()->isDefined()) {
                     $methodBuilder->docblock('{@inheritDoc}');
                 }
 
-                /** @var $parameter ReflectionParameter */
-                foreach ($missingMethod->parameters() as $parameter) {
-                    $parameterBuilder = $methodBuilder->parameter($parameter->name());
+                if ($missingMethod->returnType()->isDefined()) {
+                    if ($missingMethod->returnType()->isClass() && $missingMethod->returnType()->className()->namespace() != $class->name()->namespace()) {
+                        $sourceCodeBuilder->use((string) $missingMethod->returnType());
+                    }
+                }
 
+                foreach ($missingMethod->parameters() as $parameter) {
                     if ($parameter->type()->isDefined()) {
                         if ($parameter->type()->isClass() && $parameter->type()->className()->namespace() != $class->name()->namespace()) {
                             $sourceCodeBuilder->use((string) $parameter->type());
                         }
-
-                        $parameterBuilder->type($parameter->type()->short());
-
-                        if ($parameter->type()->isClass()) {
-                            $sourceCodeBuilder->use((string) $parameter->type());
-                        }
-                    }
-
-                    if ($parameter->default()->isDefined()) {
-                        $parameterBuilder->defaultValue($parameter->default()->value());
                     }
                 }
+
+                $classBuilder->add($methodBuilder);
             }
         }
 
@@ -100,9 +95,11 @@ class ImplementContracts implements Transformer
         $reflectionMethods = $class->methods();
         foreach ($class->interfaces() as $interface) {
             foreach ($interface->methods() as $method) {
-                if (false === $reflectionMethods->has($method->name())) {
-                    $methods[] = $method;
+                if ($reflectionMethods->has($method->name())) {
+                    continue;
                 }
+
+                $methods[] = $method;
             }
         }
 
