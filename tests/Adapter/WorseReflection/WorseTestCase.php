@@ -9,12 +9,13 @@ use Phpactor\WorseReflection\Reflector;
 use Phpactor\TestUtils\Workspace;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
 use Phpactor\CodeBuilder\Adapter\WorseReflection\WorseBuilderFactory;
+use Phpactor\WorseReflection\ReflectorBuilder;
 
 class WorseTestCase extends AdapterTestCase
 {
     public function reflectorFor(string $source)
     {
-        return Reflector::create(new StringSourceLocator(SourceCode::fromString((string) $source)));
+        return ReflectorBuilder::create()->addSource($source)->build();
     }
 
     public function builderFactory(Reflector $reflector): BuilderFactory
