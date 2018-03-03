@@ -10,6 +10,7 @@ use Phpactor\CodeTransform\Domain\Refactor\GenerateMethod;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionArgument;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
 use Phpactor\WorseReflection\Core\Inference\Variable;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClassLike;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethodCall;
@@ -48,7 +49,8 @@ class WorseGenerateMethod implements GenerateMethod
     public function generateMethod(SourceCode $sourceCode, int $offset, $methodName = null): SourceCode
     {
         $contextType = $this->contextType($sourceCode, $offset);
-        $methodCall = $this->reflector->reflectMethodCall($sourceCode->__toString(), $offset);
+        $worseSourceCode = WorseSourceCode::fromPathAndString((string) $sourceCode->path(), (string) $sourceCode);
+        $methodCall = $this->reflector->reflectMethodCall($worseSourceCode, $offset);
         $this->validate($methodCall);
         $visibility = $this->determineVisibility($contextType, $methodCall->class());
 
@@ -80,7 +82,8 @@ class WorseGenerateMethod implements GenerateMethod
      */
     private function contextType(SourceCode $sourceCode, int $offset): Type
     {
-        $reflectionOffset = $this->reflector->reflectOffset($sourceCode->__toString(), $offset);
+        $worseSourceCode = WorseSourceCode::fromPathAndString((string) $sourceCode->path(), (string) $sourceCode);
+        $reflectionOffset = $this->reflector->reflectOffset($worseSourceCode, $offset);
 
         /**
          * @var Variable $variable
