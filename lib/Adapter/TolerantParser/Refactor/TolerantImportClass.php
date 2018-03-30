@@ -15,6 +15,7 @@ use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Microsoft\PhpParser\Node;
 use Phpactor\CodeBuilder\Domain\Code;
+use Phpactor\CodeTransform\Domain\Refactor\ImportClass\AliasAlreadyUsedException;
 
 class TolerantImportClass implements ImportClass
 {
@@ -34,7 +35,7 @@ class TolerantImportClass implements ImportClass
         $this->updater = $updater;
     }
 
-    public function importClass(SourceCode $source, int $offset, string $name = null)
+    public function importClass(SourceCode $source, int $offset, string $name, string $alias = null): SourceCode
     {
         $name = ClassName::fromString($name);
         $sourceNode = $this->parser->parseSourceFile($source);
@@ -46,7 +47,7 @@ class TolerantImportClass implements ImportClass
             ));
         }
 
-        $this->checkIfAlreadyImported($node, $name);
+        $this->checkIfAlreadyImported($node, $name, $alias);
 
         return $this->addImport($source, $node, $name);
     }
@@ -66,15 +67,17 @@ class TolerantImportClass implements ImportClass
         return $name->getText($node->getFileContents());
     }
 
-    private function checkIfAlreadyImported(QualifiedName $node, ClassName $className)
+    private function checkIfAlreadyImported(QualifiedName $node, ClassName $className, string $alias = null)
     {
         $imports = $node->getImportTablesForCurrentScope()[0];
 
-        if (false === isset($imports[(string) $className])) {
-            return;
+        if (null === $alias && isset($imports[(string) $className])) {
+            throw new ClassAlreadyImportedException($className);
         }
 
-        throw new ClassAlreadyImportedException($baseShortName);
+        if ($alias && isset($imports[$alias])) {
+            throw new AliasAlreadyUsedException($alias);
+        }
     }
 
     private function addImport(SourceCode $source, Node $node, string $name): SourceCode

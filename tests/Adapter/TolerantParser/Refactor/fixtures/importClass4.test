@@ -5,7 +5,7 @@ new F<>oobar();
 // File: expected
 <?php
 
-use Foobar;
+use Foobar as Barfoo;
 
 
 new Foobar();

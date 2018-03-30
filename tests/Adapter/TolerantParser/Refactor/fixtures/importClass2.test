@@ -1,9 +1,10 @@
+// File: source
 <?php
 
-namespace Barbar;
+namespace B<>arbar;
 
 new Foobar();
-========
+// File: expected
 <?php
 
 namespace Barbar;
