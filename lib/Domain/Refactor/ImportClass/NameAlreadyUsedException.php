@@ -4,6 +4,7 @@ namespace Phpactor\CodeTransform\Domain\Refactor\ImportClass;
 
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
-class NameAlreadyUsedException extends TransformException
+abstract class NameAlreadyUsedException extends TransformException
 {
+    abstract public function name(): string;
 }

@@ -20,7 +20,7 @@ class AliasAlreadyUsedException extends NameAlreadyUsedException
         $this->name = $name;
     }
 
-    public function name()
+    public function name(): string
     {
         return $this->name;
     }

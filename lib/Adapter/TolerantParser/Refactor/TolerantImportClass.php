@@ -40,12 +40,6 @@ class TolerantImportClass implements ImportClass
         $sourceNode = $this->parser->parseSourceFile($source);
         $node = $sourceNode->getDescendantNodeAtPosition($offset);
 
-        if (false === $node instanceof QualifiedName) {
-            throw new TransformException(sprintf(
-                'Node at offset "%s" is not a qualified name', $offset
-            ));
-        }
-
         $this->checkIfAlreadyImported($node, $name, $alias);
 
         return $this->addImport($source, $node, $name, $alias);
@@ -70,8 +64,8 @@ class TolerantImportClass implements ImportClass
     {
         $imports = $node->getImportTablesForCurrentScope()[0];
 
-        if (null === $alias && isset($imports[(string) $className])) {
-            throw new ClassAlreadyImportedException($className);
+        if (null === $alias && isset($imports[$className->short()])) {
+            throw new ClassAlreadyImportedException($className->short());
         }
 
         if ($alias && isset($imports[$alias])) {
