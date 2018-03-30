@@ -60,7 +60,7 @@ class TolerantImportClass implements ImportClass
         return $name->getText($node->getFileContents());
     }
 
-    private function checkIfAlreadyImported(QualifiedName $node, ClassName $className, string $alias = null)
+    private function checkIfAlreadyImported(Node $node, ClassName $className, string $alias = null)
     {
         $imports = $node->getImportTablesForCurrentScope()[0];
 
