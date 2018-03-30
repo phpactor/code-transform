@@ -12,6 +12,6 @@ new Foo<>bar();
 use DateTime;
 use Foo;
 use Bar;
-use Foobar;
+use Barfoo\Foobar;
 
 new Foobar();

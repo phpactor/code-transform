@@ -15,6 +15,9 @@ use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Microsoft\PhpParser\Node;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\AliasAlreadyUsedException;
+use Microsoft\PhpParser\Node\Statement\ClassDeclaration;
+use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassIsCurrentClassException;
+use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyInNamespaceException;
 
 class TolerantImportClass implements ImportClass
 {
@@ -71,6 +74,14 @@ class TolerantImportClass implements ImportClass
         if ($alias && isset($imports[$alias])) {
             throw new AliasAlreadyUsedException($alias);
         }
+
+        if ($this->currentClassIsSameAsImportClass($node, $className)) {
+            throw new ClassIsCurrentClassException($className->short(), (string) $className);
+        }
+
+        if ($this->importClassInSameNamespace($node, $className)) {
+            throw new ClassAlreadyInNamespaceException($className->short(), (string) $className);
+        }
     }
 
     private function addImport(SourceCode $source, Node $node, string $name, string $alias = null): SourceCode
@@ -80,5 +91,40 @@ class TolerantImportClass implements ImportClass
         $prototype = $builder->build();
 
         return $source->withSource($this->updater->apply($prototype, Code::fromString((string) $source)));
+    }
+
+    private function currentClassIsSameAsImportClass(Node $node, ClassName $className): bool
+    {
+        if ($node instanceof ClassDeclaration) {
+            return true;
+        }
+
+        /** @var ClassDeclaration $classNode */
+        $classNode = $node->getFirstAncestor(ClassDeclaration::class);
+
+        if (null === $classNode) {
+            return false;
+        }
+        $name = $classNode->getNamespacedName();
+
+        if ((string) $name === (string) $className) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function importClassInSameNamespace(Node $node, ClassName $className)
+    {
+        $namespace = '';
+        if ($namespace = $node->getNamespaceDefinition()) {
+            $namespace = (string) $node->getNamespaceDefinition()->getFirstChildNode(QualifiedName::class);
+        }
+
+        if ($className->namespace() == $namespace) {
+            return true;
+        }
+
+        return false;
     }
 }

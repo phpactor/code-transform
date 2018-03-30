@@ -9,6 +9,6 @@ new Foobar();
 
 namespace Barbar;
 
-use Foobar;
+use Barfoo\Foobar;
 
 new Foobar();
