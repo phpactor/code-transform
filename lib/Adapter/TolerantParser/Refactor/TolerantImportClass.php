@@ -65,7 +65,7 @@ class TolerantImportClass implements ImportClass
         $imports = $node->getImportTablesForCurrentScope()[0];
 
         if (null === $alias && isset($imports[$className->short()])) {
-            throw new ClassAlreadyImportedException($className->short());
+            throw new ClassAlreadyImportedException($className->short(), $imports[$className->short()]);
         }
 
         if ($alias && isset($imports[$alias])) {
