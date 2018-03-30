@@ -8,7 +8,6 @@ use Phpactor\CodeTransform\Domain\ClassFinder\ClassFinder;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Microsoft\PhpParser\Node\QualifiedName;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
-use Phpactor\CodeTransform\Domain\ClassNames;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyImportedException;
 use Phpactor\CodeTransform\Domain\ClassName;
 use Phpactor\CodeBuilder\Domain\Updater;
@@ -49,7 +48,7 @@ class TolerantImportClass implements ImportClass
 
         $this->checkIfAlreadyImported($node, $name, $alias);
 
-        return $this->addImport($source, $node, $name);
+        return $this->addImport($source, $node, $name, $alias);
     }
 
     private function nameFromQualifiedName(QualifiedName $node): string
@@ -80,10 +79,10 @@ class TolerantImportClass implements ImportClass
         }
     }
 
-    private function addImport(SourceCode $source, Node $node, string $name): SourceCode
+    private function addImport(SourceCode $source, Node $node, string $name, string $alias = null): SourceCode
     {
         $builder = SourceCodeBuilder::create();
-        $builder->use($name);
+        $builder->use($name, $alias);
         $prototype = $builder->build();
 
         return $source->withSource($this->updater->apply($prototype, Code::fromString((string) $source)));
