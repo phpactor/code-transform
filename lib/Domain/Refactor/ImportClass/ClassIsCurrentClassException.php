@@ -4,7 +4,7 @@ namespace Phpactor\CodeTransform\Domain\Refactor\ImportClass;
 
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
-class ClassIsCurrentClassException extends NameAlreadyUsedException
+class ClassIsCurrentClassException extends TransformException
 {
     /**
      * @var string
