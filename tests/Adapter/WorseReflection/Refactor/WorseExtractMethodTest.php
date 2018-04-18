@@ -90,6 +90,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod14.test',
                 'newMethod',
             ],
+            'keep qualified type hints' => [
+                'extractMethod15.test',
+                'newMethod',
+            ],
         ];
     }
 }

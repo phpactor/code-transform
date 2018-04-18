@@ -1,0 +1,36 @@
+// File: source
+<?php
+
+use NS\A;
+use NS\B;
+
+class C
+{
+    public function aMethod(A\ClassName $param): B\ClassName
+    {
+        $bar = 'hahaha';
+<>        $bar = 'goodbye';
+        <>
+        return new B\ClassName;
+    }
+}
+// File: expected
+<?php
+
+use NS\A;
+use NS\B;
+
+class C
+{
+    public function aMethod(A\ClassName $param): B\ClassName
+    {
+        $bar = 'hahaha';
+        $this->newMethod($bar);
+        return new B\ClassName;
+    }
+
+    private function newMethod(string $bar)
+    {
+        $bar = 'goodbye';
+    }
+}
