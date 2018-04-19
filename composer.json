@@ -9,12 +9,6 @@
             "email": "daniel@dantleech.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/phpactor/code-builder"
-        }
-    ],
     "require": {
         "phpactor/code-builder": "dev-master",
         "webmozart/path-util": "^2.3@dev"
