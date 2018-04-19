@@ -1,11 +1,15 @@
-Class Transform
-===============
+Code Transform
+==============
 
-[![Build Status](https://travis-ci.org/phpactor/class-transform.svg?branch=master)](https://travis-ci.org/phpactor/class-transform)
+[![Build Status](https://travis-ci.org/phpactor/code-transform.svg?branch=master)](https://travis-ci.org/phpactor/code-transform)
 
-Generate classes or transform them.
+A bunch of refactorings for
+[Phpactor](https://github.com/phpactor/code-transform), for example:
 
-- Add missing properties.
-- Implement contracts.
-- Generate interface from class.
-- Complete constructor.
+- Extract Constant
+- Extract Method
+- Generate Accessor
+- Generate Method
+- Import Class
+- Override Method
+- Rename Variable
