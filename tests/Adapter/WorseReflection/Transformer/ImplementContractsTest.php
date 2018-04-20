@@ -428,8 +428,8 @@ EOT
                 <<<'EOT'
 <?php
 
-use Barfoo\Dirt;
 use Arg\Barg;
+use Barfoo\Dirt;
 
 
 interface Rabbit

@@ -9,9 +9,9 @@ new Foo<>bar();
 // File: expected
 <?php
 
+use Barfoo\Foobar;
 use DateTime;
 use Foo;
 use Bar;
-use Barfoo\Foobar;
 
 new Foobar();
