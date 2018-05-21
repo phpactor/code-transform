@@ -7,6 +7,7 @@ use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseExtractMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeBuilder\Adapter\WorseReflection\WorseBuilderFactory;
 use Exception;
+use Phpactor\XmlQuery\Bridge\TolerantParser\TolerantSourceLoader;
 
 class WorseExtractMethodTest extends WorseTestCase
 {
@@ -24,7 +25,7 @@ class WorseExtractMethodTest extends WorseTestCase
 
         $reflector = $this->reflectorFor($source);
         $factory = new WorseBuilderFactory($reflector);
-        $extractMethod = new WorseExtractMethod($reflector, $factory, $this->updater());
+        $extractMethod = new WorseExtractMethod($reflector, new TolerantSourceLoader(), $this->renderer());
         $transformed = $extractMethod->extractMethod(SourceCode::fromString($source), $offsetStart, $offsetEnd, $name);
 
         $this->assertEquals(trim($expected), trim($transformed));

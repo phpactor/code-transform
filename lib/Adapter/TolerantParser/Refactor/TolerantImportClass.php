@@ -113,7 +113,6 @@ class TolerantImportClass implements ImportClass
         $node = $this->loader->loadSource($source->__toString());
 
         $existingNames = $node->find('//NamespaceUseDeclaration//Token[@kind="Name"]');
-
         $statement =  'use ' . $name;
 
         if ($alias) {
