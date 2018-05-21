@@ -9,6 +9,12 @@
             "email": "daniel@dantleech.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:phpactor/xml-query"
+        }
+    ],
     "require": {
         "phpactor/code-builder": "dev-master",
         "webmozart/path-util": "^2.3@dev"
@@ -16,7 +22,8 @@
     "require-dev": {
         "phpunit/phpunit": "^6.2",
         "phpactor/worse-reflection": "^1.0@dev",
-        "phpactor/test-utils": "^1.0@dev"
+        "phpactor/test-utils": "^1.0@dev",
+        "phpactor/xml-query": "dev-master"
     },
     "autoload": {
         "psr-4": {
