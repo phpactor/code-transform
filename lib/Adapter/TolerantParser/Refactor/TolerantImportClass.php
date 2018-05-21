@@ -18,6 +18,10 @@ use Phpactor\CodeTransform\Domain\Refactor\ImportClass\AliasAlreadyUsedException
 use Microsoft\PhpParser\Node\Statement\ClassDeclaration;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassIsCurrentClassException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyInNamespaceException;
+use Phpactor\XmlQuery\Bridge\TolerantParser\TolerantSourceLoader;
+use Phpactor\XmlQuery\NodeList;
+use Phpactor\XmlQuery\SourceLoader;
+use Phpactor\XmlQuery\Node as XmlNode;
 
 class TolerantImportClass implements ImportClass
 {
@@ -27,14 +31,14 @@ class TolerantImportClass implements ImportClass
     private $parser;
 
     /**
-     * @var Updater
+     * @var SourceLoader
      */
-    private $updater;
+    private $loader;
 
-    public function __construct(Updater $updater, Parser $parser = null)
+    public function __construct(SourceLoader $loader = null, Parser $parser = null)
     {
         $this->parser = $parser ?: new Parser();;
-        $this->updater = $updater;
+        $this->loader = $loader ?: new TolerantSourceLoader([], $this->parser);
     }
 
     public function importClass(SourceCode $source, int $offset, string $name, string $alias = null): SourceCode
@@ -45,22 +49,7 @@ class TolerantImportClass implements ImportClass
 
         $this->checkIfAlreadyImported($node, $name, $alias);
 
-        return $this->addImport($source, $node, $name, $alias);
-    }
-
-    private function nameFromQualifiedName(QualifiedName $node): string
-    {
-        $parts = $node->getNameParts();
-
-        if (count($parts) === 0) {
-            throw new TransformException(sprintf(
-                'Name must have at least one part (this shouldn\'t happen'
-            ));
-        }
-
-        $name = array_shift($parts);
-
-        return $name->getText($node->getFileContents());
+        return $this->addImport($source, $name, $alias);
     }
 
     private function checkIfAlreadyImported(Node $node, ClassName $className, string $alias = null)
@@ -82,15 +71,6 @@ class TolerantImportClass implements ImportClass
         if ($this->importClassInSameNamespace($node, $className)) {
             throw new ClassAlreadyInNamespaceException($className->short(), (string) $className);
         }
-    }
-
-    private function addImport(SourceCode $source, Node $node, string $name, string $alias = null): SourceCode
-    {
-        $builder = SourceCodeBuilder::create();
-        $builder->use($name, $alias);
-        $prototype = $builder->build();
-
-        return $source->withSource($this->updater->apply($prototype, Code::fromString((string) $source)));
     }
 
     private function currentClassIsSameAsImportClass(Node $node, ClassName $className): bool
@@ -126,5 +106,57 @@ class TolerantImportClass implements ImportClass
         }
 
         return false;
+    }
+
+    private function addImport(SourceCode $source, string $name, string $alias = null): SourceCode
+    {
+        $node = $this->loader->loadSource($source->__toString());
+
+        $existingNames = $node->find('//NamespaceUseDeclaration//Token[@kind="Name"]');
+
+        $statement =  'use ' . $name;
+
+        if ($alias) {
+            $statement .= ' as ' . $alias;
+        }
+        $statement = $statement . ';';
+
+        if ($existingNames->count()) {
+            $this->updateExistingNames($existingNames, $name, $statement);
+            return $source->withSource($node->text());
+        }
+
+        $namespaceDefinitions = $node->find('//NamespaceDefinition');
+
+        if ($namespaceDefinitions->count()) {
+            $namespaceDefinitions->first()->after($node->createText(PHP_EOL . PHP_EOL . $statement));
+
+            return $source->withSource($node->text());
+        }
+
+        $node->find('//InlineHtml|//DeclareStatement')->last()->after($node->createText(PHP_EOL . $statement));
+
+        return $source->withSource($node->text());
+    }
+
+    /**
+     * @param NodeList<XmlNode> $existingNames
+     * @param string $name
+     * @param string $statement
+     */
+    private function updateExistingNames(NodeList $existingNames, string $name, string $statement)
+    {
+        foreach ($existingNames as $existingName) {
+            $cmp = strcmp($existingName->text(), $name);
+
+            if ($cmp > 0) {
+                $node = $existingName->find('ancestor::NamespaceUseDeclaration//Token[@kind="UseKeyword"]')->first();
+                $node->before(
+                    $node->createText('use ' . $name . ';' . PHP_EOL)
+                );
+
+                return;
+            }
+        }
     }
 }

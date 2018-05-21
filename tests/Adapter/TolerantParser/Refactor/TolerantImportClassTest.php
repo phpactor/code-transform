@@ -103,7 +103,7 @@ EOT
 
     private function importClass($source, int $offset, string $name, string $alias = null)
     {
-        $renameVariable = new TolerantImportClass($this->updater(), $this->parser());
+        $renameVariable = new TolerantImportClass();
         $transformed = $renameVariable->importClass(SourceCode::fromString($source), $offset, $name, $alias);
 
         return $transformed;

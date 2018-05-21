@@ -6,6 +6,4 @@ new F<>oobar();
 <?php
 
 use Barfoo\Foobar as Barfoo;
-
-
 new Foobar();
