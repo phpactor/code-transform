@@ -23,4 +23,3 @@ class extractMethod1
         $foobar = 'hello';
     }
 }
-

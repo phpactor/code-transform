@@ -3,6 +3,7 @@
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
 use Phpactor\CodeBuilder\Domain\Renderer;
+use Phpactor\CodeBuilder\Util\TextFormat;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\WorseReflection\Reflector;
@@ -44,12 +45,20 @@ class WorseExtractMethod implements ExtractMethod
      */
     private $sourceLoader;
 
-    public function __construct(Reflector $reflector, SourceLoader $sourceLoader, Renderer $updater)
+    /**
+     * @var TextFormat
+     */
+    private $textFormat;
+
+    public function __construct(Reflector $reflector, SourceLoader $sourceLoader, Renderer $updater, TextFormat $textFormat = null)
     {
         $this->reflector = $reflector;
         $this->updater = $updater;
-        $this->parser = new Parser();
         $this->sourceLoader = $sourceLoader;
+
+        // to remove
+        $this->textFormat = $textFormat ?: new TextFormat();
+        $this->parser = new Parser();
     }
 
     public function extractMethod(SourceCode $source, int $offsetStart, int $offsetEnd, string $name): SourceCode
@@ -59,7 +68,7 @@ class WorseExtractMethod implements ExtractMethod
 
         $reflectionMethod = $this->reflectMethod($offsetEnd, $source, $name);
 
-        $methodBuilder = (new MethodBuilder(null, $name))->visibility('private');
+        $methodBuilder = (new MethodBuilder($name))->visibility('private');
         $methodBuilder->body()->line($this->removeIndentation($selection));
 
         $locals = $this->scopeLocalVariables($source, $offsetStart, $offsetEnd);
@@ -71,16 +80,18 @@ class WorseExtractMethod implements ExtractMethod
         $returnAssignment = $this->addReturnAndGetAssignment($returnVariables, $methodBuilder, $args);
 
         $sourceNode->find('//MethodDeclaration')->last()->after($sourceNode->createText(
-            PHP_EOL . '    ' . $this->updater->render($methodBuilder->build()) . $this->updater->render($methodBuilder->body()->build())
+            PHP_EOL . PHP_EOL . $this->textFormat->indent($this->updater->render($methodBuilder->build()), 1)
         ));
 
+        $source = $source->withSource($sourceNode->text());
         $source = $source->replaceSelection(
             $this->replacement($name, $args, $selection, $returnAssignment),
             $offsetStart,
             $offsetEnd
         );
 
-        return $source->withSource($sourceNode->text());
+        return $source;
+
     }
 
     private function parameterVariables(Assignments $locals, string $selection, int $offsetStart)
