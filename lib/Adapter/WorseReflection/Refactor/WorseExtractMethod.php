@@ -21,6 +21,7 @@ use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeTransform\Domain\Utils\TextUtils;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 use Phpactor\XmlQuery\Node;
+use Phpactor\XmlQuery\NodeList;
 use Phpactor\XmlQuery\SourceLoader;
 
 class WorseExtractMethod implements ExtractMethod
@@ -34,11 +35,6 @@ class WorseExtractMethod implements ExtractMethod
      * @var Renderer
      */
     private $updater;
-
-    /**
-     * @var Parser
-     */
-    private $parser;
 
     /**
      * @var SourceLoader
@@ -58,25 +54,25 @@ class WorseExtractMethod implements ExtractMethod
 
         // to remove
         $this->textFormat = $textFormat ?: new TextFormat();
-        $this->parser = new Parser();
     }
 
     public function extractMethod(SourceCode $source, int $offsetStart, int $offsetEnd, string $name): SourceCode
     {
         $selection = $source->extractSelection($offsetStart, $offsetEnd);
         $sourceNode = $this->sourceLoader->loadSource($source);
+        $selection = $sourceNode->find('//Token[@start >= ? and @start + @length <= ?]', $offsetStart, $offsetEnd);
 
         $reflectionMethod = $this->reflectMethod($offsetEnd, $source, $name);
 
         $methodBuilder = (new MethodBuilder($name))->visibility('private');
-        $methodBuilder->body()->line($this->removeIndentation($selection));
+        $methodBuilder->body()->line($this->removeIndentation($selection->text()));
 
         $locals = $this->scopeLocalVariables($source, $offsetStart, $offsetEnd);
 
         $parameterVariables = $this->parameterVariables($locals->lessThan($offsetStart), $selection, $offsetStart);
         $args = $this->addParametersAndGetArgs($parameterVariables, $methodBuilder, $sourceNode);
 
-        $returnVariables = $this->returnVariables($locals, $reflectionMethod, $source, $offsetStart, $offsetEnd);
+        $returnVariables = $this->returnVariables($locals, $reflectionMethod, $sourceNode, $offsetStart, $offsetEnd);
         $returnAssignment = $this->addReturnAndGetAssignment($returnVariables, $methodBuilder, $args);
 
         $sourceNode->find('//MethodDeclaration')->last()->after($sourceNode->createText(
@@ -94,7 +90,7 @@ class WorseExtractMethod implements ExtractMethod
 
     }
 
-    private function parameterVariables(Assignments $locals, string $selection, int $offsetStart)
+    private function parameterVariables(Assignments $locals, NodeList $selection, int $offsetStart)
     {
         $variableNames = $this->variableNames($selection);
 
@@ -109,20 +105,18 @@ class WorseExtractMethod implements ExtractMethod
         return $parameterVariables;
     }
 
-    private function returnVariables(Assignments $locals, ReflectionMethod $reflectionMethod, string $source, int $offsetStart, int $offsetEnd)
+    private function returnVariables(Assignments $locals, ReflectionMethod $reflectionMethod, Node $sourceNode, int $offsetStart, int $offsetEnd)
     {
         // variables that are:
         //
         // - defined in the selection
         // - and used in the parent scope
         // - after the end offset
-        $tailDependencies = $this->variableNames(
-            $tail = mb_substr(
-                $source,
-                $offsetEnd,
-                $reflectionMethod->position()->end() - $offsetEnd
-            )
+        $tailTokens = $sourceNode->find('//Token[@start > ? and @end <= ?]', 
+            $offsetEnd,
+            $reflectionMethod->position()->end() - $offsetEnd
         );
+        $tailDependencies  = $this->variableNames($tailTokens);
 
         $returnVariables = [];
         foreach ($tailDependencies as $variable) {
@@ -198,16 +192,13 @@ class WorseExtractMethod implements ExtractMethod
         )->frame()->locals();
     }
 
-    private function variableNames(string $source)
+    private function variableNames(NodeList $selection)
     {
-        $source = '<?php ' . $source;
-        $node = $this->parser->parseSourceFile($source);
         $variables = [];
-
-        /** @var Token $token */
-        foreach ($node->getDescendantTokens() as $token) {
-            if ($token->kind == TokenKind::VariableName) {
-                $name = substr($token->getText($source), 1);
+        /** @var Node $token */
+        foreach ($selection as $token) {
+            if ($token->attributes()->get('kind') == 'VariableName') {
+                $name = substr($token->text(), 1);
                 $variables[$name] = $name;
             }
         }
@@ -249,9 +240,9 @@ class WorseExtractMethod implements ExtractMethod
         return 'list(' . $names . ')';
     }
 
-    private function replacement(string $name, array $args, string $selection, string $returnAssignment = null)
+    private function replacement(string $name, array $args, NodeList $selection, string $returnAssignment = null)
     {
-        $indentation = str_repeat(' ', TextUtils::stringIndentation($selection));
+        $indentation = str_repeat(' ', TextUtils::stringIndentation($selection->text()));
         $callString = '$this->'  . $name . '(' . implode(', ', $args) . ');';
 
         if (empty($returnAssignment)) {
