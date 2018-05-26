@@ -20,7 +20,10 @@ class WorseGenerateAccessorTest extends WorseTestCase
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
         $generateAccessor = new WorseGenerateAccessor($this->reflectorFor($source), $this->updater(), $prefix, $upperCaseFirst);
-        $transformed = $generateAccessor->generateAccessor(SourceCode::fromString($source), $offset);
+        $transformed = $this->executeMacro($generateAccessor, [
+            'sourceCode' => SourceCode::fromString($source),
+            'offset' => $offset
+        ]);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -54,7 +57,10 @@ class WorseGenerateAccessorTest extends WorseTestCase
         $this->expectExceptionMessage('Symbol at offset "9" is not a property');
         $source = '<?php echo "hello";';
 
-        $generateAccessor = new WorseGenerateAccessor($this->reflectorFor(''), $this->updater());
-        $generateAccessor->generateAccessor(SourceCode::fromString($source), 9);
+        $generateAccessor = new WorseGenerateAccessor($this->reflectorFor($source), $this->updater());
+        $this->executeMacro($generateAccessor, [
+            'sourceCode' => SourceCode::fromString($source),
+            'offset' => 9
+        ]);
     }
 }

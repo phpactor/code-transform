@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Macro;
 
+use Phpactor\CodeTransform\Domain\Macro\Macro;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\WorseReflection\Reflector;
@@ -19,7 +20,7 @@ use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeTransform\Domain\Utils\TextUtils;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 
-class WorseExtractMethod implements ExtractMethod
+class WorseExtractMethod implements Macro
 {
     /**
      * @var Reflector
@@ -49,7 +50,12 @@ class WorseExtractMethod implements ExtractMethod
         $this->factory = $factory;
     }
 
-    public function extractMethod(SourceCode $source, int $offsetStart, int $offsetEnd, string $name): SourceCode
+    public function name()
+    {
+        return 'extract_methodf';
+    }
+
+    public function __invoke(SourceCode $source, int $offsetStart, int $offsetEnd, string $name): SourceCode
     {
         $selection = $source->extractSelection($offsetStart, $offsetEnd);
         $builder = $this->factory->fromSource($source);

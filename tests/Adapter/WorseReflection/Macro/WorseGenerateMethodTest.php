@@ -85,6 +85,11 @@ EOT
         $reflector = $this->reflectorFor($source);
         $factory = new WorseBuilderFactory($reflector);
         $generateMethod = new WorseGenerateMethod($reflector, $factory, $this->updater());
+        return $this->executeMacro($generateMethod, [
+            'sourceCode' => SourceCode::fromString($source),
+            'offset'=>  $start, 
+            'methodName' => $name
+        ]);
         return $generateMethod->generateMethod(SourceCode::fromString($source), $start, $name);
     }
 }

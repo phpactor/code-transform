@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Macro;
 
+use Phpactor\CodeTransform\Domain\Macro\Macro;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\WorseReflection\Core\Inference\Symbol;
@@ -13,7 +14,7 @@ use Phpactor\WorseReflection\Core\Inference\SymbolContext;
 use Phpactor\WorseReflection\Core\Type;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
-class WorseGenerateAccessor implements GenerateAccessor
+class WorseGenerateAccessor implements Macro
 {
     /**
      * @var Reflector
@@ -47,7 +48,12 @@ class WorseGenerateAccessor implements GenerateAccessor
         $this->upperCaseFirst = $upperCaseFirst;
     }
 
-    public function generateAccessor(SourceCode $sourceCode, int $offset): SourceCode
+    public function name()
+    {
+        return 'generate_accessor';
+    }
+
+    public function __invoke(SourceCode $sourceCode, int $offset): SourceCode
     {
         $info = $this->getInfo($sourceCode, $offset);
         $prototype = $this->buildPrototype($info);

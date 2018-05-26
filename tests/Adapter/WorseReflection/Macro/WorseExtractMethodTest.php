@@ -25,7 +25,12 @@ class WorseExtractMethodTest extends WorseTestCase
         $reflector = $this->reflectorFor($source);
         $factory = new WorseBuilderFactory($reflector);
         $extractMethod = new WorseExtractMethod($reflector, $factory, $this->updater());
-        $transformed = $extractMethod->extractMethod(SourceCode::fromString($source), $offsetStart, $offsetEnd, $name);
+        $transformed = $this->executeMacro($extractMethod, [
+            'source' => SourceCode::fromString($source), 
+            'offsetStart' => $offsetStart,
+            'offsetEnd' => $offsetEnd,
+            'name' => $name
+        ]);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }

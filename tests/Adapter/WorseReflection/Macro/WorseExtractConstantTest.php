@@ -18,7 +18,11 @@ class WorseExtractConstantTest extends WorseTestCase
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
         $extractConstant = new WorseExtractConstant($this->reflectorFor($source), $this->updater());
-        $transformed = $extractConstant->extractConstant(SourceCode::fromString($source), $offset, $name);
+        $transformed = $this->executeMacro($extractConstant, [
+            'sourceCode' => SourceCode::fromString($source),
+            'offset' => $offset,
+            'constantName' => $name
+        ]);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -64,6 +68,11 @@ EOT
         ;
 
         $extractConstant = new WorseExtractConstant($this->reflectorFor($code), $this->updater());
+        $this->executeMacro($extractConstant, [
+            'sourceCode' => SourceCode::fromString($code),
+            'offset' => 8, 
+            'constantName' => 'asd'
+        ]);
         $transformed = $extractConstant->extractConstant(SourceCode::fromString($code), 8, 'asd');
     }
 }

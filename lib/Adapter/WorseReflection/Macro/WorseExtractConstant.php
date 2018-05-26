@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Macro;
 
+use Phpactor\CodeTransform\Domain\Macro\Macro;
 use Phpactor\CodeTransform\Domain\Refactor\ExtractConstant;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\CodeBuilder\Domain\Updater;
@@ -18,7 +19,7 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Core\Type;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
-class WorseExtractConstant implements ExtractConstant
+class WorseExtractConstant implements Macro
 {
     /**
      * @var Reflector
@@ -42,7 +43,12 @@ class WorseExtractConstant implements ExtractConstant
         $this->parser = $parser ?: new Parser();
     }
 
-    public function extractConstant(SourceCode $sourceCode, int $offset, string $constantName): SourceCode
+    public function name()
+    {
+        return 'extract_constant';
+    }
+
+    public function __invoke(SourceCode $sourceCode, int $offset, string $constantName): SourceCode
     {
         $symbolInformation = $this->reflector
             ->reflectOffset($sourceCode->__toString(), $offset)

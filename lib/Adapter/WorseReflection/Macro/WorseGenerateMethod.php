@@ -6,6 +6,7 @@ use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\CodeBuilder\Domain\Prototype\Visibility;
 use Phpactor\CodeBuilder\Domain\Updater;
+use Phpactor\CodeTransform\Domain\Macro\Macro;
 use Phpactor\CodeTransform\Domain\Refactor\GenerateMethod;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionArgument;
@@ -18,7 +19,7 @@ use Phpactor\WorseReflection\Core\Type;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
 
-class WorseGenerateMethod implements GenerateMethod
+class WorseGenerateMethod implements Macro
 {
     /**
      * @var Reflector
@@ -46,7 +47,12 @@ class WorseGenerateMethod implements GenerateMethod
         $this->factory = $factory;
     }
 
-    public function generateMethod(SourceCode $sourceCode, int $offset, $methodName = null): SourceCode
+    public function name()
+    {
+        return 'generate_method';
+    }
+
+    public function __invoke(SourceCode $sourceCode, int $offset, $methodName = null): SourceCode
     {
         $contextType = $this->contextType($sourceCode, $offset);
         $worseSourceCode = WorseSourceCode::fromPathAndString((string) $sourceCode->path(), (string) $sourceCode);

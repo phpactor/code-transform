@@ -12,9 +12,7 @@ use Phpactor\CodeBuilder\Adapter\WorseReflection\WorseBuilderFactory;
 class WorseOverrideMethodTest extends WorseTestCase
 {
     /**
-     * @dataProvider provideExtractMethod
-     */
-    public function testOverrideMethod(string $test, string $className, $methodName)
+     * @dataProvider provideExtractMethod */ public function testOverrideMethod(string $test, string $className, $methodName)
     {
         list($source, $expected) = $this->sourceExpected(__DIR__ . '/fixtures/' . $test);
 
@@ -65,6 +63,10 @@ class WorseOverrideMethodTest extends WorseTestCase
         $reflector = $this->reflectorFor($source);
         $factory = new WorseBuilderFactory($reflector);
         $override = new WorseOverrideMethod($reflector, $factory, $this->updater());
-        return $override->overrideMethod(SourceCode::fromString($source), $className, $methodName);
+        return $this->executeMacro($override, [
+            'source' => SourceCode::fromString($source), 
+            'className' => $className, 
+            'methodName' => $methodName
+        ]);
     }
 }

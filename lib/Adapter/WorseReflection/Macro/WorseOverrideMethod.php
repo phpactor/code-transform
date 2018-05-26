@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Macro;
 
+use Phpactor\CodeTransform\Domain\Macro\Macro;
 use Phpactor\CodeTransform\Domain\Refactor\OverrideMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Reflector;
@@ -14,7 +15,7 @@ use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
 
-class WorseOverrideMethod implements OverrideMethod
+class WorseOverrideMethod implements Macro
 {
     /**
      * @var Updater
@@ -38,7 +39,12 @@ class WorseOverrideMethod implements OverrideMethod
         $this->reflector = $reflector;
     }
 
-    public function overrideMethod(SourceCode $source, string $className, string $methodName)
+    public function name()
+    {
+        return 'override_method';
+    }
+
+    public function __invoke(SourceCode $source, string $className, string $methodName): SourceCode
     {
         $class = $this->getReflectionClass($className);
         $method = $this->getAncestorReflectionMethod($class, $methodName);
@@ -46,7 +52,7 @@ class WorseOverrideMethod implements OverrideMethod
         $methodBuilder = $this->getMethodPrototype($class, $method, $methodName);
         $sourcePrototype = $this->getSourcePrototype($class, $method, $source, $methodBuilder);
 
-        return $this->updater->apply($sourcePrototype, Code::fromString((string) $source));
+        return $source->withSource(( string) $this->updater->apply($sourcePrototype, Code::fromString((string) $source)));
     }
 
     private function getReflectionClass(string $className): ReflectionClass
