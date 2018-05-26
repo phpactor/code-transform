@@ -1,9 +1,9 @@
 <?php
 
-namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
+namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Macro;
 
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
-use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseExtractConstant;
+use Phpactor\CodeTransform\Adapter\WorseReflection\Macro\WorseExtractConstant;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\TestUtils\ExtractOffset;

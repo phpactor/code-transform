@@ -1,9 +1,9 @@
 <?php
 
-namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
+namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Macro;
 
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
-use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseExtractMethod;
+use Phpactor\CodeTransform\Adapter\WorseReflection\Macro\WorseExtractMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeBuilder\Adapter\WorseReflection\WorseBuilderFactory;
 use Exception;
