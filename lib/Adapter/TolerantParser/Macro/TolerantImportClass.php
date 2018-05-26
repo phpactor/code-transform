@@ -1,7 +1,8 @@
 <?php
 
-namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
+namespace Phpactor\CodeTransform\Adapter\TolerantParser\Macro;
 
+use Phpactor\CodeTransform\Domain\Macro\Macro;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\ClassFinder\ClassFinder;
@@ -19,7 +20,7 @@ use Microsoft\PhpParser\Node\Statement\ClassDeclaration;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassIsCurrentClassException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyInNamespaceException;
 
-class TolerantImportClass implements ImportClass
+class TolerantImportClass implements Macro
 {
     /**
      * @var Parser
@@ -37,7 +38,12 @@ class TolerantImportClass implements ImportClass
         $this->updater = $updater;
     }
 
-    public function importClass(SourceCode $source, int $offset, string $name, string $alias = null): SourceCode
+    public function name()
+    {
+        return 'import_class';
+    }
+
+    public function __invoke(SourceCode $source, int $offset, string $name, string $alias = null): SourceCode
     {
         $name = ClassName::fromString($name);
         $sourceNode = $this->parser->parseSourceFile($source);

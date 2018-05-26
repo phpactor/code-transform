@@ -1,9 +1,9 @@
 <?php
 
-namespace Phpactor\CodeTransform\Tests\Adapter\TolerantParser\Refactor;
+namespace Phpactor\CodeTransform\Tests\Adapter\TolerantParser\Macro;
 
 use Phpactor\CodeTransform\Tests\Adapter\TolerantParser\TolerantTestCase;
-use Phpactor\CodeTransform\Adapter\TolerantParser\Refactor\TolerantImportClass;
+use Phpactor\CodeTransform\Adapter\TolerantParser\Macro\TolerantImportClass;
 use Phpactor\CodeTransform\Domain\ClassFinder\ArrayClassFinder;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyImportedException;
@@ -103,9 +103,11 @@ EOT
 
     private function importClass($source, int $offset, string $name, string $alias = null)
     {
-        $renameVariable = new TolerantImportClass($this->updater(), $this->parser());
-        $transformed = $renameVariable->importClass(SourceCode::fromString($source), $offset, $name, $alias);
-
-        return $transformed;
+        return $this->executeMacro(new TolerantImportClass($this->updater()), [
+            'source' => SourceCode::fromString($source),
+            'offset' => $offset,
+            'name' => $name,
+            'alias' => $alias
+        ]);
     }
 }

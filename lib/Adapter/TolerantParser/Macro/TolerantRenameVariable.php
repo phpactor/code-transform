@@ -1,7 +1,8 @@
 <?php
 
-namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
+namespace Phpactor\CodeTransform\Adapter\TolerantParser\Macro;
 
+use Phpactor\CodeTransform\Domain\Macro\Macro;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Microsoft\PhpParser\Parser;
 use Microsoft\PhpParser\Node\Expression\Variable;
@@ -14,8 +15,11 @@ use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\Node\Parameter;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
-class TolerantRenameVariable implements RenameVariable
+class TolerantRenameVariable implements Macro
 {
+    const SCOPE_LOCAL = 'local';
+    const SCOPE_FILE = 'file';
+
     /**
      * @var Parser
      */
@@ -26,7 +30,12 @@ class TolerantRenameVariable implements RenameVariable
         $this->parser = $parser ?: new Parser();
     }
 
-    public function renameVariable(SourceCode $sourceCode, int $offset, string $newName, string $scope = self::SCOPE_FILE): SourceCode
+    public function name()
+    {
+        return 'rename_variable';
+    }
+
+    public function __invoke(SourceCode $sourceCode, int $offset, string $newName, string $scope = self::SCOPE_FILE): SourceCode
     {
         $sourceNode = $this->sourceNode($sourceCode->__toString());
         $variable = $this->variableNodeFromSource($sourceNode, $offset);
@@ -77,7 +86,7 @@ class TolerantRenameVariable implements RenameVariable
 
     private function scopeNode(Node $variable, string $scope): Node
     {
-        if ($scope === RenameVariable::SCOPE_FILE) {
+        if ($scope === self::SCOPE_FILE) {
             return $variable->getRoot();
         }
 
