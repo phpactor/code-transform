@@ -93,7 +93,7 @@ class WorseGenerateAccessor implements GenerateAccessor
         $method->body()->line(sprintf('return $this->%s;', $info->symbol()->name()));
 
         if ($info->type()->isDefined()) {
-            $method->returnType($info->type()->isClass() ? $info->type()->className()->short() : (string) $info->type());
+            $method->returnType($info->type()->isClass() ? $info->type()->className()->short() : $info->type()->primitive());
         }
 
         return $builder->build();

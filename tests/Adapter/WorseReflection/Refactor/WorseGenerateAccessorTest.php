@@ -42,6 +42,9 @@ class WorseGenerateAccessorTest extends WorseTestCase
             'namespaced' => [
                 'generateAccessor4.test',
             ],
+            'pseudo-type' => [
+                'generateAccessor5.test',
+            ],
         ];
     }
 
