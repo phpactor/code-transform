@@ -4,6 +4,7 @@ namespace Phpactor\CodeTransform\Tests\Unit\Domain;
 
 use PHPUnit\Framework\TestCase;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use RuntimeException;
 
 class SourceCodeTest extends TestCase
 {
@@ -17,6 +18,29 @@ class SourceCodeTest extends TestCase
         $source = SourceCode::fromStringAndPath(self::SOURCE, self::PATH);
 
         $this->assertEquals(self::PATH, $source->path());
+    }
+
+    public function testFromUnknownReturnsSourceCodeIfPassedSourceCode()
+    {
+        $source1 = SourceCode::fromStringAndPath(self::SOURCE, self::PATH);
+        $source2 = SourceCode::fromUnknown($source1);
+
+        $this->assertSame($source1, $source2);
+    }
+
+    public function testFromUnknownReturnsSourceCodeIfPassedString()
+    {
+        $source1 = 'hello';
+        $source2 = SourceCode::fromUnknown($source1);
+
+        $this->assertEquals(SourceCode::fromString($source1), $source2);
+    }
+
+    public function testFromUnknownThrowsExceptionIfTypeIsInvalid()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Do not know');
+        $source2 = SourceCode::fromUnknown(1234);
     }
 
     public function testWithSource()

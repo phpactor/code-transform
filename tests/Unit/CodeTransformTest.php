@@ -26,6 +26,20 @@ class CodeTransformTest extends TestCase
         $this->assertSame($expectedCode, $code);
     }
 
+    public function testAcceptsSourceCodeAsParameter()
+    {
+        $expectedCode = SourceCode::fromStringAndPath('hello goodbye', '/path/to');
+
+        $trans1 = $this->prophesize(Transformer::class);
+        $trans1->transform($expectedCode)->willReturn($expectedCode);
+
+        $code = $this->create([
+            'one' => $trans1->reveal()
+        ])->transform($expectedCode, [ 'one' ]);
+
+        $this->assertSame($expectedCode, $code);
+    }
+
     public function create(array $transformers): CodeTransform
     {
         return CodeTransform::fromTransformers(Transformers::fromArray($transformers));
