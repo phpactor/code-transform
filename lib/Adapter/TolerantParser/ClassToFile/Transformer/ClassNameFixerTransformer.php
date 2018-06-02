@@ -94,8 +94,16 @@ class ClassNameFixerTransformer implements Transformer
 
         if ($correctNamespace && null === $namespaceDefinition) {
             $scriptStart = $rootNode->getFirstDescendantNode(InlineHtml::class);
+            $scriptStart = $scriptStart ? $scriptStart->getEndPosition() : 0;
+
             $statement = PHP_EOL . $statement . PHP_EOL;
-            return new TextEdit($scriptStart->getEndPosition(), 0, $statement);
+
+            if (0 === $scriptStart) {
+                $statement = '<?php' . PHP_EOL . $statement;
+            }
+
+
+            return new TextEdit($scriptStart, 0, $statement);
         }
 
         if (null === $namespaceDefinition) {

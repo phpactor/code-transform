@@ -28,10 +28,7 @@ class ClassNameFixerTransformerTest extends AdapterTestCase
         $source = $workspace->getContents($filePath);
         $expected = $workspace->getContents('expected');
 
-        $autoload = $this->initComposer($workspace);
-
-        $fileToClass = new ComposerFileToClass($autoload);
-        $transformer = new ClassNameFixerTransformer($fileToClass);
+        $transformer = $this->createTransformer($workspace);
         $transformed = $transformer->transform(SourceCode::fromStringAndPath($source, $this->workspace()->path($filePath)));
 
         $this->assertEquals(trim($expected), trim($transformed));
@@ -51,8 +48,26 @@ class ClassNameFixerTransformerTest extends AdapterTestCase
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Source code has no path');
-        $transformer = new ClassNameFixerTransformer(new SimpleFileToClass(__DIR__));
+        $transformer = $this->createTransformer($this->workspace());
         $transformed = $transformer->transform(SourceCode::fromString('hello'));
+    }
+
+    public function testOnEmptyFile()
+    {
+        $workspace = $this->workspace();
+        $workspace->reset();
+        $workspace->loadManifest(file_get_contents(__DIR__ . '/fixtures/fixNamespace1.test'));
+        $source = $workspace->getContents('PathTo/FileOne.php');
+        $expected = $workspace->getContents('expected');
+        $transformer = $this->createTransformer($workspace);
+        $transformed = $transformer->transform(SourceCode::fromStringAndPath('', $this->workspace()->path('/PathTo/FileOne.php')));
+        $this->assertEquals(<<<'EOT'
+<?php
+
+namespace PathTo;
+
+EOT
+        , (string) $transformed);
     }
 
     private function initComposer(Workspace $workspace)
@@ -79,5 +94,13 @@ EOT
         self::$composerAutoload = require_once($workspace->path('/vendor/autoload.php'));
 
         return $this->initComposer($workspace);
+    }
+
+    private function createTransformer(Workspace $workspace)
+    {
+        $autoload = $this->initComposer($workspace);
+        $fileToClass = new ComposerFileToClass($autoload);
+        $transformer = new ClassNameFixerTransformer($fileToClass);
+        return $transformer;
     }
 }
