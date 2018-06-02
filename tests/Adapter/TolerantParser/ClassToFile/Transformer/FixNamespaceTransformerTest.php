@@ -9,9 +9,12 @@ use Phpactor\ClassFileConverter\Domain\FileToClass;
 use Phpactor\CodeTransform\Adapter\TolerantParser\ClassToFile\Transformer\FixNameTransformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Tests\Adapter\AdapterTestCase;
+use Phpactor\TestUtils\Workspace;
 
 class FixNamespaceTransformerTest extends AdapterTestCase
 {
+    private static $composerAutoload;
+
     /**
      * @dataProvider provideFixClassName
      */
@@ -23,7 +26,9 @@ class FixNamespaceTransformerTest extends AdapterTestCase
         $source = $workspace->getContents($filePath);
         $expected = $workspace->getContents('expected');
 
-        $fileToClass = new SimpleFileToClass($this->workspace()->path('/'));
+        $autoload = $this->initComposer($workspace);
+
+        $fileToClass = new ComposerFileToClass($autoload);
         $transformer = new FixNameTransformer($fileToClass);
         $transformed = $transformer->transform(SourceCode::fromStringAndPath($source, $this->workspace()->path($filePath)));
 
@@ -34,5 +39,35 @@ class FixNamespaceTransformerTest extends AdapterTestCase
     {
         yield 'no op' => [ 'FileOne.php', 'fixNamespace0.test' ];
         yield 'fix file with missing namespace' => [ 'PathTo/FileOne.php', 'fixNamespace1.test' ];
+        yield 'fix file with namespace' => [ 'PathTo/FileOne.php', 'fixNamespace2.test' ];
+        yield 'fix class name' => [ 'FileOne.php', 'fixNamespace3.test' ];
+        yield 'fix class name with same line bracket' => [ 'FileOne.php', 'fixNamespace4.test' ];
+        yield 'fix class name and namespace' => [ 'Phpactor/Test/Foobar/FileOne.php', 'fixNamespace5.test' ];
+    }
+
+    private function initComposer(Workspace $workspace)
+    {
+        if (self::$composerAutoload) {
+            return self::$composerAutoload;
+        }
+
+        $composer = <<<'EOT'
+{
+"autoload": {
+    "psr-4": {
+        "": ""
+    }
+}
+}
+EOT
+        ;
+        file_put_contents($workspace->path('/composer.json'), $composer);
+        $cwd = getcwd();
+        chdir($workspace->path('/'));
+        exec('composer dumpautoload');
+        chdir($cwd);
+        self::$composerAutoload = require_once($workspace->path('/vendor/autoload.php'));
+
+        return $this->initComposer($workspace);
     }
 }

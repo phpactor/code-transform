@@ -10,9 +10,9 @@ use Microsoft\PhpParser\Node\Statement\InterfaceDeclaration;
 use Microsoft\PhpParser\Node\Statement\NamespaceDefinition;
 use Microsoft\PhpParser\Node\Statement\TraitDeclaration;
 use Microsoft\PhpParser\Parser;
-use Microsoft\PhpParser\TextEdit;
 use Phpactor\ClassFileConverter\Domain\FilePath;
 use Phpactor\ClassFileConverter\Domain\FileToClass;
+use Phpactor\CodeBuilder\Adapter\TolerantParser\TextEdit;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Transformer;
 
@@ -41,45 +41,61 @@ class FixNameTransformer implements Transformer
         );
 
         $classFqn = $candidates->best();
-        $className = $classFqn->name();
-        $namespace = $classFqn->namespace();
+        $correctClassName = $classFqn->name();
+        $correctNamespace = $classFqn->namespace();
 
         $rootNode = $this->parser->parseSourceFile((string) $code);
-        $edits = $this->fixNamespace($rootNode, $namespace);
-        //$edits = $this->fixClassName($rootNode, $className);
+        $edits = [];
+        if ($textEdit = $this->fixNamespace($rootNode, $correctNamespace)) {
+            $edits[] = $textEdit;
+        }
+
+        if ($textEdit = $this->fixClassName($rootNode, $correctClassName)) {
+            $edits[] = $textEdit;
+        }
 
         return $code->withSource(TextEdit::applyEdits($edits, (string) $code));
     }
 
-    private function fixClassName(SourceFileNode $rootNode, string $correctClassName): array
+    private function fixClassName(SourceFileNode $rootNode, string $correctClassName):? TextEdit
     {
         $classLike = $rootNode->getFirstDescendantNode(ClassLike::class);
         
         if (null === $classLike) {
-            return [];
+            return null;
         }
         
         assert($classLike instanceof ClassDeclaration || $classLike instanceof InterfaceDeclaration || $classLike instanceof TraitDeclaration);
         
         $name = $classLike->name->getText($rootNode->getFileContents());
+
         if ($name === $correctClassName) {
-            return [];
+            return null;
         }
 
-        throw new \Exception('TODO: This');
+        return new TextEdit($classLike->name->start, strlen($name), $correctClassName);
     }
 
-    private function fixNamespace(SourceFileNode $rootNode, $correctNamespace)
+    private function fixNamespace(SourceFileNode $rootNode, $correctNamespace):? TextEdit
     {
         $namespaceDefinition = $rootNode->getFirstDescendantNode(NamespaceDefinition::class);
         $statement = sprintf('namespace %s;', $correctNamespace);
 
-        if (null === $namespaceDefinition) {
+        if ($correctNamespace && null === $namespaceDefinition) {
             $scriptStart = $rootNode->getFirstDescendantNode(InlineHtml::class);
-            return [ new TextEdit($scriptStart->getEndPosition(), 0, $statement) ];
+            $statement = PHP_EOL . $statement . PHP_EOL;
+            return new TextEdit($scriptStart->getEndPosition(), 0, $statement);
         }
 
-        return [];
+        if (null === $namespaceDefinition) {
+            return null;
+        }
+
+        return new TextEdit(
+            $namespaceDefinition->getStart(),
+            $namespaceDefinition->getEndPosition() - $namespaceDefinition->getStart(),
+            $statement
+        );
     }
 
 }
