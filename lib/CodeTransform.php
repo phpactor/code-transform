@@ -27,10 +27,11 @@ class CodeTransform
         return $this->transformers;
     }
 
-    public function transform(string $code, array $transformations): SourceCode
+    public function transform($code, array $transformations): SourceCode
     {
+        $code = SourceCode::fromUnknown($code);
         $transformers = $this->transformers->in($transformations);
 
-        return $transformers->applyTo(SourceCode::fromString($code));
+        return $transformers->applyTo($code);
     }
 }

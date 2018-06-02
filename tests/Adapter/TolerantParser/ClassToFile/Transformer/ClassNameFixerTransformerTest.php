@@ -11,6 +11,7 @@ use Phpactor\CodeTransform\Adapter\TolerantParser\ClassToFile\Transformer\FixNam
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Tests\Adapter\AdapterTestCase;
 use Phpactor\TestUtils\Workspace;
+use RuntimeException;
 
 class ClassNameFixerTransformerTest extends AdapterTestCase
 {
@@ -44,6 +45,14 @@ class ClassNameFixerTransformerTest extends AdapterTestCase
         yield 'fix class name' => [ 'FileOne.php', 'fixNamespace3.test' ];
         yield 'fix class name with same line bracket' => [ 'FileOne.php', 'fixNamespace4.test' ];
         yield 'fix class name and namespace' => [ 'Phpactor/Test/Foobar/FileOne.php', 'fixNamespace5.test' ];
+    }
+
+    public function testThrowsExceptionIfSourceCodeHasNoPath()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Source code has no path');
+        $transformer = new ClassNameFixerTransformer(new SimpleFileToClass(__DIR__));
+        $transformed = $transformer->transform(SourceCode::fromString('hello'));
     }
 
     private function initComposer(Workspace $workspace)

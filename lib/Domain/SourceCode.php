@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Domain;
 
+use RuntimeException;
 use Webmozart\PathUtil\Path;
 
 final class SourceCode
@@ -66,5 +67,21 @@ final class SourceCode
         $end = substr($this->code, $offsetEnd);
 
         return self::withSource($start . $replacement . $end);
+    }
+
+    public static function fromUnknown($code)
+    {
+        if ($code instanceof SourceCode) {
+            return $code;
+        }
+
+        if (is_string($code)) {
+            return self::fromString($code);
+        }
+
+        throw new RuntimeException(sprintf(
+            'Do not know how to create source code object from "%s"',
+            gettype($code)
+        ));
     }
 }

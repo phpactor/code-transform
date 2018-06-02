@@ -15,6 +15,7 @@ use Phpactor\ClassFileConverter\Domain\FileToClass;
 use Phpactor\CodeBuilder\Adapter\TolerantParser\TextEdit;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Transformer;
+use RuntimeException;
 
 class ClassNameFixerTransformer implements Transformer
 {
@@ -36,6 +37,10 @@ class ClassNameFixerTransformer implements Transformer
 
     public function transform(SourceCode $code): SourceCode
     {
+        if (!$code->path()) {
+            throw new RuntimeException('Source code has no path associated with it');
+        }
+
         $candidates = $this->fileToClass->fileToClassCandidates(
             FilePath::fromString((string) $code->path())
         );
