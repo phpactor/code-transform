@@ -16,7 +16,7 @@ use Phpactor\CodeBuilder\Adapter\TolerantParser\TextEdit;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Transformer;
 
-class FixNameTransformer implements Transformer
+class ClassNameFixerTransformer implements Transformer
 {
     /**
      * @var FileToClass
@@ -57,7 +57,10 @@ class FixNameTransformer implements Transformer
         return $code->withSource(TextEdit::applyEdits($edits, (string) $code));
     }
 
-    private function fixClassName(SourceFileNode $rootNode, string $correctClassName):? TextEdit
+    /**
+     * @return TextEdit|null
+     */
+    private function fixClassName(SourceFileNode $rootNode, string $correctClassName)
     {
         $classLike = $rootNode->getFirstDescendantNode(ClassLike::class);
         
@@ -76,7 +79,10 @@ class FixNameTransformer implements Transformer
         return new TextEdit($classLike->name->start, strlen($name), $correctClassName);
     }
 
-    private function fixNamespace(SourceFileNode $rootNode, $correctNamespace):? TextEdit
+    /**
+     * @return TextEdit|null
+     */
+    private function fixNamespace(SourceFileNode $rootNode, $correctNamespace)
     {
         $namespaceDefinition = $rootNode->getFirstDescendantNode(NamespaceDefinition::class);
         $statement = sprintf('namespace %s;', $correctNamespace);

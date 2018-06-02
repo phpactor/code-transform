@@ -6,12 +6,13 @@ use Phpactor\ClassFileConverter\Adapter\Composer\ComposerFileToClass;
 use Phpactor\ClassFileConverter\Adapter\Simple\SimpleFileToClass;
 use Phpactor\ClassFileConverter\Domain\ClassToFile;
 use Phpactor\ClassFileConverter\Domain\FileToClass;
+use Phpactor\CodeTransform\Adapter\TolerantParser\ClassToFile\Transformer\ClassNameFixerTransformer;
 use Phpactor\CodeTransform\Adapter\TolerantParser\ClassToFile\Transformer\FixNameTransformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Tests\Adapter\AdapterTestCase;
 use Phpactor\TestUtils\Workspace;
 
-class FixNamespaceTransformerTest extends AdapterTestCase
+class ClassNameFixerTransformerTest extends AdapterTestCase
 {
     private static $composerAutoload;
 
@@ -29,7 +30,7 @@ class FixNamespaceTransformerTest extends AdapterTestCase
         $autoload = $this->initComposer($workspace);
 
         $fileToClass = new ComposerFileToClass($autoload);
-        $transformer = new FixNameTransformer($fileToClass);
+        $transformer = new ClassNameFixerTransformer($fileToClass);
         $transformed = $transformer->transform(SourceCode::fromStringAndPath($source, $this->workspace()->path($filePath)));
 
         $this->assertEquals(trim($expected), trim($transformed));
