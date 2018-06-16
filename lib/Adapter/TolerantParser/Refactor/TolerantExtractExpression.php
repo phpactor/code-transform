@@ -9,9 +9,10 @@ use Microsoft\PhpParser\Node\Statement\ExpressionStatement;
 use Microsoft\PhpParser\Parser;
 use Microsoft\PhpParser\TextEdit;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
+use Phpactor\CodeTransform\Domain\Refactor\ExtractExpression;
 use Phpactor\CodeTransform\Domain\SourceCode;
 
-class TolerantExtractExpression
+class TolerantExtractExpression implements ExtractExpression
 {
     /**
      * @var Parser
