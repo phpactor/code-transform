@@ -17,12 +17,12 @@ class TextUtilsTest extends TestCase
 
     public function provideRemoveIndentation()
     {
-        return [
-            [
+            yield [
                 '    hello',
                 'hello'
-            ],
-            [
+            ];
+
+            yield [
                 <<<'EOT'
     hello
         world
@@ -36,8 +36,9 @@ hello
 hello
         world
 EOT
-            ],
-            [
+            ];
+
+            yield [
                 <<<'EOT'
 hello
     hello
@@ -53,7 +54,6 @@ hello
     hello
             world
 EOT
-            ]
         ];
     }
 }

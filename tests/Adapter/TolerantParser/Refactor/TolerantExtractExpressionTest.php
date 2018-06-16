@@ -68,5 +68,10 @@ class TolerantExtractExpressionTest extends TolerantTestCase
             'extractExpression7.test',
             'foobar',
         ];
+
+        yield 'preserve statement indentation' => [
+            'extractExpression8.test',
+            'foobar',
+        ];
     }
 }

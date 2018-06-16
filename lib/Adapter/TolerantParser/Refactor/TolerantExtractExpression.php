@@ -11,6 +11,7 @@ use Microsoft\PhpParser\TextEdit;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeTransform\Domain\Refactor\ExtractExpression;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\CodeTransform\Domain\Utils\TextUtils;
 
 class TolerantExtractExpression implements ExtractExpression
 {
@@ -55,6 +56,8 @@ class TolerantExtractExpression implements ExtractExpression
             return $source;
         }
 
+        assert($statement instanceof StatementNode);
+
         $edits = $this->resolveEdits($statement, $startNode, $extractedString, $assigment, $variableName);
 
         return $source->withSource(TextEdit::applyEdits($edits, (string) $source));
@@ -73,14 +76,16 @@ class TolerantExtractExpression implements ExtractExpression
                 new TextEdit($statement->getStart(), $statement->getWidth(), $assigment)
             ];
         }
+
+        $indentation = mb_substr_count($statement->getLeadingCommentAndWhitespaceText(), ' ');
         
         return [
-            new TextEdit($statement->getStart(), 0, $assigment),
+            new TextEdit($statement->getStart(), 0, $assigment . str_repeat(' ', $indentation)),
             new TextEdit($startNode->getStart(), strlen($extractedString), '$' . $variableName),
         ];
     }
 
-    private function outerNode(Node $node)
+    private function outerNode(Node $node): Node
     {
         $parent = $node->getParent();
 
