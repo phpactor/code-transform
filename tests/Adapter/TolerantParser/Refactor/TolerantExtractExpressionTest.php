@@ -63,5 +63,10 @@ class TolerantExtractExpressionTest extends TolerantTestCase
             'extractExpression6.test',
             'foobar',
         ];
+
+        yield 'string concatenation' => [
+            'extractExpression7.test',
+            'foobar',
+        ];
     }
 }

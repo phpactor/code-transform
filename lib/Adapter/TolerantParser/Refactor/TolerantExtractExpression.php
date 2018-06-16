@@ -36,13 +36,19 @@ class TolerantExtractExpression
             return $source;
         }
 
-        $startPosition = $startNode->getStart();
+        $startNode = $this->outerNode($startNode);
 
+        $startPosition = $startNode->getStart();
         $endPosition = $offsetEnd ? $endNode->getEndPosition() : $startNode->getEndPosition();
+
         $extractedString = rtrim(trim($source->extractSelection($startPosition, $endPosition)), ';');
         $assigment = sprintf('$%s = %s;', $variableName, $extractedString) . PHP_EOL;
 
-        $statement = $startNode->getFirstAncestor(StatementNode::class);
+        if (!$startNode instanceof StatementNode) {
+            $statement = $startNode->getFirstAncestor(StatementNode::class);
+        } else {
+            $statement = $startNode;
+        }
 
         if (null === $statement) {
             return $source;
@@ -61,7 +67,6 @@ class TolerantExtractExpression
         string $variableName
     )
     {
-        // replace entire statement
         if ($statement->getStart() === $startNode->getStart()) {
             return [
                 new TextEdit($statement->getStart(), $statement->getWidth(), $assigment)
@@ -72,5 +77,20 @@ class TolerantExtractExpression
             new TextEdit($statement->getStart(), 0, $assigment),
             new TextEdit($startNode->getStart(), strlen($extractedString), '$' . $variableName),
         ];
+    }
+
+    private function outerNode(Node $node)
+    {
+        $parent = $node->getParent();
+
+        if (null === $parent) {
+            return $node;
+        }
+
+        if ($parent->getStart() !== $node->getStart()) {
+            return $node;
+        }
+
+        return $this->outerNode($parent);
     }
 }
