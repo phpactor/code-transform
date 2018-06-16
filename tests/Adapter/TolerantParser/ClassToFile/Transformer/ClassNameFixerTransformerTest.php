@@ -36,12 +36,30 @@ class ClassNameFixerTransformerTest extends AdapterTestCase
 
     public function provideFixClassName()
     {
-        yield 'no op' => [ 'FileOne.php', 'fixNamespace0.test' ];
-        yield 'fix file with missing namespace' => [ 'PathTo/FileOne.php', 'fixNamespace1.test' ];
-        yield 'fix file with namespace' => [ 'PathTo/FileOne.php', 'fixNamespace2.test' ];
-        yield 'fix class name' => [ 'FileOne.php', 'fixNamespace3.test' ];
-        yield 'fix class name with same line bracket' => [ 'FileOne.php', 'fixNamespace4.test' ];
-        yield 'fix class name and namespace' => [ 'Phpactor/Test/Foobar/FileOne.php', 'fixNamespace5.test' ];
+        yield 'no op' => [
+            'FileOne.php',
+            'fixNamespace0.test'
+        ];
+        yield 'fix file with missing namespace' => [
+            'PathTo/FileOne.php',
+            'fixNamespace1.test'
+        ];
+        yield 'fix file with namespace' => [
+            'PathTo/FileOne.php',
+            'fixNamespace2.test'
+        ];
+        yield 'fix class name' => [
+            'FileOne.php',
+            'fixNamespace3.test'
+        ];
+        yield 'fix class name with same line bracket' => [
+            'FileOne.php',
+            'fixNamespace4.test'
+        ];
+        yield 'fix class name and namespace' => [
+            'Phpactor/Test/Foobar/FileOne.php',
+            'fixNamespace5.test'
+        ];
     }
 
     public function testThrowsExceptionIfSourceCodeHasNoPath()

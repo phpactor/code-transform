@@ -51,6 +51,11 @@ final class SourceCode
         return new self($code, $this->path);
     }
 
+    public function withPath(string $path): SourceCode
+    {
+        return new self($this->code, $path);
+    }
+
     public function path()
     {
         return $this->path;

@@ -11,6 +11,7 @@ class SourceCodeTest extends TestCase
     const PATH = '/bar';
     const SOURCE = 'asd';
     const OTHER_SOURCE = 'other source';
+    const OTHER_PATH = '/other/path.php';
 
 
     public function testPath()
@@ -49,6 +50,15 @@ class SourceCodeTest extends TestCase
         $source2 = $source1->withSource(self::OTHER_SOURCE);
 
         $this->assertEquals(self::OTHER_SOURCE, $source2->__toString());
+        $this->assertNotSame($source1, $source2);
+    }
+
+    public function testWithPath()
+    {
+        $source1 = SourceCode::fromStringAndPath(self::SOURCE, self::PATH);
+        $source2 = $source1->withPath(self::OTHER_PATH);
+
+        $this->assertEquals(self::OTHER_PATH, $source2->path());
         $this->assertNotSame($source1, $source2);
     }
 
