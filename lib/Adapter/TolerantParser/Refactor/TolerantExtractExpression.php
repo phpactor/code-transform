@@ -85,18 +85,20 @@ class TolerantExtractExpression implements ExtractExpression
         ];
     }
 
-    private function outerNode(Node $node): Node
+    private function outerNode(Node $node, Node $originalNode = null): Node
     {
+        $originalNode = $originalNode ?: $node;
+
         $parent = $node->getParent();
 
         if (null === $parent) {
             return $node;
         }
 
-        if ($parent->getStart() !== $node->getStart()) {
-            return $node;
+        if ($parent->getStart() !== $originalNode->getStart()) {
+            return $originalNode;
         }
 
-        return $this->outerNode($parent);
+        return $this->outerNode($parent, $originalNode);
     }
 }

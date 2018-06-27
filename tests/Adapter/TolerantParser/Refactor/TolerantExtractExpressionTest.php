@@ -73,5 +73,10 @@ class TolerantExtractExpressionTest extends TolerantTestCase
             'extractExpression8.test',
             'foobar',
         ];
+
+        yield 'extract element in array' => [
+            'extractExpression9.test',
+            'foobar',
+        ];
     }
 }
