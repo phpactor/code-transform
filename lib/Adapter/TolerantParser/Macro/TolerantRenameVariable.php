@@ -15,11 +15,8 @@ use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\Node\Parameter;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
-class TolerantRenameVariable implements Macro
+class TolerantRenameVariable implements Macro, RenameVariable
 {
-    const SCOPE_LOCAL = 'local';
-    const SCOPE_FILE = 'file';
-
     /**
      * @var Parser
      */

@@ -20,7 +20,7 @@ use Microsoft\PhpParser\Node\Statement\ClassDeclaration;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassIsCurrentClassException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyInNamespaceException;
 
-class TolerantImportClass implements Macro
+class TolerantImportClass implements Macro, ImportClass
 {
     /**
      * @var Parser
