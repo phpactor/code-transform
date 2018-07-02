@@ -6,5 +6,5 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 
 interface GenerateMethod
 {
-    public function generateMethod(SourceCode $sourceCode, int $offset): SourceCode;
+    public function __invoke(SourceCode $sourceCode, int $offset): SourceCode;
 }

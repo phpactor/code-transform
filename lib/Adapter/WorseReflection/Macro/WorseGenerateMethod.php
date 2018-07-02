@@ -19,7 +19,7 @@ use Phpactor\WorseReflection\Core\Type;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
 
-class WorseGenerateMethod implements Macro
+class WorseGenerateMethod implements Macro, GenerateMethod
 {
     /**
      * @var Reflector

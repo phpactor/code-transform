@@ -20,7 +20,7 @@ use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeTransform\Domain\Utils\TextUtils;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 
-class WorseExtractMethod implements Macro
+class WorseExtractMethod implements Macro, ExtractMethod
 {
     /**
      * @var Reflector

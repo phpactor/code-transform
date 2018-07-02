@@ -19,7 +19,7 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Core\Type;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
-class WorseExtractConstant implements Macro
+class WorseExtractConstant implements Macro, ExtractConstant
 {
     /**
      * @var Reflector

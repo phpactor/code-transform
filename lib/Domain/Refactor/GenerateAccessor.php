@@ -6,5 +6,5 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 
 interface GenerateAccessor
 {
-    public function generateAccessor(SourceCode $sourceCode, int $offset): SourceCode;
+    public function __invoke(SourceCode $sourceCode, int $offset): SourceCode;
 }

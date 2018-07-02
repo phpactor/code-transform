@@ -9,11 +9,12 @@ use Microsoft\PhpParser\Node\Statement\ExpressionStatement;
 use Microsoft\PhpParser\Parser;
 use Microsoft\PhpParser\TextEdit;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
+use Phpactor\CodeTransform\Domain\Macro\Macro;
 use Phpactor\CodeTransform\Domain\Refactor\ExtractExpression;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Utils\TextUtils;
 
-class TolerantExtractExpression implements ExtractExpression
+class TolerantExtractExpression implements Macro, ExtractExpression
 {
     /**
      * @var Parser
@@ -25,7 +26,12 @@ class TolerantExtractExpression implements ExtractExpression
         $this->parser = $parser ?: new Parser();
     }
 
-    public function extractExpression(SourceCode $source, int $offsetStart, int $offsetEnd = null, string $variableName): SourceCode
+    public function name()
+    {
+        return 'extract_expression';
+    }
+
+    public function __invoke(SourceCode $source, int $offsetStart, int $offsetEnd = null, string $variableName): SourceCode
     {
         $rootNode = $this->parser->parseSourceFile((string) $source);
         $startNode = $rootNode->getDescendantNodeAtPosition($offsetStart);

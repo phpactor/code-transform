@@ -15,7 +15,7 @@ use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
 
-class WorseOverrideMethod implements Macro
+class WorseOverrideMethod implements Macro, OverrideMethod
 {
     /**
      * @var Updater

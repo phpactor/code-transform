@@ -22,7 +22,13 @@ class TolerantExtractExpressionTest extends TolerantTestCase
         }
 
         $extractMethod = new TolerantExtractExpression();
-        $transformed = $extractMethod->extractExpression(SourceCode::fromString($source), $offsetStart, $offsetEnd, $name);
+
+        $transformed = $this->executeMacro($extractMethod, [
+            'source' => SourceCode::fromString($source),
+            'offsetStart' => $offsetStart,
+            'offsetEnd' => $offsetEnd,
+            'variableName' => $name
+        ]);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }

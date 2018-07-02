@@ -6,5 +6,5 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 
 interface ExtractExpression
 {
-    public function extractExpression(SourceCode $source, int $offsetStart, int $offsetEnd = null, string $variableName): SourceCode;
+    public function __invoke(SourceCode $source, int $offsetStart, int $offsetEnd = null, string $variableName): SourceCode;
 }
