@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Domain\Macro;
 
+use DTL\ArgumentResolver\ArgumentResolver;
 use Phpactor\CodeTransform\Domain\SourceCode;
 
 class MacroRunner
@@ -12,23 +13,16 @@ class MacroRunner
     private $macroRegistry;
 
     /**
-     * @var MacroDefinitionFactory
-     */
-    private $definitionFactory;
-
-    /**
      * @var ArgumentResolver
      */
     private $argumentResolver;
 
     public function __construct(
         MacroRegistry $macroRegistry,
-        MacroDefinitionFactory $definitionFactory = null,
         ArgumentResolver $argumentResolver = null
     )
     {
         $this->macroRegistry = $macroRegistry;
-        $this->definitionFactory = $definitionFactory ?: new MacroDefinitionFactory();
         $this->argumentResolver = $argumentResolver ?: new ArgumentResolver();
     }
 
@@ -36,8 +30,7 @@ class MacroRunner
     {
         $macro = $this->macroRegistry->get($macroName);
 
-        $definition = $this->definitionFactory->definitionFor(get_class($macro));
-        $arguments = $this->argumentResolver->resolve($definition, $arguments);
+        $arguments = $this->argumentResolver->resolveArguments(get_class($macro), '__invoke', $arguments);
 
         return $macro->__invoke(...$arguments);
     }

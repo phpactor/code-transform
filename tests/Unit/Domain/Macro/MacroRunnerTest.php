@@ -2,11 +2,9 @@
 
 namespace Phpactor\CodeTransform\Tests\Unit\Domain\Macro;
 
+use DTL\ArgumentResolver\ArgumentResolver;
 use PHPUnit\Framework\TestCase;
-use Phpactor\CodeTransform\Domain\Macro\ArgumentResolver;
 use Phpactor\CodeTransform\Domain\Macro\Macro;
-use Phpactor\CodeTransform\Domain\Macro\MacroDefinition;
-use Phpactor\CodeTransform\Domain\Macro\MacroDefinitionFactory;
 use Phpactor\CodeTransform\Domain\Macro\MacroRegistry;
 use Phpactor\CodeTransform\Domain\Macro\MacroRunner;
 use Phpactor\CodeTransform\Domain\Macro\ParameterDefinition;
@@ -52,12 +50,10 @@ class MacroRunnerTest extends TestCase
     public function setUp()
     {
         $this->registry = $this->prophesize(MacroRegistry::class);
-        $this->factory = $this->prophesize(MacroDefinitionFactory::class);
         $this->argumentResolver = $this->prophesize(ArgumentResolver::class);
 
         $this->runner = new MacroRunner(
             $this->registry->reveal(),
-            $this->factory->reveal(),
             $this->argumentResolver->reveal()
         );
 
@@ -79,17 +75,9 @@ class MacroRunnerTest extends TestCase
             'bar' => 345,
             'foo' => 123,
         ];
-        $definition = new MacroDefinition(
-            'macro1',
-            [
-                new ParameterDefinition('foo'),
-                new ParameterDefinition('bar')
-            ]
-        );
 
         $this->registry->get('macro1')->willReturn($this->macro);
-        $this->factory->definitionFor(get_class($this->macro))->willReturn($definition);
-        $this->argumentResolver->resolve($definition, $arguments)->willReturn(
+        $this->argumentResolver->resolveArguments(get_class($this->macro), '__invoke', $arguments)->willReturn(
             [123, 456]
         );
 
