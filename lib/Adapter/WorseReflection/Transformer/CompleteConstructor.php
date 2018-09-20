@@ -4,6 +4,8 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Transformer;
 
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionClassLike;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionInterface;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
 use Phpactor\CodeBuilder\Domain\Updater;
@@ -34,7 +36,12 @@ class CompleteConstructor implements Transformer
         $edits = [];
         $sourceCodeBuilder = SourceCodeBuilder::create();
 
-        foreach ($classes->concrete() as $class) {
+        /** @var ReflectionClassLike $class */
+        foreach ($classes as $class) {
+            if ($class instanceof ReflectionInterface) {
+                continue;
+            }
+
             $classBuilder = $sourceCodeBuilder->class($class->name()->short());
 
             if (!$class->methods()->has('__construct')) {

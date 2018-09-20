@@ -22,30 +22,19 @@ class CompleteConstructorTest extends WorseTestCase
 
     public function provideCompleteConstructor()
     {
-        return [
-            'It does nothing on source with no classes' => [
-                <<<'EOT'
+        yield 'It does nothing on source with no classes' => [
+            <<<'EOT'
 <?php
 EOT
-                ,
-                <<<'EOT'
+        ,
+            <<<'EOT'
 <?php
 EOT
 
-            ],
-            'It does nothing on an empty constructor' => [
-                <<<'EOT'
-<?php
+        ];
 
-class Foobar
-{
-    public function __construct()
-    {
-    }
-}
-EOT
-                ,
-                <<<'EOT'
+        yield  'It does nothing on an empty constructor' => [
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -55,18 +44,30 @@ class Foobar
     }
 }
 EOT
+        ,
+            <<<'EOT'
+<?php
 
-            ],
-            'It does nothing with no constructor' => [
-                <<<'EOT'
+class Foobar
+{
+    public function __construct()
+    {
+    }
+}
+EOT
+
+        ];
+
+        yield  'It does nothing with no constructor' => [
+            <<<'EOT'
 <?php
 
 class Foobar
 {
 }
 EOT
-                ,
-                <<<'EOT'
+        ,
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -74,9 +75,10 @@ class Foobar
 }
 EOT
 
-            ],
-            'It does adds assignations and properties' => [
-                <<<'EOT'
+        ];
+
+        yield  'It does adds assignations and properties' => [
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -86,8 +88,8 @@ class Foobar
     }
 }
 EOT
-                ,
-                <<<'EOT'
+        ,
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -103,9 +105,40 @@ class Foobar
 }
 EOT
 
-            ],
-            'It does adds type docblocks' => [
-                <<<'EOT'
+        ];
+
+        yield  'adds assignations and properties on abstract class' => [
+            <<<'EOT'
+<?php
+
+abstract class Foobar
+{
+    public function __construct($foo, $bar)
+    {
+    }
+}
+EOT
+        ,
+            <<<'EOT'
+<?php
+
+abstract class Foobar
+{
+    private $foo;
+    private $bar;
+
+    public function __construct($foo, $bar)
+    {
+        $this->foo = $foo;
+        $this->bar = $bar;
+    }
+}
+EOT
+
+        ];
+
+        yield  'It does adds type docblocks' => [
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -115,8 +148,8 @@ class Foobar
     }
 }
 EOT
-                ,
-                <<<'EOT'
+        ,
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -138,9 +171,10 @@ class Foobar
 }
 EOT
 
-            ],
-            'It is idempotent' => [
-                <<<'EOT'
+        ];
+
+        yield  'It is idempotent' => [
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -156,8 +190,8 @@ class Foobar
     }
 }
 EOT
-                ,
-                <<<'EOT'
+        ,
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -174,9 +208,10 @@ class Foobar
 }
 EOT
 
-            ],
-            'It is updates missing' => [
-                <<<'EOT'
+        ];
+
+        yield  'It is updates missing' => [
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -192,8 +227,8 @@ class Foobar
     }
 }
 EOT
-                ,
-                <<<'EOT'
+        ,
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -217,9 +252,10 @@ class Foobar
 }
 EOT
 
-            ],
-            'It does not redeclare' => [
-                <<<'EOT'
+        ];
+
+        yield  'It does not redeclare' => [
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -235,8 +271,8 @@ class Foobar
     }
 }
 EOT
-                ,
-                <<<'EOT'
+        ,
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -253,9 +289,10 @@ class Foobar
 }
 EOT
 
-            ],
-            'Existing property with assignment' => [
-                <<<'EOT'
+        ];
+
+        yield  'Existing property with assignment' => [
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -270,8 +307,8 @@ class Foobar
     }
 }
 EOT
-                ,
-                <<<'EOT'
+        ,
+            <<<'EOT'
 <?php
 
 class Foobar
@@ -290,7 +327,6 @@ class Foobar
 }
 EOT
 
-            ],
         ];
     }
 }
