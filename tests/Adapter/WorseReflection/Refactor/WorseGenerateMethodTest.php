@@ -49,6 +49,9 @@ class WorseGenerateMethodTest extends WorseTestCase
             'public accessor on interface with namespace' => [
                 'generateMethod8.test',
             ],
+            'imports classes' => [
+                'generateMethod9.test',
+            ],
         ];
     }
 
