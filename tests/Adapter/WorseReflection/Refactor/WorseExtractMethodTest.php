@@ -90,6 +90,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod14.test',
                 'newMethod',
             ],
+            'imports classes' => [
+                'extractMethod15.test',
+                'newMethod',
+            ],
         ];
     }
 }
