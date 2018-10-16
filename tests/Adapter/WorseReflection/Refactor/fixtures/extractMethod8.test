@@ -42,7 +42,7 @@ class extractMethod
         return $new;
     }
 
-    private function newMethod(string $hello)
+    private function newMethod(string $hello): array
     {
         $new = false;
         if ($hello) {

@@ -1,0 +1,29 @@
+// File: source
+<?php
+
+class One {
+    public function hello() {
+        <>$car = new stdClass();<>
+
+        return $car;
+    }
+}
+// File: expected
+<?php
+
+use stdClass;
+
+
+class One {
+    public function hello() {
+        $car = $this->newMethod();
+
+        return $car;
+    }
+
+    private function newMethod(): stdClass
+    {
+        $car = new stdClass();
+        return $car;
+    }
+}

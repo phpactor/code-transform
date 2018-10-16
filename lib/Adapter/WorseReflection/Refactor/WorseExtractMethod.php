@@ -234,8 +234,9 @@ class WorseExtractMethod implements ExtractMethod
 
             if ($variable->symbolContext()->type()->isDefined()) {
                 $type = $variable->symbolContext()->type();
-                if ($type->isPrimitive()) {
-                    $methodBuilder->returnType($type->short());
+                $methodBuilder->returnType($type->short());
+                if (false === $type->isPrimitive()) {
+                    $methodBuilder->end()->end()->use($type->className()->full());
                 }
             }
 
@@ -248,6 +249,7 @@ class WorseExtractMethod implements ExtractMethod
         }, $returnVariables));
 
         $methodBuilder->body()->line('return [' . $names . '];');
+        $methodBuilder->returnType('array');
 
         return 'list(' . $names . ')';
     }

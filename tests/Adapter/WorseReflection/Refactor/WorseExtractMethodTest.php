@@ -98,6 +98,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod16.test',
                 'newMethod',
             ],
+            'adds return type for class' => [
+                'extractMethod17.test',
+                'newMethod',
+            ],
         ];
     }
 }
