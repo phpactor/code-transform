@@ -27,7 +27,7 @@ class PhpactorRocks
         return $bar;
     }
 
-    private function newMethod(string $bar)
+    private function newMethod(string $bar): string
     {
         $bar = 'goodbye';
         return $bar;

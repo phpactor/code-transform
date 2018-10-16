@@ -27,7 +27,7 @@ class extractMethod
         return $new;
     }
 
-    private function newMethod()
+    private function newMethod(): bool
     {
         $new = false;
         if (true) {

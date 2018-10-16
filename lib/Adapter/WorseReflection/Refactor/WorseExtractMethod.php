@@ -228,8 +228,17 @@ class WorseExtractMethod implements ExtractMethod
         }
 
         if (count($returnVariables) === 1) {
+            /** @var Variable $variable */
             $variable = reset($returnVariables);
             $methodBuilder->body()->line('return $' . $variable->name() . ';');
+
+            if ($variable->symbolContext()->type()->isDefined()) {
+                $type = $variable->symbolContext()->type();
+                if ($type->isPrimitive()) {
+                    $methodBuilder->returnType($type->short());
+                }
+            }
+
 
             return '$' . $variable->name();
         }
