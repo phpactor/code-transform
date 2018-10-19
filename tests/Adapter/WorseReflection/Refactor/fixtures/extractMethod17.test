@@ -11,9 +11,6 @@ class One {
 // File: expected
 <?php
 
-use stdClass;
-
-
 class One {
     public function hello() {
         $car = $this->newMethod();
