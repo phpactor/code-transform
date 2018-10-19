@@ -36,7 +36,7 @@ class extractMethod
         return $new;
     }
 
-    private function newMethod()
+    private function newMethod(): array
     {
         $new = false;
         if (true) {

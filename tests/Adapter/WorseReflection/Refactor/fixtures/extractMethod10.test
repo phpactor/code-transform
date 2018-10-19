@@ -36,7 +36,7 @@ class PhpactorRocks
         return [ $new, $bar ];
     }
 
-    private function newMethod(string $foobar)
+    private function newMethod(string $foobar): array
     {
         $new = true;
                 if ($foobar !== 'hello') {

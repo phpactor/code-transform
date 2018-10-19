@@ -126,6 +126,7 @@ class WorseGenerateMethod implements GenerateMethod
 
                 if ($type->isClass()) {
                     $argumentBuilder->type($type->className()->short());
+                    $builder->use($type->className()->full());
                 }
             }
         }

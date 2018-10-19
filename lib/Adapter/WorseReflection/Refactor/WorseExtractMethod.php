@@ -228,8 +228,18 @@ class WorseExtractMethod implements ExtractMethod
         }
 
         if (count($returnVariables) === 1) {
+            /** @var Variable $variable */
             $variable = reset($returnVariables);
             $methodBuilder->body()->line('return $' . $variable->name() . ';');
+
+            if ($variable->symbolContext()->type()->isDefined()) {
+                $type = $variable->symbolContext()->type();
+                $methodBuilder->returnType($type->short());
+                if (false === $type->isPrimitive()) {
+                    $methodBuilder->end()->end()->use($type->className()->full());
+                }
+            }
+
 
             return '$' . $variable->name();
         }
@@ -239,6 +249,7 @@ class WorseExtractMethod implements ExtractMethod
         }, $returnVariables));
 
         $methodBuilder->body()->line('return [' . $names . '];');
+        $methodBuilder->returnType('array');
 
         return 'list(' . $names . ')';
     }
