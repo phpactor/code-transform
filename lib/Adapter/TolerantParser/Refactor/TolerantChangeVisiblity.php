@@ -10,9 +10,10 @@ use Microsoft\PhpParser\Parser;
 use Microsoft\PhpParser\TextEdit;
 use Microsoft\PhpParser\Token;
 use Microsoft\PhpParser\TokenKind;
+use Phpactor\CodeTransform\Domain\Refactor\ChangeVisiblity;
 use Phpactor\CodeTransform\Domain\SourceCode;
 
-class TolerantChangeVisiblity
+class TolerantChangeVisiblity implements ChangeVisiblity
 {
     /**
      * @var Parser
@@ -39,6 +40,9 @@ class TolerantChangeVisiblity
 
         $textEdit = $this->resolveNewVisiblityTextEdit($node);
 
+        if (null === $textEdit) {
+            return $source;
+        }
 
         return $source->withSource(TextEdit::applyEdits([
             $textEdit
@@ -46,9 +50,9 @@ class TolerantChangeVisiblity
     }
 
     /**
-     * @param MethodDeclaration|PropertyDeclaration|ClassConsDeclaration $node
+     * @param MethodDeclaration|PropertyDeclaration|ClassConstDeclaration $node
      */
-    private function resolveNewVisiblityTextEdit(Node $node): TextEdit
+    private function resolveNewVisiblityTextEdit(Node $node): ?TextEdit
     {
         foreach ($node->modifiers as $modifier) {
             if ($modifier->kind === TokenKind::PublicKeyword) {
@@ -63,8 +67,6 @@ class TolerantChangeVisiblity
                 return $this->visiblityTextEdit($modifier, 'public');
             }
         }
-
-        return $this->visiblityTextEdit($modifier, 'private');
     }
 
     private function visiblityTextEdit(Token $modifier, $newVisiblity): TextEdit
