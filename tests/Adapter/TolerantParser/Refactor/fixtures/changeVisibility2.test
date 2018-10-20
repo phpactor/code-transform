@@ -1,0 +1,15 @@
+// File: source
+<?php
+
+class Foo {
+    pu<>blic function hello() {}
+}
+
+'he<>llo';
+// File: expected
+<?php
+
+class Foo {
+    protected function hello() {}
+}
+
