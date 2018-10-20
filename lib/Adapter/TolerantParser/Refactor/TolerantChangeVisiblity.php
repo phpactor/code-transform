@@ -30,11 +30,9 @@ class TolerantChangeVisiblity implements ChangeVisiblity
         $node = $this->parser->parseSourceFile((string) $source);
         $node = $node->getDescendantNodeAtPosition($offset);
 
-        if (!(
-            $node instanceof MethodDeclaration ||
-            $node instanceof PropertyDeclaration ||
-            $node instanceof ClassConstDeclaration
-        )) {
+        $node = $this->resolveMemberNode($node);
+
+        if (null === $node) {
             return $source;
         }
 
@@ -72,5 +70,21 @@ class TolerantChangeVisiblity implements ChangeVisiblity
     private function visiblityTextEdit(Token $modifier, $newVisiblity): TextEdit
     {
         return new TextEdit($modifier->getStartPosition(), $modifier->getWidth(), $newVisiblity);
+    }
+
+    private function resolveMemberNode(Node $node)
+    {
+        if (!(
+            $node instanceof MethodDeclaration ||
+            $node instanceof PropertyDeclaration ||
+            $node instanceof ClassConstDeclaration
+        )) {
+            $node = $node->getFirstAncestor(
+                MethodDeclaration::class,
+                PropertyDeclaration::class,
+                ClassConstDeclaration::class
+            );
+        }
+        return $node;
     }
 }
