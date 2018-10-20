@@ -132,17 +132,6 @@ class WorseGenerateMethod implements GenerateMethod
         return $builder->build();
     }
 
-    private function sourceFromSymbolContext(SymbolContext $info): SourceCode
-    {
-        $containingClass = $this->reflector->reflectClassLike($info->containerType()->className());
-        $worseSourceCode = $containingClass->sourceCode();
-
-        return SourceCode::fromStringAndPath(
-            $worseSourceCode->__toString(),
-            $worseSourceCode->path()
-        );
-    }
-
     private function determineVisibility(Type $contextType, ReflectionClassLike $targetClass): Visibility
     {
         if ($contextType->isClass() && $contextType->className() == $targetClass->name()) {

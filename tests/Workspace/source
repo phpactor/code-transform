@@ -1,5 +1,17 @@
+
 <?php
 
-class Foo {
-    priva<>te const hello = 'bar';
+class ParentClass
+{
+    protected function booboo()
+    {
+    }
+
+    protected function barbar()
+    {
+    }
+}
+
+class ChildClass extends ParentClass
+{
 }

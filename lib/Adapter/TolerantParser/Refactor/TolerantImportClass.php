@@ -76,11 +76,11 @@ class TolerantImportClass implements ImportClass
         }
 
         if ($this->currentClassIsSameAsImportClass($node, $className)) {
-            throw new ClassIsCurrentClassException($className->short(), (string) $className);
+            throw new ClassIsCurrentClassException($className->short());
         }
 
         if ($this->importClassInSameNamespace($node, $className)) {
-            throw new ClassAlreadyInNamespaceException($className->short(), (string) $className);
+            throw new ClassAlreadyInNamespaceException($className->short());
         }
     }
 
