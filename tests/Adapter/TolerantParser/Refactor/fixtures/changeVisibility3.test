@@ -2,12 +2,13 @@
 <?php
 
 class Foo {
-    pu<>blic function hello() {}
+    protec<>ted $hello;
 }
 // File: expected
 <?php
 
 class Foo {
-    protected function hello() {}
+    private $hello;
 }
+
 

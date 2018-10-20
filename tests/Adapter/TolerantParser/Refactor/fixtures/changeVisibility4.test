@@ -2,12 +2,14 @@
 <?php
 
 class Foo {
-    pu<>blic function hello() {}
+    priva<>te const hello = 'bar';
 }
 // File: expected
 <?php
 
 class Foo {
-    protected function hello() {}
+    public const hello = 'bar';
 }
+
+
 
