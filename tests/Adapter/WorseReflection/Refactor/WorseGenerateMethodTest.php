@@ -91,4 +91,3 @@ EOT
         return $generateMethod->generateMethod(SourceCode::fromString($source), $start, $name);
     }
 }
-

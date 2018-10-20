@@ -14,7 +14,8 @@ class ClassAlreadyInNamespaceException extends TransformException
     public function __construct(string $name)
     {
         parent::__construct(sprintf(
-            'Class "%s" is in the same namespace as current class', $name
+            'Class "%s" is in the same namespace as current class',
+            $name
         ));
 
         $this->name = $name;

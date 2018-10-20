@@ -1,0 +1,5 @@
+<?php
+
+class Foo {
+    priva<>te const hello = 'bar';
+}

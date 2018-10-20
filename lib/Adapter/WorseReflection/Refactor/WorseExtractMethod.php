@@ -163,7 +163,6 @@ class WorseExtractMethod implements ExtractMethod
 
         /** @var Variable $freeVariable */
         foreach ($freeVariables as $freeVariable) {
-
             if (in_array($freeVariable->name(), [ 'this', 'self' ])) {
                 continue;
             }

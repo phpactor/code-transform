@@ -6,7 +6,6 @@ use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseExtractConstant;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
-use Phpactor\TestUtils\ExtractOffset;
 
 class WorseExtractConstantTest extends WorseTestCase
 {

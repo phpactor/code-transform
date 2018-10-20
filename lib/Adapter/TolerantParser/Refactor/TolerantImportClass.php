@@ -4,7 +4,6 @@ namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass;
 use Microsoft\PhpParser\Parser;
-use Phpactor\CodeTransform\Domain\ClassFinder\ClassFinder;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Microsoft\PhpParser\Node\QualifiedName;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
@@ -33,7 +32,8 @@ class TolerantImportClass implements ImportClass
 
     public function __construct(Updater $updater, Parser $parser = null)
     {
-        $this->parser = $parser ?: new Parser();;
+        $this->parser = $parser ?: new Parser();
+        ;
         $this->updater = $updater;
     }
 
