@@ -29,6 +29,11 @@ class AdapterTestCase extends TestCase
     {
         $workspace = $this->workspace();
         $workspace->reset();
+
+        if (!file_exists($manifestPath)) {
+            touch($manifestPath);
+        }
+
         $workspace->loadManifest(file_get_contents($manifestPath));
         $source = $workspace->getContents('source');
         $expected = $workspace->getContents('expected');

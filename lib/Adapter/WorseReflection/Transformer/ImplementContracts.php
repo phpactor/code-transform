@@ -11,7 +11,6 @@ use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
-use Phpactor\WorseReflection\Core\Reflection\ReflectionParameter;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
 
 class ImplementContracts implements Transformer
@@ -55,7 +54,6 @@ class ImplementContracts implements Transformer
 
             /** @var $missingMethod ReflectionMethod */
             foreach ($missingMethods as $missingMethod) {
-
                 $builder = $this->factory->fromSource((string) $missingMethod->declaringClass()->sourceCode());
 
                 $methodBuilder = $builder->classLike(

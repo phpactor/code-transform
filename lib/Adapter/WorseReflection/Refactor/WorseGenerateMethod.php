@@ -2,7 +2,6 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
-use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\CodeBuilder\Domain\Prototype\Visibility;
 use Phpactor\CodeBuilder\Domain\Updater;
@@ -98,7 +97,6 @@ class WorseGenerateMethod implements GenerateMethod
         Visibility $visibility,
         $methodName
     ) {
-
         $methodName = $methodName ?: $methodCall->name();
 
         $reflectionClass = $methodCall->class();
@@ -132,17 +130,6 @@ class WorseGenerateMethod implements GenerateMethod
         }
 
         return $builder->build();
-    }
-
-    private function sourceFromSymbolContext(SymbolContext $info): SourceCode
-    {
-        $containingClass = $this->reflector->reflectClassLike($info->containerType()->className());
-        $worseSourceCode = $containingClass->sourceCode();
-
-        return SourceCode::fromStringAndPath(
-            $worseSourceCode->__toString(),
-            $worseSourceCode->path()
-        );
     }
 
     private function determineVisibility(Type $contextType, ReflectionClassLike $targetClass): Visibility

@@ -3,11 +3,7 @@
 namespace Phpactor\CodeTransform\Tests\Adapter\TolerantParser\ClassToFile\Transformer;
 
 use Phpactor\ClassFileConverter\Adapter\Composer\ComposerFileToClass;
-use Phpactor\ClassFileConverter\Adapter\Simple\SimpleFileToClass;
-use Phpactor\ClassFileConverter\Domain\ClassToFile;
-use Phpactor\ClassFileConverter\Domain\FileToClass;
 use Phpactor\CodeTransform\Adapter\TolerantParser\ClassToFile\Transformer\ClassNameFixerTransformer;
-use Phpactor\CodeTransform\Adapter\TolerantParser\ClassToFile\Transformer\FixNameTransformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Tests\Adapter\AdapterTestCase;
 use Phpactor\TestUtils\Workspace;

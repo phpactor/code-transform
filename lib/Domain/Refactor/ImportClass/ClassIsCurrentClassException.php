@@ -14,7 +14,8 @@ class ClassIsCurrentClassException extends TransformException
     public function __construct(string $name)
     {
         parent::__construct(sprintf(
-            'Class "%s" is the current class', $name
+            'Class "%s" is the current class',
+            $name
         ));
 
         $this->name = $name;

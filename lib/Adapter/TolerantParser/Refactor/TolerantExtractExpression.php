@@ -2,16 +2,12 @@
 
 namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 
-use Exception;
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\StatementNode;
-use Microsoft\PhpParser\Node\Statement\ExpressionStatement;
 use Microsoft\PhpParser\Parser;
 use Microsoft\PhpParser\TextEdit;
-use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeTransform\Domain\Refactor\ExtractExpression;
 use Phpactor\CodeTransform\Domain\SourceCode;
-use Phpactor\CodeTransform\Domain\Utils\TextUtils;
 
 class TolerantExtractExpression implements ExtractExpression
 {
@@ -69,8 +65,7 @@ class TolerantExtractExpression implements ExtractExpression
         string $extractedString,
         string $assigment,
         string $variableName
-    )
-    {
+    ) {
         if ($statement->getStart() === $startNode->getStart()) {
             return [
                 new TextEdit($statement->getStart(), $statement->getWidth(), $assigment)

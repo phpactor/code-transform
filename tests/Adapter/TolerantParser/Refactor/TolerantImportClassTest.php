@@ -4,7 +4,6 @@ namespace Phpactor\CodeTransform\Tests\Adapter\TolerantParser\Refactor;
 
 use Phpactor\CodeTransform\Tests\Adapter\TolerantParser\TolerantTestCase;
 use Phpactor\CodeTransform\Adapter\TolerantParser\Refactor\TolerantImportClass;
-use Phpactor\CodeTransform\Domain\ClassFinder\ArrayClassFinder;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyImportedException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\AliasAlreadyUsedException;

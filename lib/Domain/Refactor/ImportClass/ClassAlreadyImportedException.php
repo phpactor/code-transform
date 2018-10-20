@@ -2,8 +2,6 @@
 
 namespace Phpactor\CodeTransform\Domain\Refactor\ImportClass;
 
-use Phpactor\CodeTransform\Domain\Exception\TransformException;
-
 class ClassAlreadyImportedException extends NameAlreadyUsedException
 {
     /**
@@ -19,7 +17,8 @@ class ClassAlreadyImportedException extends NameAlreadyUsedException
     public function __construct(string $name, string $existingName)
     {
         parent::__construct(sprintf(
-            'Class "%s" is already imported', $name
+            'Class "%s" is already imported',
+            $name
         ));
 
         $this->name = $name;
