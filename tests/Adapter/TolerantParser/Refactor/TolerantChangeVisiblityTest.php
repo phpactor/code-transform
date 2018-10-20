@@ -27,5 +27,6 @@ class TolerantChangeVisiblityTest extends TolerantTestCase
         yield 'method: from public to protected' => [ 'changeVisibility2.test' ];
         yield 'property: from protected to private' => [ 'changeVisibility3.test' ];
         yield 'constant: from public to protected' => [ 'changeVisibility4.test' ];
+        yield 'property: on keyword' => [ 'changeVisibility5.test' ];
     }
 }
