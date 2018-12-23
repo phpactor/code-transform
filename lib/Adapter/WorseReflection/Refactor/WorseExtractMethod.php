@@ -314,6 +314,9 @@ class WorseExtractMethod implements ExtractMethod
             if ($type->isDefined()) {
                 $methodBuilder->returnType($type);
             }
+            if (false === $type->isPrimitive()) {
+                $methodBuilder->end()->end()->use($type->className()->full());
+            }
         }
         return $newMethodBody;
     }
