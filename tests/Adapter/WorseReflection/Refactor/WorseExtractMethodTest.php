@@ -110,6 +110,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod19.test',
                 'newMethod',
             ],
+            'extracts assignment expression with unknown return type' => [
+                'extractMethod20.test',
+                'newMethod',
+            ],
         ];
     }
 }

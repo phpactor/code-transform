@@ -310,7 +310,10 @@ class WorseExtractMethod implements ExtractMethod
         $offset = $this->reflector->reflectOffset($source->__toString(), $offsetEnd);
         $expressionTypes = $offset->symbolContext()->types();
         if ($expressionTypes->count() === 1) {
-            $methodBuilder->returnType($expressionTypes->best());
+            $type = $expressionTypes->best();
+            if ($type->isDefined()) {
+                $methodBuilder->returnType($type);
+            }
         }
         return $newMethodBody;
     }
