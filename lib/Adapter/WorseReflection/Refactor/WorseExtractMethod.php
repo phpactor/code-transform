@@ -2,6 +2,8 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
+use Microsoft\PhpParser\Node;
+use Microsoft\PhpParser\Node\Statement\CompoundStatementNode;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\WorseReflection\Reflector;
@@ -41,22 +43,28 @@ class WorseExtractMethod implements ExtractMethod
      */
     private $factory;
 
-    public function __construct(Reflector $reflector, BuilderFactory $factory, Updater $updater)
+    public function __construct(Reflector $reflector, BuilderFactory $factory, Updater $updater, Parser $parser = null)
     {
         $this->reflector = $reflector;
         $this->updater = $updater;
-        $this->parser = new Parser();
+        $this->parser = $parser ?: new Parser();
         $this->factory = $factory;
     }
 
     public function extractMethod(SourceCode $source, int $offsetStart, int $offsetEnd, string $name): SourceCode
     {
+        $isExpression = $this->isSelectionAnExpression($source, $offsetStart, $offsetEnd);
+
         $selection = $source->extractSelection($offsetStart, $offsetEnd);
         $builder = $this->factory->fromSource($source);
         $reflectionMethod = $this->reflectMethod($offsetEnd, $source, $name);
 
         $methodBuilder = $this->createMethodBuilder($reflectionMethod, $builder, $name);
-        $methodBuilder->body()->line($this->removeIndentation($selection));
+        $newMethodBody = $this->removeIndentation($selection);
+        if ($isExpression) {
+            $newMethodBody = $this->addExpressionReturn($newMethodBody, $source, $offsetEnd, $methodBuilder);
+        }
+        $methodBuilder->body()->line($newMethodBody);
 
         $locals = $this->scopeLocalVariables($source, $offsetStart, $offsetEnd);
 
@@ -64,11 +72,23 @@ class WorseExtractMethod implements ExtractMethod
         $args = $this->addParametersAndGetArgs($parameterVariables, $methodBuilder, $builder);
 
         $returnVariables = $this->returnVariables($locals, $reflectionMethod, $source, $offsetStart, $offsetEnd);
-        $returnAssignment = $this->addReturnAndGetAssignment($returnVariables, $methodBuilder, $args);
+
+        $returnAssignment = $this->addReturnAndGetAssignment(
+            $returnVariables,
+            $methodBuilder,
+            $args
+        );
 
         $prototype = $builder->build();
+
+        $replacement = $this->replacement($name, $args, $selection, $returnAssignment);
+
+        if ($isExpression) {
+            $replacement = rtrim($replacement, ';');
+        }
+
         $source = $source->replaceSelection(
-            $this->replacement($name, $args, $selection, $returnAssignment),
+            $replacement,
             $offsetStart,
             $offsetEnd
         );
@@ -239,7 +259,6 @@ class WorseExtractMethod implements ExtractMethod
                 }
             }
 
-
             return '$' . $variable->name();
         }
 
@@ -253,7 +272,7 @@ class WorseExtractMethod implements ExtractMethod
         return 'list(' . $names . ')';
     }
 
-    private function replacement(string $name, array $args, string $selection, string $returnAssignment = null)
+    private function replacement(string $name, array $args, string $selection, ?string $returnAssignment)
     {
         $indentation = str_repeat(' ', TextUtils::stringIndentation($selection));
         $callString = '$this->'  . $name . '(' . implode(', ', $args) . ');';
@@ -263,5 +282,38 @@ class WorseExtractMethod implements ExtractMethod
         }
 
         return $indentation . $returnAssignment . ' = ' . $callString;
+    }
+
+    private function isSelectionAnExpression(SourceCode $source, int $offsetStart, int $offsetEnd)
+    {
+        $node = $this->parser->parseSourceFile($source->__toString());
+        $startNode = $node->getDescendantNodeAtPosition($offsetStart);
+        $endNode = $node->getDescendantNodeAtPosition($offsetEnd);
+        
+        // end node is in the statement body, get last child node
+        if ($endNode instanceof CompoundStatementNode) {
+            $childNodes = iterator_to_array($endNode->getChildNodes());
+            $endNode = end($childNodes);
+            assert($endNode instanceof Node);
+        }
+        
+        // get the positional parent of the node
+        while ($endNode->getEndPosition() === $endNode->parent->getEndPosition()) {
+            $endNode = $endNode->parent;
+        }
+        
+        $isExpression = !$endNode->parent instanceof CompoundStatementNode;
+        return $isExpression;
+    }
+
+    private function addExpressionReturn($newMethodBody, SourceCode $source, int $offsetEnd, MethodBuilder $methodBuilder): string
+    {
+        $newMethodBody = 'return ' . $newMethodBody .';';
+        $offset = $this->reflector->reflectOffset($source->__toString(), $offsetEnd);
+        $expressionTypes = $offset->symbolContext()->types();
+        if ($expressionTypes->count() === 1) {
+            $methodBuilder->returnType($expressionTypes->best());
+        }
+        return $newMethodBody;
     }
 }
