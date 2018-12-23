@@ -287,7 +287,6 @@ class WorseExtractMethod implements ExtractMethod
     private function isSelectionAnExpression(SourceCode $source, int $offsetStart, int $offsetEnd)
     {
         $node = $this->parser->parseSourceFile($source->__toString());
-        $startNode = $node->getDescendantNodeAtPosition($offsetStart);
         $endNode = $node->getDescendantNodeAtPosition($offsetEnd);
         
         // end node is in the statement body, get last child node
@@ -302,8 +301,7 @@ class WorseExtractMethod implements ExtractMethod
             $endNode = $endNode->parent;
         }
         
-        $isExpression = !$endNode->parent instanceof CompoundStatementNode;
-        return $isExpression;
+        return !$endNode->parent instanceof CompoundStatementNode;
     }
 
     private function addExpressionReturn($newMethodBody, SourceCode $source, int $offsetEnd, MethodBuilder $methodBuilder): string

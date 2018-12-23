@@ -106,6 +106,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod18.test',
                 'newMethod',
             ],
+            'extracts assignment expression to method' => [
+                'extractMethod19.test',
+                'newMethod',
+            ],
         ];
     }
 }
