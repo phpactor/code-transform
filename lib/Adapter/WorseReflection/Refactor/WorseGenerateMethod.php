@@ -100,7 +100,7 @@ class WorseGenerateMethod implements GenerateMethod
         $methodName = $methodName ?: $methodCall->name();
 
         $reflectionClass = $methodCall->class();
-        $builder = $this->factory->fromSource((string) $reflectionClass->sourceCode());
+        $builder = $this->factory->fromSource($reflectionClass->sourceCode());
 
         if ($reflectionClass->isClass()) {
             $classBuilder = $builder->class($reflectionClass->name()->short());
