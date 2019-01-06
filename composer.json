@@ -10,9 +10,9 @@
         }
     ],
     "require": {
-        "phpactor/code-builder": "dev-master",
-        "webmozart/path-util": "^2.3@dev",
-        "phpactor/class-to-file": "dev-master"
+        "phpactor/code-builder": "~0.2",
+        "webmozart/path-util": "~2.3",
+        "phpactor/class-to-file": "~0.3"
     },
     "require-dev": {
         "phpactor/worse-reflection": "~0.1",
