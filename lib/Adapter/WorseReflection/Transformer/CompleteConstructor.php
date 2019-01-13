@@ -4,7 +4,6 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Transformer;
 
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
-use Phpactor\WorseReflection\Core\Reflection\ReflectionClassLike;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionInterface;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;

@@ -16,3 +16,4 @@ before_script:
 script: 
   - ./vendor/bin/phpunit
   - ./vendor/bin/phpstan analyse lib --level=6
+  - ./vendor/bin/php-cs-fixer fix --dry-run
