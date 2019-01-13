@@ -321,7 +321,7 @@ class WorseExtractMethod implements ExtractMethod
         if ($expressionTypes->count() === 1) {
             $type = $expressionTypes->best();
             if ($type->isDefined()) {
-                $methodBuilder->returnType($type);
+                $methodBuilder->returnType($type->short());
             }
             $className = $type->className();
             if ($className) {
