@@ -3,7 +3,9 @@
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
 use Microsoft\PhpParser\Node;
+use Microsoft\PhpParser\Node\SourceFileNode;
 use Microsoft\PhpParser\Node\Statement\CompoundStatementNode;
+use Microsoft\PhpParser\Node\Statement\ReturnStatement;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\WorseReflection\Reflector;
@@ -218,14 +220,13 @@ class WorseExtractMethod implements ExtractMethod
 
     private function variableNames(string $source)
     {
-        $source = '<?php ' . $source;
-        $node = $this->parser->parseSourceFile($source);
+        $node = $this->parseSelection($source);
         $variables = [];
 
         /** @var Token $token */
         foreach ($node->getDescendantTokens() as $token) {
             if ($token->kind == TokenKind::VariableName) {
-                $text = $token->getText($source);
+                $text = $token->getText($node->getFileContents());
                 if (is_string($text)) {
                     $name = substr($text, 1);
                     $variables[$name] = $name;
@@ -287,7 +288,14 @@ class WorseExtractMethod implements ExtractMethod
         $callString = '$this->'  . $name . '(' . implode(', ', $args) . ');';
 
         if (empty($returnAssignment)) {
-            return $indentation . $callString;
+            $replacement = $indentation . $callString;
+            $selectionRootNode = $this->parseSelection($selection);
+
+            if  ($selectionRootNode->getFirstDescendantNode(ReturnStatement::class)) {
+                $replacement = 'return ' . $replacement;
+            }
+
+            return $replacement;
         }
 
         return $indentation . $returnAssignment . ' = ' . $callString;
@@ -329,5 +337,12 @@ class WorseExtractMethod implements ExtractMethod
             }
         }
         return $newMethodBody;
+    }
+
+    private function parseSelection(string $source): SourceFileNode
+    {
+        $source = '<?php ' . $source;
+        $node = $this->parser->parseSourceFile($source);
+        return $node;
     }
 }

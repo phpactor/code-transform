@@ -118,6 +118,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod21.test',
                 'newMethod',
             ],
+            'return if extracted code has a return' => [
+                'extractMethod22.test',
+                'newMethod',
+            ],
         ];
     }
 }

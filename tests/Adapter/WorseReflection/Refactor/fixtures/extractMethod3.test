@@ -29,7 +29,7 @@ class extractMethod
     {
         $barfoo = 'yes';
 
-        $this->newMethod($foobar, $barfoo);
+        return $this->newMethod($foobar, $barfoo);
     }
 
     private function newMethod(Foobar $foobar, string $barfoo)
