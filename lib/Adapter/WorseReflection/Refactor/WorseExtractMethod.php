@@ -291,7 +291,7 @@ class WorseExtractMethod implements ExtractMethod
             $replacement = $indentation . $callString;
             $selectionRootNode = $this->parseSelection($selection);
 
-            if  ($selectionRootNode->getFirstDescendantNode(ReturnStatement::class)) {
+            if ($selectionRootNode->getFirstDescendantNode(ReturnStatement::class)) {
                 $replacement = 'return ' . $replacement;
             }
 
