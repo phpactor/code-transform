@@ -159,7 +159,7 @@ class WorseExtractMethod implements ExtractMethod
 
     private function reflectMethod(int $offsetEnd, string $source, string $name): ReflectionMethod
     {
-        $offset = $this->reflector->reflectOffset((string) $source, $offsetEnd);
+        $offset = $this->reflector->reflectOffset($source, $offsetEnd);
         $thisVariable = $offset->frame()->locals()->byName('this');
 
         if (empty($thisVariable)) {
@@ -167,6 +167,11 @@ class WorseExtractMethod implements ExtractMethod
         }
 
         $className = $thisVariable->last()->symbolContext()->type()->className();
+
+        if (!$className) {
+            throw new TransformException('Cannot extract method, not in class scope');
+        }
+
         $reflectionClass = $this->reflector->reflectClass((string) $className);
 
         $methods = $reflectionClass->methods();
@@ -220,8 +225,11 @@ class WorseExtractMethod implements ExtractMethod
         /** @var Token $token */
         foreach ($node->getDescendantTokens() as $token) {
             if ($token->kind == TokenKind::VariableName) {
-                $name = substr($token->getText($source), 1);
-                $variables[$name] = $name;
+                $text = $token->getText($source);
+                if (is_string($text)) {
+                    $name = substr($text, 1);
+                    $variables[$name] = $name;
+                }
             }
         }
 
@@ -253,9 +261,10 @@ class WorseExtractMethod implements ExtractMethod
 
             if ($variable->symbolContext()->type()->isDefined()) {
                 $type = $variable->symbolContext()->type();
+                $className = $type->className();
                 $methodBuilder->returnType($type->short());
-                if (false === $type->isPrimitive()) {
-                    $methodBuilder->end()->end()->use($type->className()->full());
+                if ($className) {
+                    $methodBuilder->end()->end()->use($className->full());
                 }
             }
 
@@ -314,8 +323,9 @@ class WorseExtractMethod implements ExtractMethod
             if ($type->isDefined()) {
                 $methodBuilder->returnType($type);
             }
-            if (false === $type->isPrimitive()) {
-                $methodBuilder->end()->end()->use($type->className()->full());
+            $className = $type->className();
+            if ($className) {
+                $methodBuilder->end()->end()->use($className->full());
             }
         }
         return $newMethodBody;

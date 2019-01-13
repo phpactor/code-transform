@@ -57,9 +57,21 @@ class WorseExtractConstant implements ExtractConstant
         $symbol = $symbolInformation->symbol();
 
         $builder = SourceCodeBuilder::create();
-        $builder->namespace((string) $symbolInformation->containerType()->className()->namespace());
+        $containerType = $symbolInformation->containerType();
+
+        if (!$containerType) {
+            throw new TransformException(sprintf('Could not find container class'));
+        }
+
+        $className = $containerType->className();
+
+        if (!$className) {
+            throw new TransformException(sprintf('Could not find container class'));
+        }
+
+        $builder->namespace($className->namespace());
         $builder
-            ->class((string) $symbolInformation->containerType()->className()->short())
+            ->class($className->short())
                 ->constant($constantName, $symbolInformation->value())
             ->end();
 
