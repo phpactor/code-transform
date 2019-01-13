@@ -52,7 +52,7 @@ class CompleteConstructor implements Transformer
             $methodBody = (string) $constructMethod->body();
 
             foreach ($constructMethod->parameters() as $parameter) {
-                if (preg_match('{this\s*->' . $parameter->name() . '}', (string) $methodBody)) {
+                if (preg_match('{this\s*->' . $parameter->name() . '}', $methodBody)) {
                     continue;
                 }
                 $methodBuilder->body()->line('$this->' . $parameter->name() . ' = $' . $parameter->name() .';');

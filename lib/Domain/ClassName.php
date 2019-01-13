@@ -32,7 +32,7 @@ final class ClassName
             return '';
         }
 
-        return substr($this->name, 0, $pos);
+        return substr($this->name, 0, $pos ?: 0);
     }
 
     public function short(): string
