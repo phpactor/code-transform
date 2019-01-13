@@ -26,18 +26,16 @@ class TolerantExtractExpression implements ExtractExpression
         $rootNode = $this->parser->parseSourceFile((string) $source);
         $startNode = $rootNode->getDescendantNodeAtPosition($offsetStart);
 
+        $endPosition = $startNode->getEndPosition();
         if ($offsetEnd) {
             $endNode = $rootNode->getDescendantNodeAtPosition($offsetEnd);
-        }
-
-        if (null === $startNode) {
-            return $source;
+            $endPosition = $endNode->getEndPosition();
         }
 
         $startNode = $this->outerNode($startNode);
 
         $startPosition = $startNode->getStart();
-        $endPosition = $offsetEnd ? $endNode->getEndPosition() : $startNode->getEndPosition();
+        $endPosition = $offsetEnd ?  : $startNode->getEndPosition();
 
         $extractedString = rtrim(trim($source->extractSelection($startPosition, $endPosition)), ';');
         $assigment = sprintf('$%s = %s;', $variableName, $extractedString) . PHP_EOL;

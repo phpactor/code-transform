@@ -51,6 +51,7 @@ class ClassNameFixerTransformer implements Transformer
 
         $rootNode = $this->parser->parseSourceFile((string) $code);
         $edits = [];
+
         if ($textEdit = $this->fixNamespace($rootNode, $correctNamespace)) {
             $edits[] = $textEdit;
         }
@@ -65,7 +66,7 @@ class ClassNameFixerTransformer implements Transformer
     /**
      * @return TextEdit|null
      */
-    private function fixClassName(SourceFileNode $rootNode, string $correctClassName)
+    private function fixClassName(SourceFileNode $rootNode, string $correctClassName): ?TextEdit
     {
         $classLike = $rootNode->getFirstDescendantNode(ClassLike::class);
         
@@ -77,7 +78,7 @@ class ClassNameFixerTransformer implements Transformer
         
         $name = $classLike->name->getText($rootNode->getFileContents());
 
-        if ($name === $correctClassName) {
+        if (!is_string($name) || $name === $correctClassName) {
             return null;
         }
 

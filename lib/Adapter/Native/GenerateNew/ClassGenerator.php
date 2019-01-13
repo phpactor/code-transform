@@ -16,7 +16,7 @@ class ClassGenerator implements GenerateNew
     private $renderer;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $variant;
 
@@ -36,7 +36,7 @@ class ClassGenerator implements GenerateNew
         $classPrototype = $builder->class($targetName->short());
 
         return SourceCode::fromString(
-            (string) $this->renderer->render($builder->build(), $this->variant)
+            (string) $this->renderer->render($builder->build())
         );
     }
 }
