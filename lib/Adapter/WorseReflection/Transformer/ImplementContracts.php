@@ -43,7 +43,7 @@ class ImplementContracts implements Transformer
         $edits = [];
         $sourceCodeBuilder = SourceCodeBuilder::create();
 
-        /** @var $class ReflectionClass */
+        /** @var ReflectionClass $class */
         foreach ($classes->concrete() as $class) {
             $classBuilder = $sourceCodeBuilder->class($class->name()->short());
             $missingMethods = $this->missingClassMethods($class);
@@ -52,7 +52,7 @@ class ImplementContracts implements Transformer
                 continue;
             }
 
-            /** @var $missingMethod ReflectionMethod */
+            /** @var ReflectionMethod $missingMethod */
             foreach ($missingMethods as $missingMethod) {
                 $builder = $this->factory->fromSource($missingMethod->declaringClass()->sourceCode());
 

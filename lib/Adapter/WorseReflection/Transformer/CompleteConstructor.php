@@ -36,7 +36,6 @@ class CompleteConstructor implements Transformer
         $edits = [];
         $sourceCodeBuilder = SourceCodeBuilder::create();
 
-        /** @var ReflectionClassLike $class */
         foreach ($classes as $class) {
             if ($class instanceof ReflectionInterface) {
                 continue;
@@ -60,6 +59,7 @@ class CompleteConstructor implements Transformer
             }
 
             foreach ($constructMethod->parameters() as $parameter) {
+                /** @var ReflectionClass|ReflectionTrait $class */
                 if (true === $class->properties()->has($parameter->name())) {
                     continue;
                 }

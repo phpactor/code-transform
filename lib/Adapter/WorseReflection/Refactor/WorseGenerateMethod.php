@@ -76,9 +76,6 @@ class WorseGenerateMethod implements GenerateMethod
         return $sourceCode;
     }
 
-    /**
-     * @return ReflectionClassLike
-     */
     private function contextType(SourceCode $sourceCode, int $offset): Type
     {
         $worseSourceCode = WorseSourceCode::fromPathAndString((string) $sourceCode->path(), (string) $sourceCode);
