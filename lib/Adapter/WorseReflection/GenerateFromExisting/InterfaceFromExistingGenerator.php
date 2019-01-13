@@ -38,13 +38,13 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
     {
         $existingClass = $this->reflector->reflectClass(ReflectionClassName::fromString((string) $existingClass));
 
-        /** @var $sourceBuilder SourceCodeBuilder */
+        /** @var SourceCodeBuilder $sourceBuilder */
         $sourceBuilder = SourceCodeBuilder::create();
-        $sourceBuilder->namespace((string) $targetName->namespace());
-        $interfaceBuilder = $sourceBuilder->interface((string) $targetName->short());
+        $sourceBuilder->namespace($targetName->namespace());
+        $interfaceBuilder = $sourceBuilder->interface($targetName->short());
         $useClasses = [];
 
-        /** @var $method ReflectionMethod */
+        /** @var ReflectionMethod $method */
         foreach ($existingClass->methods()->byVisibilities([ Visibility::public() ]) as $method) {
             if ($method->name() === '__construct') {
                 continue;
@@ -58,22 +58,28 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
             }
 
             if ($method->returnType()->isDefined()) {
-                $methodBuilder->returnType((string) $method->returnType()->short());
+                $methodBuilder->returnType($method->returnType()->short());
 
                 if ($method->returnType()->isClass()) {
-                    $sourceBuilder->use((string) $method->returnType());
+                    $sourceBuilder->use($method->returnType());
                 }
             }
 
-            /** @var $parameter ReflectionParameter */
+            /** @var ReflectionParameter $parameter */
             foreach ($method->parameters() as $parameter) {
-                $parameterBuilder = $methodBuilder->parameter((string) $parameter->name());
+                $parameterBuilder = $methodBuilder->parameter($parameter->name());
                 if ($parameter->type()->isDefined()) {
                     if ($parameter->type()->isPrimitive()) {
                         $parameterBuilder->type($parameter->type()->primitive());
                     } else {
-                        $parameterBuilder->type((string) $parameter->type()->className()->short());
-                        $useClasses[$parameter->type()->className()->__toString()] = true;
+                        $className = $parameter->type()->className();
+                        if ($className) {
+                            $parameterBuilder->type($className->short());
+                            $paramClassName = $parameter->type()->className();
+                            if ($paramClassName) {
+                                $useClasses[$paramClassName->__toString()] = true;
+                            }
+                        }
                     }
 
                     if ($parameter->default()->isDefined()) {
@@ -84,7 +90,7 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
         }
 
         foreach (array_keys($useClasses) as $useClass) {
-            $sourceBuilder->use((string) $useClass);
+            $sourceBuilder->use($useClass);
         }
 
         return SourceCode::fromString($this->renderer->render($sourceBuilder->build()));

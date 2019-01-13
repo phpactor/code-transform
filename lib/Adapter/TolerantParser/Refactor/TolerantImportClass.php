@@ -99,7 +99,7 @@ class TolerantImportClass implements ImportClass
             return true;
         }
 
-        /** @var ClassDeclaration $classNode */
+        /** @var ClassDeclaration|null $classNode */
         $classNode = $node->getFirstAncestor(ClassDeclaration::class);
 
         if (null === $classNode) {
@@ -117,8 +117,8 @@ class TolerantImportClass implements ImportClass
     private function importClassInSameNamespace(Node $node, ClassName $className)
     {
         $namespace = '';
-        if ($namespace = $node->getNamespaceDefinition()) {
-            $namespace = (string) $node->getNamespaceDefinition()->getFirstChildNode(QualifiedName::class);
+        if ($definition = $node->getNamespaceDefinition()) {
+            $namespace = (string) $definition->getFirstChildNode(QualifiedName::class);
         }
 
         if ($className->namespace() == $namespace) {
