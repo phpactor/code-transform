@@ -103,7 +103,7 @@ class WorseGenerateAccessor implements GenerateAccessor
         $containingClass = $this->reflector->reflectClassLike($info->containerType()->className());
         $worseSourceCode = $containingClass->sourceCode();
 
-        if ($worseSourceCode->path() == $sourceCode->path()) {
+        if ($worseSourceCode->path() != $sourceCode->path()) {
             return $sourceCode;
         }
 

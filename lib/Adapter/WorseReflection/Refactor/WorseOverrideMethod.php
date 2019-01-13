@@ -60,7 +60,7 @@ class WorseOverrideMethod implements OverrideMethod
     {
         /** @var ReflectionMethod $method */
         $builder = $this->factory->fromSource(
-            (string) $method->class()->sourceCode()
+            $method->class()->sourceCode()
         );
 
         $methodBuilder = $builder->class($method->declaringClass()->name()->short())->method($method->name());
@@ -82,7 +82,7 @@ class WorseOverrideMethod implements OverrideMethod
 
     private function getSourcePrototype(ReflectionClass $class, ReflectionMethod $method, SourceCode $source, $methodBuilder)
     {
-        $sourceBuilder = $this->factory->fromSource((string) $source);
+        $sourceBuilder = $this->factory->fromSource($source);
         $sourceBuilder->class($class->name()->short())->add($methodBuilder);
         $this->importClasses($class, $method, $sourceBuilder);
 

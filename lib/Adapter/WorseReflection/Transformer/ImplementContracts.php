@@ -54,7 +54,7 @@ class ImplementContracts implements Transformer
 
             /** @var $missingMethod ReflectionMethod */
             foreach ($missingMethods as $missingMethod) {
-                $builder = $this->factory->fromSource((string) $missingMethod->declaringClass()->sourceCode());
+                $builder = $this->factory->fromSource($missingMethod->declaringClass()->sourceCode());
 
                 $methodBuilder = $builder->classLike(
                     $missingMethod->declaringClass()->name()->short()
