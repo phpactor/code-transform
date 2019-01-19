@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 
+use Microsoft\PhpParser\Node\UseVariableName;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Microsoft\PhpParser\Parser;
 use Microsoft\PhpParser\Node\Expression\Variable;
@@ -106,6 +107,7 @@ class TolerantRenameVariable implements RenameVariable
     private function textEditForRenameFromNode(Node $variable, Node $node, string $newName)
     {
         if (
+            false === $node instanceof UseVariableName &&
             false === $node instanceof Variable &&
             false === $node instanceof Parameter
         ) {
@@ -117,7 +119,7 @@ class TolerantRenameVariable implements RenameVariable
         }
 
 
-        if ($node instanceof Variable) {
+        if ($node instanceof Variable || $node instanceof UseVariableName) {
             return new TextEdit(
                 $node->getStart(),
                 $node->getEndPosition() - $node->getStart(),
