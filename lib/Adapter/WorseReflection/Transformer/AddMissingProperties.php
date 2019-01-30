@@ -44,7 +44,8 @@ class AddMissingProperties implements Transformer
 
         /** @var ReflectionClass $class */
         foreach ($classes as $class) {
-            $classBuilder = $sourceBuilder->class($class->name()->short());
+            $classOrTrait = $class->isTrait() ? 'trait' : 'class';
+            $classBuilder = $sourceBuilder->$classOrTrait($class->name()->short());
 
             foreach ($class->methods()->belongingTo($class->name()) as $method) {
                 $frame = $method->frame();
