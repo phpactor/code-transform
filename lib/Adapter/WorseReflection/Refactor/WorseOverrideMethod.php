@@ -4,6 +4,7 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
 use Phpactor\CodeTransform\Domain\Refactor\OverrideMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\TextDocument\TextDocumentBuilder;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
@@ -40,7 +41,7 @@ class WorseOverrideMethod implements OverrideMethod
 
     public function overrideMethod(SourceCode $source, string $className, string $methodName)
     {
-        $class = $this->getReflectionClass($className);
+        $class = $this->getReflectionClass($source, $className);
         $method = $this->getAncestorReflectionMethod($class, $methodName);
 
         $methodBuilder = $this->getMethodPrototype($class, $method);
@@ -49,11 +50,16 @@ class WorseOverrideMethod implements OverrideMethod
         return $this->updater->apply($sourcePrototype, Code::fromString((string) $source));
     }
 
-    private function getReflectionClass(string $className): ReflectionClass
+    private function getReflectionClass(SourceCode $source, string $className): ReflectionClass
     {
-        $class = $this->reflector->reflectClass($className);
+        $builder = TextDocumentBuilder::create($source)->language('php');
+        if ($source->path()) {
+            $builder->uri($source->path());
+        }
 
-        return $class;
+        $classes = $this->reflector->reflectClassesIn($builder->build());
+
+        return $classes->get($className);
     }
 
     private function getMethodPrototype(ReflectionClass $class, ReflectionMethod $method)
