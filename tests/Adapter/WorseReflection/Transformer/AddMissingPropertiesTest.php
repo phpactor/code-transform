@@ -342,6 +342,36 @@ class Foobar
 EOT
 
             ],
+            'It adds missing trait properties within the Trait' => [
+                <<<'EOT'
+<?php
+
+trait Foobar
+{
+    public function hello()
+    {
+        $this->hello = 'goodbye';
+    }
+}
+EOT
+                ,
+                <<<'EOT'
+<?php
+
+trait Foobar
+{
+    /**
+     * @var string
+     */
+    private $hello;
+
+    public function hello()
+    {
+        $this->hello = 'goodbye';
+    }
+}
+EOT
+            ],
         ];
     }
 }
