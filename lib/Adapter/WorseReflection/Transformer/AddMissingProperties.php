@@ -8,9 +8,11 @@ use Phpactor\WorseReflection\Core\Inference\Variable;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
 use Phpactor\CodeBuilder\Domain\Updater;
+use Phpactor\CodeBuilder\Domain\Builder\ClassLikeBuilder;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionClassLike;
 
 class AddMissingProperties implements Transformer
 {
@@ -44,10 +46,7 @@ class AddMissingProperties implements Transformer
 
         /** @var ReflectionClass $class */
         foreach ($classes as $class) {
-
-            $classBuilder = $class->isTrait()
-                ? $sourceBuilder->trait($class->name()->short())
-                : $sourceBuilder->class($class->name()->short());
+            $classBuilder = $this->resolveClassBuilder($sourceBuilder, $class);
 
             foreach ($class->methods()->belongingTo($class->name()) as $method) {
                 $frame = $method->frame();
@@ -74,5 +73,16 @@ class AddMissingProperties implements Transformer
         );
 
         return SourceCode::fromString($code);
+    }
+
+    private function resolveClassBuilder(SourceCodeBuilder $sourceBuilder, ReflectionClassLike $class): ClassLikeBuilder
+    {
+        $name = $class->name()->short();
+
+        if ($class->isTrait()) {
+            return $sourceBuilder->trait($name);
+        }
+
+        return $sourceBuilder->class($name);
     }
 }
