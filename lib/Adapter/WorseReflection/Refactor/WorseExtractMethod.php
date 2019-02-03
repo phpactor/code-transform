@@ -181,7 +181,8 @@ class WorseExtractMethod implements ExtractMethod
             throw new TransformException(sprintf('Class "%s" already has method "%s"', (string) $className, $name));
         }
 
-        return $methods->atOffset($offsetEnd)->first();
+        // returns the method that the offset is within
+        return $methods->belongingTo($className)->atOffset($offsetEnd)->first();
     }
 
     private function addParametersAndGetArgs(array $freeVariables, $methodBuilder, SourceCodeBuilder $builder): array
