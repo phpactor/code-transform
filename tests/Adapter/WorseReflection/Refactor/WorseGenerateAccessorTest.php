@@ -5,38 +5,29 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseGenerateAccessor;
 use Phpactor\CodeTransform\Domain\SourceCode;
-use Phpactor\CodeTransform\Domain\Exception\TransformException;
+use Phpactor\WorseReflection\Core\Exception\ItemNotFound;
 
 class WorseGenerateAccessorTest extends WorseTestCase
 {
     /**
      * @dataProvider provideExtractAccessor
      */
-    public function testGenerateAccessorFromOffset(
+    public function testGenerateAccessor(
         string $test,
         string $prefix = '',
         bool $upperCaseFirst = false
     ) {
-        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
+        list($source, $expected, $propertyName) = $this->sourceExpectedAndWordUnderCursor(
+            __DIR__ . '/fixtures/' . $test
+        );
 
-        $generateAccessor = new WorseGenerateAccessor($this->reflectorFor($source), $this->updater(), $prefix, $upperCaseFirst);
-        $transformed = $generateAccessor->generateFromOffset(SourceCode::fromString($source), $offset);
-
-        $this->assertEquals(trim($expected), trim($transformed));
-    }
-
-    /**
-     * @dataProvider provideExtractAccessor
-     */
-    public function testGenerateAccessorFromPropertyName(
-        string $test,
-        string $prefix = '',
-        bool $upperCaseFirst = false
-    ) {
-        list($source, $expected) = $this->sourceExpectedAndWordUnderCursor(__DIR__ . '/fixtures/' . $test);
-
-        $generateAccessor = new WorseGenerateAccessor($this->reflectorFor($source), $this->updater(), $prefix, $upperCaseFirst);
-        $transformed = $generateAccessor->generateFromPropertyName(SourceCode::fromString($source), 'method');
+        $generateAccessor = new WorseGenerateAccessor(
+            $this->reflectorFor($source),
+            $this->updater(),
+            $prefix,
+            $upperCaseFirst
+        );
+        $transformed = $generateAccessor->generate(SourceCode::fromString($source), $propertyName);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -66,11 +57,11 @@ class WorseGenerateAccessorTest extends WorseTestCase
 
     public function testNonProperty()
     {
-        $this->expectException(TransformException::class);
-        $this->expectExceptionMessage('Symbol at offset "9" is not a property');
-        $source = '<?php echo "hello";';
+        $this->expectException(ItemNotFound::class);
+        $this->expectExceptionMessage('Unknown item "bar", known items: "foo"');
+        $source = '<?php class Foo { private $foo; }';
 
         $generateAccessor = new WorseGenerateAccessor($this->reflectorFor(''), $this->updater());
-        $generateAccessor->generateFromOffset(SourceCode::fromString($source), 9);
+        $generateAccessor->generate(SourceCode::fromString($source), 'bar');
     }
 }
