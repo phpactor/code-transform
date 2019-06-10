@@ -48,15 +48,15 @@ class WorseGenerateAccessor implements GenerateAccessor
 
     public function generate(SourceCode $sourceCode, string $propertyName): SourceCode
     {
-        $class = $this->class((string) $sourceCode);
-        $property = $class->properties()->get($propertyName);
+        $property = $this->class((string) $sourceCode)->properties()->get($propertyName);
 
         $prototype = $this->buildPrototype($property);
-        $sourceCode = $this->sourceFromSymbolInformation($sourceCode, $property->class()->name());
+        $sourceCode = $this->sourceFromClassName($sourceCode, $property->class()->name());
 
-        return $sourceCode->withSource(
-            (string) $this->updater->apply($prototype, Code::fromString((string) $sourceCode))
-        );
+        return $sourceCode->withSource((string) $this->updater->apply(
+            $prototype,
+            Code::fromString((string) $sourceCode)
+        ));
     }
 
     private function formatName(string $name)
@@ -87,7 +87,7 @@ class WorseGenerateAccessor implements GenerateAccessor
         return $builder->build();
     }
 
-    private function sourceFromSymbolInformation(SourceCode $sourceCode, ClassName $className): SourceCode
+    private function sourceFromClassName(SourceCode $sourceCode, ClassName $className): SourceCode
     {
         $containingClass = $this->reflector->reflectClassLike($className);
         $worseSourceCode = $containingClass->sourceCode();
