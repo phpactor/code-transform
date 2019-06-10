@@ -51,12 +51,14 @@ class AdapterTestCase extends TestCase
 
     protected function sourceExpectedAndWordUnderCursor($manifestPath): array
     {
-        list($source, $expected) = $this->sourceExpected($manifestPath);
+        list(
+            $source,
+            $expected,
+            $offsetStart,
+            $offsetEnd
+        ) = $this->sourceExpectedAndOffset($manifestPath);
 
-        preg_match('/(\w+)<>(\w+)/', $source, $matches);
-        $word = $matches[1] . $matches[2];
-
-        $source = preg_replace('/<>/', '', $source);
+        $word = mb_substr($source, $offsetStart, $offsetEnd - $offsetStart);
 
         return [ $source, $expected, $word ];
     }
