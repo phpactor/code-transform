@@ -49,7 +49,7 @@ class WorseGenerateAccessor implements GenerateAccessor
 
     public function generate(SourceCode $sourceCode, string $propertyName): SourceCode
     {
-        $property = $this->class((string) $sourceCode)->properties()->get($propertyName);
+        $property = $this->class((string) $sourceCode)->properties()->offsetGet($propertyName);
 
         $prototype = $this->buildPrototype($property);
         $sourceCode = $this->sourceFromClassName($sourceCode, $property->class()->name());
