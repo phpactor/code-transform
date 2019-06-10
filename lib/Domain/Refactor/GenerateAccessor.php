@@ -6,5 +6,6 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 
 interface GenerateAccessor
 {
-    public function generateAccessor(SourceCode $sourceCode, int $offset): SourceCode;
+    public function generateFromOffset(SourceCode $sourceCode, int $offset): SourceCode;
+    public function generateFromPropertyName(SourceCode $sourceCode, string $propertyName): SourceCode;
 }

@@ -12,7 +12,7 @@ class WorseGenerateAccessorTest extends WorseTestCase
     /**
      * @dataProvider provideExtractAccessor
      */
-    public function testGenerateAccessor(
+    public function testGenerateAccessorFromOffset(
         string $test,
         string $prefix = '',
         bool $upperCaseFirst = false
@@ -20,7 +20,23 @@ class WorseGenerateAccessorTest extends WorseTestCase
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
         $generateAccessor = new WorseGenerateAccessor($this->reflectorFor($source), $this->updater(), $prefix, $upperCaseFirst);
-        $transformed = $generateAccessor->generateAccessor(SourceCode::fromString($source), $offset);
+        $transformed = $generateAccessor->generateFromOffset(SourceCode::fromString($source), $offset);
+
+        $this->assertEquals(trim($expected), trim($transformed));
+    }
+
+    /**
+     * @dataProvider provideExtractAccessor
+     */
+    public function testGenerateAccessorFromPropertyName(
+        string $test,
+        string $prefix = '',
+        bool $upperCaseFirst = false
+    ) {
+        list($source, $expected) = $this->sourceExpectedAndWordUnderCursor(__DIR__ . '/fixtures/' . $test);
+
+        $generateAccessor = new WorseGenerateAccessor($this->reflectorFor($source), $this->updater(), $prefix, $upperCaseFirst);
+        $transformed = $generateAccessor->generateFromPropertyName(SourceCode::fromString($source), 'method');
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -55,6 +71,6 @@ class WorseGenerateAccessorTest extends WorseTestCase
         $source = '<?php echo "hello";';
 
         $generateAccessor = new WorseGenerateAccessor($this->reflectorFor(''), $this->updater());
-        $generateAccessor->generateAccessor(SourceCode::fromString($source), 9);
+        $generateAccessor->generateFromOffset(SourceCode::fromString($source), 9);
     }
 }
