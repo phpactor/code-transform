@@ -3,7 +3,7 @@
 
 class generateMethod
 {
-    private $<>method<>;
+    pr<>ivate $method;
 }
 // File: expected
 <?php

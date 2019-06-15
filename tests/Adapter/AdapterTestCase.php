@@ -48,18 +48,4 @@ class AdapterTestCase extends TestCase
 
         return [ $source, $expected, $offsetStart, $offsetEnd ];
     }
-
-    protected function sourceExpectedAndWordUnderCursor($manifestPath): array
-    {
-        list(
-            $source,
-            $expected,
-            $offsetStart,
-            $offsetEnd
-        ) = $this->sourceExpectedAndOffset($manifestPath);
-
-        $word = mb_substr($source, $offsetStart, $offsetEnd - $offsetStart);
-
-        return [ $source, $expected, $word ];
-    }
 }
