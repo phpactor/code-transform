@@ -3,6 +3,7 @@
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
 use InvalidArgumentException;
+use RuntimeException;
 use Phpactor\WorseReflection\Core\ClassName;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionProperty;
@@ -47,9 +48,11 @@ class WorseGenerateAccessor implements GenerateAccessor
         $this->upperCaseFirst = $upperCaseFirst;
     }
 
-    public function generate(SourceCode $sourceCode, string $propertyName): SourceCode
+    public function generate(SourceCode $sourceCode, string $propertyName, int $offset): SourceCode
     {
-        $property = $this->class((string) $sourceCode)->properties()->offsetGet($propertyName);
+        $property = $this->class((string) $sourceCode, $offset)
+             ->properties()
+             ->offsetGet($propertyName);
 
         $prototype = $this->buildPrototype($property);
         $sourceCode = $this->sourceFromClassName($sourceCode, $property->class()->name());
@@ -103,22 +106,40 @@ class WorseGenerateAccessor implements GenerateAccessor
         );
     }
 
-    private function class(string $source): ReflectionClass
+    /**
+     * Finds the class containing the property.
+     *
+     * @param string $source The source code of the file.
+     * @param int $offset The position where the cursor was, used to identify the correct
+     * class if there is more than one in the `$source`.
+     *
+     * @return ReflectionClass
+     *
+     * @throws InvalidArgumentException If there is no class in the code.
+     * @throws RuntimeException If it's impossible to determine which class to use.
+     */
+    private function class(string $source, int $offset): ReflectionClass
     {
         $classes = $this->reflector->reflectClassesIn($source);
 
-        if ($classes->count() === 0) {
+        if (0 === $classes->count()) {
             throw new InvalidArgumentException(
                 'No classes in source file'
             );
         }
 
-        if ($classes->count() > 1) {
-            throw new InvalidArgumentException(
-                'Currently will only generates accessor by name in files with one class'
-            );
+        if (1 === $classes->count()) {
+            return $classes->first();
         }
 
-        return $classes->first();
+        foreach ($this->reflector->reflectClassesIn($source) as $class) {
+            $position = $class->position();
+
+            if ($position->start() <= $offset && $offset <= $position->end()) {
+                return $class;
+            }
+        }
+
+        throw new RuntimeException('Impossible to determine which class to use.');
     }
 }

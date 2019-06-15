@@ -14,10 +14,11 @@ class WorseGenerateAccessorTest extends WorseTestCase
      */
     public function testGenerateAccessor(
         string $test,
+        string $propertyName,
         string $prefix = '',
         bool $upperCaseFirst = false
     ) {
-        list($source, $expected, $propertyName) = $this->sourceExpectedAndWordUnderCursor(
+        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(
             __DIR__ . '/fixtures/' . $test
         );
 
@@ -27,30 +28,45 @@ class WorseGenerateAccessorTest extends WorseTestCase
             $prefix,
             $upperCaseFirst
         );
-        $transformed = $generateAccessor->generate(SourceCode::fromString($source), $propertyName);
+        $transformed = $generateAccessor->generate(
+            SourceCode::fromString($source),
+            $propertyName,
+            $offset
+        );
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
 
     public function provideExtractAccessor()
     {
+        $propertyName = 'method';
+
         return [
             'property' => [
                 'generateAccessor1.test',
+                $propertyName,
             ],
             'prefix and ucfirst' => [
                 'generateAccessor2.test',
+                $propertyName,
                 'get',
                 true,
             ],
             'return type' => [
                 'generateAccessor3.test',
+                $propertyName,
             ],
             'namespaced' => [
                 'generateAccessor4.test',
+                $propertyName,
             ],
             'pseudo-type' => [
                 'generateAccessor5.test',
+                $propertyName,
+            ],
+            'multiple-classes' => [
+                'generateAccessor6.test',
+                $propertyName,
             ],
         ];
     }
@@ -62,6 +78,6 @@ class WorseGenerateAccessorTest extends WorseTestCase
         $source = '<?php class Foo { private $foo; }';
 
         $generateAccessor = new WorseGenerateAccessor($this->reflectorFor(''), $this->updater());
-        $generateAccessor->generate(SourceCode::fromString($source), 'bar');
+        $generateAccessor->generate(SourceCode::fromString($source), 'bar', 0);
     }
 }
