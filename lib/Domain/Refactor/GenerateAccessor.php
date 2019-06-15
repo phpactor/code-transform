@@ -2,7 +2,9 @@
 
 namespace Phpactor\CodeTransform\Domain\Refactor;
 
+use InvalidArgumentException;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use RuntimeException;
 
 interface GenerateAccessor
 {
