@@ -106,18 +106,6 @@ class WorseGenerateAccessor implements GenerateAccessor
         );
     }
 
-    /**
-     * Finds the class containing the property.
-     *
-     * @param string $source The source code of the file.
-     * @param int $offset The position where the cursor was, used to identify the correct
-     * class if there is more than one in the `$source`.
-     *
-     * @return ReflectionClass
-     *
-     * @throws InvalidArgumentException If there is no class in the code.
-     * @throws RuntimeException If it's impossible to determine which class to use.
-     */
     private function class(string $source, int $offset): ReflectionClass
     {
         $classes = $this->reflector->reflectClassesIn($source);
