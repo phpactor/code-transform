@@ -9,8 +9,8 @@ class generateMethod
     /**
      * @var Type1
      */
-    private $met<>hod;
-}
+    private $method;
+<>}
 // File: expected
 <?php
 

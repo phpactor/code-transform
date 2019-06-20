@@ -2,15 +2,17 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
+use InvalidArgumentException;
+use RuntimeException;
+use Phpactor\WorseReflection\Core\ClassName;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionProperty;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\CodeBuilder\Domain\Updater;
-use Phpactor\WorseReflection\Core\Inference\Symbol;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\CodeTransform\Domain\Refactor\GenerateAccessor;
-use Phpactor\WorseReflection\Core\Inference\SymbolContext;
-use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
 class WorseGenerateAccessor implements GenerateAccessor
 {
@@ -46,31 +48,19 @@ class WorseGenerateAccessor implements GenerateAccessor
         $this->upperCaseFirst = $upperCaseFirst;
     }
 
-    public function generateAccessor(SourceCode $sourceCode, int $offset): SourceCode
+    public function generate(SourceCode $sourceCode, string $propertyName, int $offset): SourceCode
     {
-        $info = $this->getInfo($sourceCode, $offset);
-        $prototype = $this->buildPrototype($info);
-        $sourceCode = $this->sourceFromSymbolInformation($sourceCode, $info);
+        $property = $this->class((string) $sourceCode, $offset)
+             ->properties()
+             ->offsetGet($propertyName);
 
-        return $sourceCode->withSource(
-            (string) $this->updater->apply($prototype, Code::fromString((string) $sourceCode))
-        );
-    }
+        $prototype = $this->buildPrototype($property);
+        $sourceCode = $this->sourceFromClassName($sourceCode, $property->class()->name());
 
-    private function getInfo(SourceCode $sourceCode, int $offset): SymbolContext
-    {
-        $reflectionOffset = $this->reflector->reflectOffset($sourceCode->__toString(), $offset);
-        $info = $reflectionOffset->symbolContext();
-
-        if ($info->symbol()->symbolType() !== Symbol::PROPERTY) {
-            throw new TransformException(sprintf(
-                'Symbol at offset "%s" is not a property, it is a symbol of type "%s"',
-                $offset,
-                $info->symbol()->symbolType()
-            ));
-        }
-
-        return $info;
+        return $sourceCode->withSource((string) $this->updater->apply(
+            $prototype,
+            Code::fromString((string) $sourceCode)
+        ));
     }
 
     private function formatName(string $name)
@@ -82,25 +72,28 @@ class WorseGenerateAccessor implements GenerateAccessor
         return $this->prefix . $name;
     }
 
-    private function buildPrototype(SymbolContext $info)
+    private function buildPrototype(ReflectionProperty $property)
     {
         $builder = SourceCodeBuilder::create();
-        $builder->namespace($info->containerType()->className()->namespace());
-        $method = $builder
-            ->class($info->containerType()->className()->short())
-            ->method($this->formatName($info->symbol()->name()));
-        $method->body()->line(sprintf('return $this->%s;', $info->symbol()->name()));
+        $className = $property->class()->name();
 
-        if ($info->type()->isDefined()) {
-            $method->returnType($info->type()->isClass() ? $info->type()->className()->short() : $info->type()->primitive());
+        $builder->namespace($className->namespace());
+        $method = $builder
+            ->class($className->short())
+            ->method($this->formatName($property->name()));
+        $method->body()->line(sprintf('return $this->%s;', $property->name()));
+
+        $type = $property->inferredTypes()->best();
+        if ($type->isDefined()) {
+            $method->returnType($type->isClass() ? $type->className()->short() : $type->primitive());
         }
 
         return $builder->build();
     }
 
-    private function sourceFromSymbolInformation(SourceCode $sourceCode, SymbolContext $info): SourceCode
+    private function sourceFromClassName(SourceCode $sourceCode, ClassName $className): SourceCode
     {
-        $containingClass = $this->reflector->reflectClassLike($info->containerType()->className());
+        $containingClass = $this->reflector->reflectClassLike($className);
         $worseSourceCode = $containingClass->sourceCode();
 
         if ($worseSourceCode->path() != $sourceCode->path()) {
@@ -111,5 +104,30 @@ class WorseGenerateAccessor implements GenerateAccessor
             $worseSourceCode->__toString(),
             $worseSourceCode->path()
         );
+    }
+
+    private function class(string $source, int $offset): ReflectionClass
+    {
+        $classes = $this->reflector->reflectClassesIn($source);
+
+        if (0 === $classes->count()) {
+            throw new InvalidArgumentException(
+                'No classes in source file'
+            );
+        }
+
+        if (1 === $classes->count()) {
+            return $classes->first();
+        }
+
+        foreach ($this->reflector->reflectClassesIn($source) as $class) {
+            $position = $class->position();
+
+            if ($position->start() <= $offset && $offset <= $position->end()) {
+                return $class;
+            }
+        }
+
+        throw new RuntimeException('Impossible to determine which class to use.');
     }
 }

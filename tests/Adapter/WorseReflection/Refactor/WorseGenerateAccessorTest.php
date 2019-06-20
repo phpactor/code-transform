@@ -5,7 +5,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseGenerateAccessor;
 use Phpactor\CodeTransform\Domain\SourceCode;
-use Phpactor\CodeTransform\Domain\Exception\TransformException;
+use Phpactor\WorseReflection\Core\Exception\ItemNotFound;
 
 class WorseGenerateAccessorTest extends WorseTestCase
 {
@@ -14,47 +14,70 @@ class WorseGenerateAccessorTest extends WorseTestCase
      */
     public function testGenerateAccessor(
         string $test,
+        string $propertyName,
         string $prefix = '',
         bool $upperCaseFirst = false
     ) {
-        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
+        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(
+            __DIR__ . '/fixtures/' . $test
+        );
 
-        $generateAccessor = new WorseGenerateAccessor($this->reflectorFor($source), $this->updater(), $prefix, $upperCaseFirst);
-        $transformed = $generateAccessor->generateAccessor(SourceCode::fromString($source), $offset);
+        $generateAccessor = new WorseGenerateAccessor(
+            $this->reflectorFor($source),
+            $this->updater(),
+            $prefix,
+            $upperCaseFirst
+        );
+        $transformed = $generateAccessor->generate(
+            SourceCode::fromString($source),
+            $propertyName,
+            $offset
+        );
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
 
     public function provideExtractAccessor()
     {
+        $propertyName = 'method';
+
         return [
             'property' => [
                 'generateAccessor1.test',
+                $propertyName,
             ],
             'prefix and ucfirst' => [
                 'generateAccessor2.test',
+                $propertyName,
                 'get',
                 true,
             ],
             'return type' => [
                 'generateAccessor3.test',
+                $propertyName,
             ],
             'namespaced' => [
                 'generateAccessor4.test',
+                $propertyName,
             ],
             'pseudo-type' => [
                 'generateAccessor5.test',
+                $propertyName,
+            ],
+            'multiple-classes' => [
+                'generateAccessor6.test',
+                $propertyName,
             ],
         ];
     }
 
     public function testNonProperty()
     {
-        $this->expectException(TransformException::class);
-        $this->expectExceptionMessage('Symbol at offset "9" is not a property');
-        $source = '<?php echo "hello";';
+        $this->expectException(ItemNotFound::class);
+        $this->expectExceptionMessage('Unknown item "bar", known items: "foo"');
+        $source = '<?php class Foo { private $foo; }';
 
         $generateAccessor = new WorseGenerateAccessor($this->reflectorFor(''), $this->updater());
-        $generateAccessor->generateAccessor(SourceCode::fromString($source), 9);
+        $generateAccessor->generate(SourceCode::fromString($source), 'bar', 0);
     }
 }

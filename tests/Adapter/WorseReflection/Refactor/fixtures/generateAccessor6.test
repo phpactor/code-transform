@@ -2,19 +2,37 @@
 
 <?php
 
+namespace Acme;
+
 class generateMethod
 {
+    /**
+     * @var Type1[]
+     */
     private $method;
 <>}
+
+class Bar
+{
+}
 // File: expected
 <?php
 
+namespace Acme;
+
 class generateMethod
 {
+    /**
+     * @var Type1[]
+     */
     private $method;
 
-    public function getMethod()
+    public function method(): array
     {
         return $this->method;
     }
+}
+
+class Bar
+{
 }
