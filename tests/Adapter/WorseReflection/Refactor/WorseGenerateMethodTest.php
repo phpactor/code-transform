@@ -52,6 +52,12 @@ class WorseGenerateMethodTest extends WorseTestCase
             'imports classes' => [
                 'generateMethod9.test',
             ],
+            'static private method' => [
+                'generateMethod10.test',
+            ],
+            'static public method' => [
+                'generateMethod11.test',
+            ],
         ];
     }
 
