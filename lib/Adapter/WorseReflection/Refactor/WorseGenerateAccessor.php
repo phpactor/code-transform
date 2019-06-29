@@ -85,7 +85,8 @@ class WorseGenerateAccessor implements GenerateAccessor
 
         $type = $property->inferredTypes()->best();
         if ($type->isDefined()) {
-            $method->returnType($type->isClass() ? $type->className()->short() : $type->primitive());
+            $className = $type->className();
+            $method->returnType($className ? $className->short() : $type->primitive());
         }
 
         return $builder->build();

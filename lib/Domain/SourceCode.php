@@ -13,7 +13,7 @@ final class SourceCode
     private $code;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $path;
 

@@ -1,3 +1,9 @@
+includes:
+    - vendor/phpstan/phpstan/conf/config.level7.neon
+
 parameters:
-  ignoreErrors:
-    - '#Strict comparison using === between false and true#'
+    ignoreErrors:
+        - '#between false and true will always evaluate to false#'
+    paths:
+        - lib
+
