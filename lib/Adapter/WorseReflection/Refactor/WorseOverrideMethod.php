@@ -114,7 +114,13 @@ class WorseOverrideMethod implements OverrideMethod
         }
 
         foreach ($usedClasses as $usedClass) {
-            if ($class->name()->namespace() == $usedClass->className()->namespace()) {
+            $className = $usedClass->className();
+
+            if (!$className) {
+                continue;
+            }
+
+            if ($class->name()->namespace() == $className->namespace()) {
                 continue;
             }
 

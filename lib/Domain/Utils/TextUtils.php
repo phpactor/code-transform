@@ -32,6 +32,10 @@ class TextUtils
             }
         }
 
+        if (null === $indentation) {
+            $indentation = 0;
+        }
+
         foreach ($lines as &$line) {
             $line = substr($line, $indentation);
         }

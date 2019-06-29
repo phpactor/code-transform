@@ -315,7 +315,7 @@ class WorseExtractMethod implements ExtractMethod
         }
         
         // get the positional parent of the node
-        while ($endNode->getEndPosition() === $endNode->parent->getEndPosition()) {
+        while ($endNode->parent && $endNode->getEndPosition() === $endNode->parent->getEndPosition()) {
             $endNode = $endNode->parent;
         }
         
