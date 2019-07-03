@@ -36,8 +36,8 @@ class WorseInterestingOffsetFinder implements InterestingOffsetFinder
 
             $symbolType = $reflectionOffset->symbolContext()->symbol()->symbolType();
 
-            if ($symbolType != Symbol::UNKNOWN) {
-                return ByteOffset::fromInt($reflectionOffset->symbolContext()->symbol()->position()->start());
+            if ($symbolType !== Symbol::UNKNOWN) {
+                return ByteOffset::fromInt($node->getStart());
             }
 
             $node = $node->parent;
