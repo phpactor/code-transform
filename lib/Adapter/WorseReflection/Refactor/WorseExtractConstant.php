@@ -91,7 +91,7 @@ class WorseExtractConstant implements ExtractConstant
 
         $textEdits = [];
         foreach ($classNode->getDescendantNodes() as $node) {
-            if (false === $node instanceof $targetNode) {
+            if (!$node instanceof $targetNode) {
                 continue;
             }
 
