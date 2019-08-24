@@ -182,7 +182,13 @@ class WorseExtractMethod implements ExtractMethod
         }
 
         // returns the method that the offset is within
-        return $methods->belongingTo($className)->atOffset($offsetEnd)->first();
+        $member = $methods->belongingTo($className)->atOffset($offsetEnd)->first();
+
+        if (!$member instanceof ReflectionMethod) {
+            throw new TransformException(sprintf('Member should have been a method but it was a "%s"', get_class($member)));
+        }
+
+        return $member;
     }
 
     private function addParametersAndGetArgs(array $freeVariables, $methodBuilder, SourceCodeBuilder $builder): array
