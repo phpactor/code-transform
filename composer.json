@@ -15,7 +15,7 @@
         "phpactor/class-to-file": "~0.3"
     },
     "require-dev": {
-        "phpactor/worse-reflection": "~0.1",
+        "phpactor/worse-reflection": "~0.4",
         "phpactor/test-utils": "^1.0@dev",
         "phpstan/phpstan": "~0.11.0",
         "phpunit/phpunit": "~7.0",
