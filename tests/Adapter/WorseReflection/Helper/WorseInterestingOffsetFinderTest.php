@@ -89,7 +89,27 @@ class Foobar
 }
 EOT
             , Symbol::METHOD,
+            ];
+
+        yield 'offset in method call' => [
+            <<<'EOT'
+<?php
+
+class Foobar
+{
+    public function methodOne()
+    {
+        $this->ba<>r();
+    }
+
+    private function bar()
+    {
+    }
+}
+EOT
+            , Symbol::METHOD,
         ];
+
 
         yield 'offset on var' => [
             <<<'EOT'
@@ -114,7 +134,7 @@ class Foobar
 {
     public function methodOne()
     {
-        $foo = $bar + 3 / 2 <>+ $foo;
+        $foo = $bar + 3 / 2 + $<>foo;
     }
 }
 EOT
