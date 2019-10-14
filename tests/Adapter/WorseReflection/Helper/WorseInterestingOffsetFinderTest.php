@@ -134,7 +134,7 @@ class Foobar
 {
     public function methodOne()
     {
-        $foo = $bar + 3 / 2 <>+ $foo;
+        $foo = $bar + 3 / 2 + $<>foo;
     }
 }
 EOT

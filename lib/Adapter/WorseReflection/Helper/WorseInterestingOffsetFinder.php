@@ -29,20 +29,35 @@ class WorseInterestingOffsetFinder implements InterestingOffsetFinder
 
     public function find(TextDocument $source, ByteOffset $offset): ByteOffset
     {
+        if ($interestingOffset = $this->resolveInterestingOffset($source, $offset)) {
+            return $interestingOffset;
+        }
+
         $node = $this->parser->parseSourceFile($source->__toString())->getDescendantNodeAtPosition($offset->toInt());
 
         do {
-            $reflectionOffset = $this->reflector->reflectOffset($source, $node->getStart());
+            $offset = ByteOffset::fromInt($node->getStart());
 
-            $symbolType = $reflectionOffset->symbolContext()->symbol()->symbolType();
-
-            if ($symbolType !== Symbol::UNKNOWN) {
-                return ByteOffset::fromInt($node->getStart());
+            if ($interestingOffset = $this->resolveInterestingOffset($source, $offset)) {
+                return $interestingOffset;
             }
 
             $node = $node->parent;
         } while ($node);
 
         return $offset;
+    }
+
+    private function resolveInterestingOffset(TextDocument $source, ByteOffset $offset): ?ByteOffset
+    {
+        $reflectionOffset = $this->reflector->reflectOffset($source, $offset->toInt());
+
+        $symbolType = $reflectionOffset->symbolContext()->symbol()->symbolType();
+
+        if ($symbolType !== Symbol::UNKNOWN) {
+            return $offset;
+        }
+
+        return null;
     }
 }
