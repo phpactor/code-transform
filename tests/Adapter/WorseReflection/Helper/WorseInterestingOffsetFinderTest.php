@@ -89,7 +89,27 @@ class Foobar
 }
 EOT
             , Symbol::METHOD,
+            ];
+
+        yield 'offset in method call' => [
+            <<<'EOT'
+<?php
+
+class Foobar
+{
+    public function methodOne()
+    {
+        $this->ba<>r();
+    }
+
+    private function bar()
+    {
+    }
+}
+EOT
+            , Symbol::METHOD,
         ];
+
 
         yield 'offset on var' => [
             <<<'EOT'
