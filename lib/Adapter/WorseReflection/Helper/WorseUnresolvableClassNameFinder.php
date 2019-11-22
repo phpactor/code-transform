@@ -5,11 +5,14 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Helper;
 use Generator;
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\QualifiedName;
+use Microsoft\PhpParser\Node\Statement\NamespaceDefinition;
+use Phpactor\CodeTransform\Domain\NameWithByteOffset;
 use Phpactor\Name\QualifiedName as PhpactorQualifiedName;
 use Microsoft\PhpParser\Node\SourceFileNode;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\Helper\UnresolvableClassNameFinder;
 use Phpactor\Name\Names;
+use Phpactor\TextDocument\ByteOffset;
 use Phpactor\TextDocument\TextDocument;
 use Phpactor\WorseReflection\Core\Exception\NotFound;
 use Phpactor\WorseReflection\Core\Reflector\ClassReflector;
@@ -32,19 +35,30 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         $this->reflector = $reflector;
     }
 
-    public function find(TextDocument $sourceCode): Names
+    /**
+     * @return NameWithByteOffset[]
+     */
+    public function find(TextDocument $sourceCode): array
     {
         $rootNode = $this->parser->parseSourceFile($sourceCode);
         $names = $this->findNameNodes($rootNode);
         $names = $this->filterResolvedNames($names);
 
-        return Names::fromNames($names);
+        return $names;
     }
 
     private function findNameNodes(SourceFileNode $rootNode): array
     {
-        return array_filter(iterator_to_array($rootNode->getDescendantNodes()), function (Node $node) {
-            return $node instanceof QualifiedName;
+        return array_filter($this->descendants($rootNode), function (Node $node) {
+            if  (!$node instanceof QualifiedName) {
+                return false;
+            }
+
+            if ($node->getParent() instanceof NamespaceDefinition) {
+                return false;
+            }
+
+            return true;
         });
     }
 
@@ -65,10 +79,28 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         try {
             $class = $this->reflector->reflectClass($nameText);
         } catch (NotFound $notFound) {
-            $unresolvedNames[] = PhpactorQualifiedName::fromString($nameText);
+            $unresolvedNames[] = new NameWithByteOffset(
+                PhpactorQualifiedName::fromString($nameText),
+                ByteOffset::fromInt($name->getStart())
+            );
         }
 
         return $unresolvedNames;
+    }
+
+    private function descendants($node): array
+    {
+        $descendants = [];
+        foreach ($node->getChildNodes() as $childNode) {
+            if (!$childNode instanceof Node) {
+                continue;
+            }
+
+            $descendants[] = $childNode;
+            $descendants = array_merge($descendants, $this->descendants($childNode));
+        }
+
+        return $descendants;
     }
 
 }

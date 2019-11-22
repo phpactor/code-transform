@@ -7,5 +7,8 @@ use Phpactor\TextDocument\TextDocument;
 
 interface UnresolvableClassNameFinder
 {
-    public function find(TextDocument $sourceCode): Names;
+    /**
+     * @return NameWithByteOffset[]
+     */
+    public function find(TextDocument $sourceCode): array;
 }
