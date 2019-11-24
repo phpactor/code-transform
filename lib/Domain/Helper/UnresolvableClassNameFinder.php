@@ -2,7 +2,7 @@
 
 namespace Phpactor\CodeTransform\Domain\Helper;
 
-use Phpactor\Name\Names;
+use Phpactor\CodeTransform\Domain\NameWithByteOffset;
 use Phpactor\TextDocument\TextDocument;
 
 interface UnresolvableClassNameFinder

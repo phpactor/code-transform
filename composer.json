@@ -13,7 +13,7 @@
         "phpactor/code-builder": "~0.3",
         "webmozart/path-util": "~2.3",
         "phpactor/class-to-file": "~0.3",
-        "phpactor/name-specification": "^0.1.0@dev"
+        "phpactor/name-specification": "^0.1"
     },
     "require-dev": {
         "phpactor/worse-reflection": "~0.3",

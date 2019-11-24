@@ -2,7 +2,6 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Helper;
 
-use Generator;
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\QualifiedName;
 use Microsoft\PhpParser\Node\Statement\NamespaceDefinition;
@@ -11,7 +10,6 @@ use Phpactor\Name\QualifiedName as PhpactorQualifiedName;
 use Microsoft\PhpParser\Node\SourceFileNode;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\Helper\UnresolvableClassNameFinder;
-use Phpactor\Name\Names;
 use Phpactor\TextDocument\ByteOffset;
 use Phpactor\TextDocument\TextDocument;
 use Phpactor\WorseReflection\Core\Exception\NotFound;
@@ -50,7 +48,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
     private function findNameNodes(SourceFileNode $rootNode): array
     {
         return array_filter($this->descendants($rootNode), function (Node $node) {
-            if  (!$node instanceof QualifiedName) {
+            if (!$node instanceof QualifiedName) {
                 return false;
             }
 
@@ -102,5 +100,4 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
 
         return $descendants;
     }
-
 }

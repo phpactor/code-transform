@@ -2,10 +2,8 @@
 
 namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Helper\WorseUnresolvableClassNameFinder;
 use Phpactor\CodeTransform\Domain\NameWithByteOffset;
-use Phpactor\CodeTransform\Tests\Adapter\AdapterTestCase;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\Name\QualifiedName;
 use Phpactor\TextDocument\ByteOffset;
