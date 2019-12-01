@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Helper;
 
+use PharIo\Manifest\Manifest;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Helper\WorseUnresolvableClassNameFinder;
 use Phpactor\CodeTransform\Domain\NameWithByteOffset;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
@@ -14,8 +15,12 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
     /**
      * @dataProvider provideReturnsUnresolableClass
      */
-    public function testReturnsUnresolableClass(string $source, array $expectedNames)
+    public function testReturnsUnresolableClass(string $manifest, array $expectedNames)
     {
+        $this->workspace()->reset();
+        $this->workspace()->loadManifest($manifest);
+        $source = $this->workspace()->getContents('test.php');
+
         $finder = new WorseUnresolvableClassNameFinder(
             $this->reflectorFor($source)
         );
@@ -27,19 +32,28 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
     public function provideReturnsUnresolableClass()
     {
         yield 'no classes' => [
-            '',
-            []
+            <<<'EOT'
+// File: test.php
+<?
+EOT
+            , []
         ];
 
         yield 'resolvable class' => [
-            '<?php class Foo() {} new Foo();',
-            [
+            <<<'EOT'
+// File: test.php
+<?php class Foo() {} new Foo();
+EOT
+            , [
             ]
         ];
 
         yield 'unresolvable class' => [
-            '<?php new NotFound();',
-            [
+            <<<'EOT'
+// File: test.php
+<?php new NotFound();
+EOT
+            ,[
                 new NameWithByteOffset(
                     QualifiedName::fromString('NotFound'),
                     ByteOffset::fromInt(10)
@@ -48,8 +62,11 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
         ];
 
         yield 'namespaced unresolvable class' => [
-            '<?php namespace Foo; new NotFound();',
-            [
+            <<<'EOT'
+// File: test.php
+<?php namespace Foo; new NotFound();
+EOT
+            , [
                 new NameWithByteOffset(
                     QualifiedName::fromString('Foo\\NotFound'),
                     ByteOffset::fromInt(25)
@@ -59,6 +76,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
 
         yield 'multiple unresolvable classes' => [
             <<<'EOT'
+// File: test.php
 <?php 
 
 new Bar\NotFound();
@@ -77,6 +95,26 @@ EOT
                     QualifiedName::fromString('NotFound36'),
                     ByteOffset::fromInt(47)
                 ),
+            ]
+        ];
+
+        yield 'external resolvable class' => [
+            <<<'EOT'
+// File: Foobar.php
+<?php
+
+namespace Foobar;
+
+class Barfoo {}
+// File: test.php
+<?php 
+
+use Foobar\Barfoo;
+
+new Barfoo();
+EOT
+,
+            [
             ]
         ];
     }

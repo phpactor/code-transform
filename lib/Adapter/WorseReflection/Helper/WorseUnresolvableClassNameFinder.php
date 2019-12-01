@@ -52,10 +52,6 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
                 return false;
             }
 
-            if ($node->getParent() instanceof NamespaceDefinition) {
-                return false;
-            }
-
             return true;
         });
     }
@@ -72,7 +68,14 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
 
     private function appendUnresolvedName(QualifiedName $name, array $unresolvedNames)
     {
-        $nameText = $name->getNamespacedName()->getFullyQualifiedNameText();
+        $nameText = (string)$name->getResolvedName();
+
+        // If node cannot provide a "resolved" name then this is not a valid
+        // candidate (e.g. it may be part of a namespace statement) and we can
+        // ignore it.
+        if (!$nameText) {
+            return $unresolvedNames;
+        }
 
         try {
             $class = $this->reflector->reflectClass($nameText);
