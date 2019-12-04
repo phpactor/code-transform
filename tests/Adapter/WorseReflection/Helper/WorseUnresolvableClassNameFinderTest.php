@@ -2,7 +2,6 @@
 
 namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Helper;
 
-use PharIo\Manifest\Manifest;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Helper\WorseUnresolvableClassNameFinder;
 use Phpactor\CodeTransform\Domain\NameWithByteOffset;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;

@@ -4,7 +4,6 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Helper;
 
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\QualifiedName;
-use Microsoft\PhpParser\Node\Statement\NamespaceDefinition;
 use Phpactor\CodeTransform\Domain\NameWithByteOffset;
 use Phpactor\Name\QualifiedName as PhpactorQualifiedName;
 use Microsoft\PhpParser\Node\SourceFileNode;
