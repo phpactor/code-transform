@@ -82,6 +82,37 @@ class Foobar implements Rabbit
 EOT
 
             ],
+            'It implements an interface with nullable types' => [
+                <<<'EOT'
+<?php
+
+interface Rabbit
+{
+    public function dig(int $depth = 5, ?string $name): ?int;
+}
+
+class Foobar implements Rabbit
+{
+}
+EOT
+                ,
+                <<<'EOT'
+<?php
+
+interface Rabbit
+{
+    public function dig(int $depth = 5, ?string $name): ?int;
+}
+
+class Foobar implements Rabbit
+{
+    public function dig(int $depth = 5, ?string $name): ?int
+    {
+    }
+}
+EOT
+
+            ],
             'It implements a static methods' => [
                 <<<'EOT'
 <?php
