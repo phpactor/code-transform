@@ -330,5 +330,46 @@ class Foobar
 EOT
 
         ];
+
+        yield  'Add a nullable typed parameter' => [
+            <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    private $foo = false;
+
+    public function __construct(?string $bar)
+    {
+    }
+}
+EOT
+        ,
+            <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var string
+     */
+    private $foo = false;
+
+    /**
+     * @var string|null
+     */
+    private $bar;
+
+    public function __construct(?string $bar)
+    {
+        $this->bar = $bar;
+    }
+}
+EOT
+
+        ];
     }
 }
