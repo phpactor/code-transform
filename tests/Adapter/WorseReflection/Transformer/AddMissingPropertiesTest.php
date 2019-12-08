@@ -50,6 +50,7 @@ EOT
 
 class Foobar
 {
+
     /**
      * @var string
      */
@@ -167,7 +168,6 @@ class Foobar
      */
     private $foobar;
 
-
     public function hello()
     {
         $this->foobar = 1234;
@@ -212,7 +212,6 @@ class Foobar
      */
     private $foobar;
 
-
     public function hello()
     {
         $this->foobar = 1234;
@@ -250,6 +249,7 @@ namespace Hello;
 
 class Dodo
 {
+
     /**
      * @var string
      */
@@ -263,6 +263,7 @@ class Dodo
 
 class Foobar extends Dodo
 {
+
     /**
      * @var int
      */
@@ -297,6 +298,7 @@ use MyLibrary\Hello;
 
 class Foobar
 {
+
     /**
      * @var Hello
      */
@@ -360,6 +362,7 @@ EOT
 
 trait Foobar
 {
+
     /**
      * @var string
      */

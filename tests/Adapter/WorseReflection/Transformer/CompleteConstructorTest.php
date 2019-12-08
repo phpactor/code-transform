@@ -154,10 +154,12 @@ EOT
 
 class Foobar
 {
+
     /**
      * @var string
      */
     private $foo;
+
     /**
      * @var Foobar
      */
@@ -220,6 +222,7 @@ class Foobar
      * @var string
      */
     private $foo;
+
 
     public function __construct(string $foo, Acme $acme)
     {
@@ -318,7 +321,6 @@ class Foobar
      */
     private $foo = false;
     private $bar;
-
 
     public function __construct($bar)
     {
