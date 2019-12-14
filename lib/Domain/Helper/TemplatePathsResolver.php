@@ -7,7 +7,8 @@ use FilesystemIterator;
 class TemplatePathsResolver
 {
     /**
-     * @var string
+     * @var string In the form of "major.minor.release[extra]"
+     * @see https://www.php.net/manual/en/reserved.constants.php#reserved.constants.core
      */
     private $phpVersion;
 
@@ -27,7 +28,7 @@ class TemplatePathsResolver
 
             $phpDirectoriesIterator = new FilterPhpVersionDirectoryIterator(
                 new FilesystemIterator($path),
-                (int) $this->phpVersion
+                $this->phpVersion
             );
             $phpDirectories = array_keys(iterator_to_array($phpDirectoriesIterator));
             rsort($phpDirectories, SORT_NATURAL);

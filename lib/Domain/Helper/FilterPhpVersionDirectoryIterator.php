@@ -10,15 +10,16 @@ use SplFileInfo;
 class FilterPhpVersionDirectoryIterator extends FilterIterator
 {
     /**
-     * @var int
+     * @var string In the form of "major.minor.release[extra]"
+     * @see https://www.php.net/manual/en/reserved.constants.php#reserved.constants.core
      */
-    private $phpVersionId;
+    private $phpVersion;
 
-    public function __construct(Iterator $iterator, int $phpVersionId)
+    public function __construct(Iterator $iterator, string $phpVersion)
     {
         parent::__construct($iterator);
 
-        $this->phpVersionId = $phpVersionId;
+        $this->phpVersion = $phpVersion;
     }
 
     /**
@@ -36,12 +37,11 @@ class FilterPhpVersionDirectoryIterator extends FilterIterator
             );
         }
 
-        $path = $file->isLink() ? $file->getPathname() : $file->getRealPath();
         $filename = $file->getFilename();
 
         if (!$file->isDir() || // Keep only directy
-            !preg_match('/^\d{5}$/', $filename) || // Should be formed of 5 digits
-            $this->phpVersionId < (int) $filename // Ignore next versions of PHP
+            !preg_match('/^\d+\.\d+/', $filename) || // Should have at leasts major and minor version
+            !version_compare($filename, $this->phpVersion, '<=') // Should be at maximum equals to the defined version
         ) {
             return false;
         }
