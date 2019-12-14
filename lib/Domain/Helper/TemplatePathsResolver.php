@@ -2,7 +2,7 @@
 
 namespace Phpactor\CodeTransform\Domain\Helper;
 
-use FileSystemIterator;
+use FilesystemIterator;
 
 class TemplatePathsResolver
 {
@@ -26,7 +26,7 @@ class TemplatePathsResolver
             }
 
             $phpDirectoriesIterator = new FilterPhpVersionDirectoryIterator(
-                new FileSystemIterator($path),
+                new FilesystemIterator($path),
                 (int) $this->phpVersion
             );
             $phpDirectories = array_keys(iterator_to_array($phpDirectoriesIterator));
