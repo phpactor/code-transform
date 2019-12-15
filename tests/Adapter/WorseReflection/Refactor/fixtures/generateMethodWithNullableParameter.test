@@ -1,0 +1,28 @@
+// File: source
+<?php
+
+namespace Test\Foo;
+
+class Bar
+{
+    public function baz(?int $i): string
+    {
+        $this->f<>oo($i);
+    }
+}
+// File: expected
+<?php
+
+namespace Test\Foo;
+
+class Bar
+{
+    public function baz(?int $i): string
+    {
+        $this->foo($i);
+    }
+
+    private function foo(?int $i)
+    {
+    }
+}

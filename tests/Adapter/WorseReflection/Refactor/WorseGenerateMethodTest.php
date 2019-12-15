@@ -58,6 +58,9 @@ class WorseGenerateMethodTest extends WorseTestCase
             'static public method' => [
                 'generateMethod11.test',
             ],
+            'method with nullable parameter' => [
+                'generateMethodWithNullableParameter.test',
+            ],
         ];
     }
 
