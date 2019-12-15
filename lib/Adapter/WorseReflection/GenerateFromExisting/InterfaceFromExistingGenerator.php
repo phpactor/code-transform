@@ -58,10 +58,12 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
             }
 
             if ($method->returnType()->isDefined()) {
-                $methodBuilder->returnType($method->returnType()->short());
+                $shortTypeAsString = ($method->returnType()->isNullable() ? '?' : '') .
+                    $method->returnType()->short();
+                $methodBuilder->returnType($shortTypeAsString);
 
                 if ($method->returnType()->isClass()) {
-                    $sourceBuilder->use($method->returnType());
+                    $sourceBuilder->use(ltrim($method->returnType(), '?'));
                 }
             }
 
@@ -74,7 +76,9 @@ final class InterfaceFromExistingGenerator implements GenerateFromExisting
                     } else {
                         $className = $parameter->type()->className();
                         if ($className) {
-                            $parameterBuilder->type($className->short());
+                            $shortTypeAsString = ($parameter->type()->isNullable() ? '?' : '') .
+                                $className->short();
+                            $parameterBuilder->type($shortTypeAsString);
                             $paramClassName = $parameter->type()->className();
                             if ($paramClassName) {
                                 $useClasses[$paramClassName->__toString()] = true;

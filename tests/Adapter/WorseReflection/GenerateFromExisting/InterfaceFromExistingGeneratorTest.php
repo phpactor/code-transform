@@ -141,6 +141,40 @@ interface BeatInterface
 EOT
 
             ],
+            'Generates interface with nullable types' => [
+                'Music\Beat',
+                'Music\BeatInterface',
+                <<<'EOT'
+<?php
+
+namespace Music;
+
+class Beat
+{
+    public function play(?Song $b, ?string $s): ?string
+    {
+    }
+
+    public function foo(): ?Song
+    {
+    }
+}
+EOT
+                , <<<'EOT'
+<?php
+
+namespace Music;
+
+use Music\Song;
+
+interface BeatInterface
+{
+    public function play(?Song $b, ?string $s): ?string;
+
+    public function foo(): ?Song;
+}
+EOT
+            ],
         ];
     }
 }
