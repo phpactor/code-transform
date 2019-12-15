@@ -126,6 +126,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod23.test',
                 'newMethod',
             ],
+            'extract method with a nullable parameter' => [
+                'extractMethodWithNullableParameter.test',
+                'newMethod',
+            ],
         ];
     }
 }

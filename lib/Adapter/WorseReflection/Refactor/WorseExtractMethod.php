@@ -205,8 +205,17 @@ class WorseExtractMethod implements ExtractMethod
             $variableType = $freeVariable->symbolContext()->type();
 
             if ($variableType->isDefined()) {
-                $parameterBuilder->type($variableType->short());
+                // TODO Create a utils class or something to get the shortest type by taking
+                // into account the import table, to handle aliases and partial namespaces
+                $shortTypeAsString = ($variableType->isNullable() ? '?' : '') . $variableType->short();
+
+                $parameterBuilder->type($shortTypeAsString);
                 if ($variableType->isClass()) {
+                    // TODO Remove this ?
+                    // We should not have to import it, we are extracting the
+                    // method into the same file. We should not try to fix an
+                    // oversight from the user, espacially since he might want
+                    // to keep his partial qualified name
                     $builder->use((string) $variableType);
                 }
             }

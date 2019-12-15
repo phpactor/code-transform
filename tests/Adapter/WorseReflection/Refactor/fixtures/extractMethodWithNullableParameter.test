@@ -1,0 +1,30 @@
+// File: source
+<?php
+
+namespace Test\Foo;
+
+class Bar
+{
+    public function baz(?string $s)
+    {
+        <>$foobar = $s.'hello';<>
+    }
+}
+// File: expected
+<?php
+
+namespace Test\Foo;
+
+class Bar
+{
+    public function baz(?string $s)
+    {
+        $this->newMethod($s);
+    }
+
+    private function newMethod(?string $s)
+    {
+        $foobar = $s.'hello';
+    }
+}
+
