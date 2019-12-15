@@ -1,0 +1,23 @@
+// File: source
+<?php
+
+namespace Test\Foo;
+
+class Bar
+{
+    pr<>ivate ?string $baz;
+}
+// File: expected
+<?php
+
+namespace Test\Foo;
+
+class Bar
+{
+    private ?string $baz;
+
+    public function baz(): ?string
+    {
+        return $this->baz;
+    }
+}

@@ -68,6 +68,10 @@ class WorseGenerateAccessorTest extends WorseTestCase
                 'generateAccessor6.test',
                 $propertyName,
             ],
+            'nullable typed property' => [
+                'generateAccessorForNullableProperty.test',
+                'baz',
+            ],
         ];
     }
 
