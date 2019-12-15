@@ -50,6 +50,11 @@ class WorseOverrideMethodTest extends WorseTestCase
                 'ChildClass',
                 'barbar'
             ],
+            'method with nullable types' => [
+                'overrideMethodWithNullableTypes.test',
+                'Test\Foo\Baz',
+                'baz'
+            ],
         ];
     }
 

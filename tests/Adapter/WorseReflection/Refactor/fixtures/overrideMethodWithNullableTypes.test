@@ -1,0 +1,33 @@
+// File: source
+<?php
+
+namespace Test\Foo;
+
+class Bar
+{
+    public function baz(?int $i): ?string
+    {
+    }
+}
+
+class Baz extends Bar
+{
+}
+// File: expected
+<?php
+
+namespace Test\Foo;
+
+class Bar
+{
+    public function baz(?int $i): ?string
+    {
+    }
+}
+
+class Baz extends Bar
+{
+    public function baz(?int $i): ?string
+    {
+    }
+}
