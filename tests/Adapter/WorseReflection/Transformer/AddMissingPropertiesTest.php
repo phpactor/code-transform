@@ -375,6 +375,48 @@ trait Foobar
 }
 EOT
             ],
+            'It adds missing nullable typed properties' => [
+                <<<'EOT'
+<?php
+
+namespace Test;
+
+class Foobar
+{
+    public function hello(?string $s, ?Foo $foo)
+    {
+        $this->s = $s;
+        $this->foo = $foo;
+    }
+}
+EOT
+                ,
+                <<<'EOT'
+<?php
+
+namespace Test;
+
+class Foobar
+{
+
+    /**
+     * @var string|null
+     */
+    private $s;
+
+    /**
+     * @var Foo|null
+     */
+    private $foo;
+
+    public function hello(?string $s, ?Foo $foo)
+    {
+        $this->s = $s;
+        $this->foo = $foo;
+    }
+}
+EOT
+            ],
         ];
     }
 }

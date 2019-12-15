@@ -59,7 +59,9 @@ class AddMissingProperties implements Transformer
                         ->property($variable->name())
                         ->visibility('private');
                     if ($variable->symbolContext()->type()->isDefined()) {
-                        $propertyBuilder->type($variable->symbolContext()->type()->short());
+                        $type = $variable->symbolContext()->type();
+                        $shortTypeAsString = ($type->isNullable() ? '?' : '') . $type->short();
+                        $propertyBuilder->type($shortTypeAsString);
                     }
                 }
             }
