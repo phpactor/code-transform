@@ -15,13 +15,22 @@ class NameWithByteOffsets implements IteratorAggregate
         $this->nameWithByteOffsets = $nameWithByteOffsets;
     }
 
-    private function add($element): void
-    {
-        $this->nameWithByteOffsets[] = $element;
-    }
-
     public function getIterator(): Iterator
     {
         return new ArrayIterator($this->nameWithByteOffsets);
+    }
+
+    public function onlyUniqueNames(): self
+    {
+        $seen = [];
+        return new self(...array_filter($this->nameWithByteOffsets, function (NameWithByteOffset $byteOffset) use (&$seen) {
+            $name = $byteOffset->name()->__toString();
+            if (in_array($name, $seen)) {
+                return false;
+            }
+            $seen[] = $name;
+            return true;
+
+        }));
     }
 }
