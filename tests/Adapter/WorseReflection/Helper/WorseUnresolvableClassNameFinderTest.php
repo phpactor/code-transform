@@ -4,6 +4,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Helper;
 
 use Phpactor\CodeTransform\Adapter\WorseReflection\Helper\WorseUnresolvableClassNameFinder;
 use Phpactor\CodeTransform\Domain\NameWithByteOffset;
+use Phpactor\CodeTransform\Domain\NameWithByteOffsets;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\Name\QualifiedName;
 use Phpactor\TextDocument\ByteOffset;
@@ -23,7 +24,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
         $finder = new WorseUnresolvableClassNameFinder(
             $this->reflectorFor($source)
         );
-        $this->assertEquals($expectedNames, $finder->find(
+        $this->assertEquals(new NameWithByteOffsets(...$expectedNames), $finder->find(
             TextDocumentBuilder::create($source)->build()
         ));
     }

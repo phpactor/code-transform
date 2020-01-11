@@ -5,6 +5,7 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Helper;
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\QualifiedName;
 use Phpactor\CodeTransform\Domain\NameWithByteOffset;
+use Phpactor\CodeTransform\Domain\NameWithByteOffsets;
 use Phpactor\Name\QualifiedName as PhpactorQualifiedName;
 use Microsoft\PhpParser\Node\SourceFileNode;
 use Microsoft\PhpParser\Parser;
@@ -32,16 +33,13 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         $this->reflector = $reflector;
     }
 
-    /**
-     * @return NameWithByteOffset[]
-     */
-    public function find(TextDocument $sourceCode): array
+    public function find(TextDocument $sourceCode): NameWithByteOffsets
     {
         $rootNode = $this->parser->parseSourceFile($sourceCode);
         $names = $this->findNameNodes($rootNode);
         $names = $this->filterResolvedNames($names);
 
-        return $names;
+        return new NameWithByteOffsets(...$names);
     }
 
     private function findNameNodes(SourceFileNode $rootNode): array
