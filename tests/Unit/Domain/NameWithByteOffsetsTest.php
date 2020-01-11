@@ -41,5 +41,4 @@ class NameWithByteOffsetsTest extends TestCase
             $names->onlyUniqueNames()
         );
     }
-
 }

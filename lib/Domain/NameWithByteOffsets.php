@@ -30,7 +30,6 @@ class NameWithByteOffsets implements IteratorAggregate
             }
             $seen[] = $name;
             return true;
-
         }));
     }
 }

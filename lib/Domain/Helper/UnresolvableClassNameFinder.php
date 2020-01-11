@@ -2,7 +2,6 @@
 
 namespace Phpactor\CodeTransform\Domain\Helper;
 
-use Phpactor\CodeTransform\Domain\NameWithByteOffset;
 use Phpactor\CodeTransform\Domain\NameWithByteOffsets;
 use Phpactor\TextDocument\TextDocument;
 
