@@ -77,7 +77,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         }
 
         try {
-            $class = $this->reflector->reflectClass($nameText);
+            $class = $this->reflector->reflectClassLike($nameText);
         } catch (NotFound $notFound) {
             $unresolvedNames[] = new NameWithByteOffset(
                 PhpactorQualifiedName::fromString($nameText),
