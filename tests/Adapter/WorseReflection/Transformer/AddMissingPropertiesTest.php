@@ -167,7 +167,6 @@ class Foobar
      */
     private $foobar;
 
-
     public function hello()
     {
         $this->foobar = 1234;
@@ -211,7 +210,6 @@ class Foobar
      * @var int
      */
     private $foobar;
-
 
     public function hello()
     {
