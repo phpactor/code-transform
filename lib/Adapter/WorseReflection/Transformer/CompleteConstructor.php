@@ -66,7 +66,11 @@ class CompleteConstructor implements Transformer
                 $propertyBuilder = $classBuilder->property($parameter->name());
                 $propertyBuilder->visibility('private');
                 if ($parameter->type()->isDefined()) {
-                    $propertyBuilder->type((string) $parameter->type()->short());
+                    $typeName = (string) $parameter->type()->short();
+                    if ($parameter->type()->isNullable()) {
+                        $typeName = '?' . $typeName;
+                    }
+                    $propertyBuilder->type($typeName);
                 }
             }
         }

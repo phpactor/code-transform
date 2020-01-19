@@ -174,6 +174,37 @@ EOT
 
         ];
 
+        yield  'It does adds nullable type docblocks' => [
+            <<<'EOT'
+<?php
+
+class Foobar
+{
+    public function __construct(?string $foo)
+    {
+    }
+}
+EOT
+        ,
+            <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var string|null
+     */
+    private $foo;
+
+    public function __construct(?string $foo)
+    {
+        $this->foo = $foo;
+    }
+}
+EOT
+
+        ];
+
         yield  'It is idempotent' => [
             <<<'EOT'
 <?php
