@@ -444,7 +444,38 @@ class Foobar implements Rabbit
     }
 }
 EOT
-            ]
+            ],
+            'It implements contracts with nullable return type' => [
+                <<<'EOT'
+<?php
+
+interface Animal
+{
+    abstract public function jump(): ?Arg\Foo;
+}
+class Foobar implements Animal
+{
+}
+EOT
+                ,
+                <<<'EOT'
+<?php
+
+use Arg\Foo;
+
+
+interface Animal
+{
+    abstract public function jump(): ?Arg\Foo;
+}
+class Foobar implements Animal
+{
+    public function jump(): ?Foo
+    {
+    }
+}
+EOT
+            ],
         ];
     }
 }

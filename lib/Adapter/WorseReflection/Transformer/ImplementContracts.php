@@ -67,7 +67,7 @@ class ImplementContracts implements Transformer
                 if ($missingMethod->returnType()->isDefined()) {
                     $returnTypeClassName = $missingMethod->returnType()->className();
                     if ($returnTypeClassName && $missingMethod->returnType()->isClass() && $returnTypeClassName->namespace() != $class->name()->namespace()) {
-                        $sourceCodeBuilder->use((string) $missingMethod->returnType());
+                        $sourceCodeBuilder->use((string)$missingMethod->returnType());
                     }
                 }
 
