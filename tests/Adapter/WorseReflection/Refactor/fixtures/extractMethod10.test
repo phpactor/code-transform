@@ -39,10 +39,10 @@ class PhpactorRocks
     private function newMethod(string $foobar): array
     {
         $new = true;
-                if ($foobar !== 'hello') {
-                    $new = false;
-                    $bar = 'hahaha';
-                }
+        if ($foobar !== 'hello') {
+            $new = false;
+            $bar = 'hahaha';
+        }
         return [$new, $bar];
     }
 }
