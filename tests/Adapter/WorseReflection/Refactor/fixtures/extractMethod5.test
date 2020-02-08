@@ -35,7 +35,7 @@ class extractMethod
         if ($foobar) {
             return 'yes';
         }
-
+        
         return $foobar;
     }
 }
