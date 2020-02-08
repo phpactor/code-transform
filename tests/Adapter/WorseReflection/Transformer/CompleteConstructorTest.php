@@ -158,7 +158,6 @@ class Foobar
      * @var string
      */
     private $foo;
-
     /**
      * @var Foobar
      */
@@ -275,6 +274,7 @@ class Foobar
      */
     private $acme;
 
+
     public function __construct(string $foo, Acme $acme)
     {
         $this->foo = $foo;
@@ -349,6 +349,7 @@ class Foobar
      */
     private $foo = false;
     private $bar;
+
 
     public function __construct($bar)
     {

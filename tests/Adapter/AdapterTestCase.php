@@ -2,14 +2,9 @@
 
 namespace Phpactor\CodeTransform\Tests\Adapter;
 
-use Phpactor\CodeBuilder\Adapter\TolerantParser\StyleProposer\DocblockIndentationProposer;
-use Phpactor\CodeBuilder\Adapter\TolerantParser\StyleProposer\IndentationProposer;
-use Phpactor\CodeBuilder\Adapter\TolerantParser\StyleProposer\MemberBlankLineProposer;
-use Phpactor\CodeBuilder\Adapter\TolerantParser\TolerantStyleFixer;
 use Phpactor\CodeBuilder\Adapter\Twig\TwigRenderer;
 use Phpactor\CodeBuilder\Adapter\TolerantParser\TolerantUpdater;
 use PHPUnit\Framework\TestCase;
-use Phpactor\CodeBuilder\Util\TextFormat;
 use Phpactor\TestUtils\Workspace;
 use Phpactor\TestUtils\ExtractOffset;
 
@@ -22,17 +17,7 @@ class AdapterTestCase extends TestCase
 
     protected function updater()
     {
-        $textFormat = new TextFormat();
-        return new TolerantUpdater(
-            $this->renderer(),
-            null,
-            null,
-            new TolerantStyleFixer([
-                new MemberBlankLineProposer($textFormat),
-                new IndentationProposer($textFormat),
-                new DocblockIndentationProposer($textFormat),
-            ])
-        );
+        return new TolerantUpdater($this->renderer());
     }
 
     protected function workspace(): Workspace
