@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 
+use Microsoft\PhpParser\Node\MethodDeclaration;
 use Microsoft\PhpParser\Node\UseVariableName;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Microsoft\PhpParser\Parser;
@@ -46,7 +47,11 @@ class TolerantRenameVariable implements RenameVariable
     {
         $node = $sourceNode->getDescendantNodeAtPosition($offset);
 
-        if (false === $node instanceof Variable && false === $node instanceof Parameter) {
+        if (
+            false === $node instanceof Variable &&
+            false === $node instanceof UseVariableName &&
+            false === $node instanceof Parameter
+        ) {
             throw new TransformException(sprintf(
                 'Expected Variable or Parameter node, got "%s"',
                 get_class($node)
@@ -80,6 +85,10 @@ class TolerantRenameVariable implements RenameVariable
     {
         if ($scope === RenameVariable::SCOPE_FILE) {
             return $variable->getRoot();
+        }
+
+        if ($variable instanceof UseVariableName) {
+            $variable = $variable->getFirstAncestor(MethodDeclaration::class) ?: $variable;
         }
 
         $scopeNode = $variable->getFirstAncestor(FunctionLike::class, ClassLike::class, SourceFileNode::class);
