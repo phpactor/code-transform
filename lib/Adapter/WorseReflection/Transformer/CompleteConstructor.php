@@ -5,6 +5,7 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Transformer;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionInterface;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionParameter;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
 use Phpactor\CodeBuilder\Domain\Updater;
@@ -58,18 +59,25 @@ class CompleteConstructor implements Transformer
             }
 
             foreach ($constructMethod->parameters() as $parameter) {
-                /** @var ReflectionClass|ReflectionTrait $class */
+                assert($parameter instanceof ReflectionParameter);
                 if (true === $class->properties()->has($parameter->name())) {
                     continue;
                 }
 
                 $propertyBuilder = $classBuilder->property($parameter->name());
                 $propertyBuilder->visibility('private');
-                if ($parameter->type()->isDefined()) {
+                $parameterType = $parameter->type();
+                if ($parameterType->isDefined()) {
                     $typeName = (string) $parameter->type()->short();
-                    if ($parameter->type()->isNullable()) {
+                    $className = $parameterType->className();
+                    if ($className) {
+                        $typeName = $class->scope()->resolveLocalName($className)->__toString();
+                    }
+
+                    if ($parameterType->isNullable()) {
                         $typeName = '?' . $typeName;
                     }
+
                     $propertyBuilder->type($typeName);
                 }
             }

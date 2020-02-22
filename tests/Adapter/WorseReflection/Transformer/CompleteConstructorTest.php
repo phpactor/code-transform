@@ -137,7 +137,7 @@ EOT
 
         ];
 
-        yield  'It does adds type docblocks' => [
+        yield  'It adds type docblocks' => [
             <<<'EOT'
 <?php
 
@@ -352,6 +352,76 @@ class Foobar
 
 
     public function __construct($bar)
+    {
+        $this->bar = $bar;
+    }
+}
+EOT
+
+        ];
+
+        yield  'Aliased import' => [
+            <<<'EOT'
+<?php
+
+use stdClass as Foobar;
+
+class Foobar
+{
+    public function __construct(Foobar $bar)
+    {
+    }
+}
+EOT
+        ,
+            <<<'EOT'
+<?php
+
+use stdClass as Foobar;
+
+class Foobar
+{
+    /**
+     * @var Foobar
+     */
+    private $bar;
+
+    public function __construct(Foobar $bar)
+    {
+        $this->bar = $bar;
+    }
+}
+EOT
+
+        ];
+
+        yield  'Aliased relative import' => [
+            <<<'EOT'
+<?php
+
+use stdClass as Foobar;
+
+class Foobar
+{
+    public function __construct(Foobar\Bar $bar)
+    {
+    }
+}
+EOT
+        ,
+            <<<'EOT'
+<?php
+
+use stdClass as Foobar;
+
+class Foobar
+{
+    /**
+     * @var Foobar\Bar
+     */
+    private $bar;
+
+    public function __construct(Foobar\Bar $bar)
     {
         $this->bar = $bar;
     }
