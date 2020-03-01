@@ -117,5 +117,24 @@ EOT
             [
             ]
         ];
+
+        yield 'reserved names' => [
+            <<<'EOT'
+// File: test.php
+<?php
+
+namespace Foobar;
+
+class Barfoo { 
+    public function foo(): self {}
+    public function bar(): {
+        static::foo();
+    }
+}
+EOT
+,
+            [
+            ]
+        ];
     }
 }
