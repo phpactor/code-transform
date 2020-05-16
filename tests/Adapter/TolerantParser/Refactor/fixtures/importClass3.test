@@ -7,5 +7,4 @@ new F<>oobar();
 
 use Barfoo\Foobar;
 
-
 new Foobar();
