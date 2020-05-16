@@ -5,9 +5,10 @@ namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\StatementNode;
 use Microsoft\PhpParser\Parser;
-use Microsoft\PhpParser\TextEdit;
 use Phpactor\CodeTransform\Domain\Refactor\ExtractExpression;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\TextDocument\TextEdit;
+use Phpactor\TextDocument\TextEdits;
 
 class TolerantExtractExpression implements ExtractExpression
 {
@@ -54,7 +55,7 @@ class TolerantExtractExpression implements ExtractExpression
 
         $edits = $this->resolveEdits($statement, $startNode, $extractedString, $assigment, $variableName);
 
-        return $source->withSource(TextEdit::applyEdits($edits, (string) $source));
+        return $source->withSource(TextEdits::fromTextEdits($edits)->apply((string) $source));
     }
 
     private function resolveEdits(
@@ -66,15 +67,15 @@ class TolerantExtractExpression implements ExtractExpression
     ) {
         if ($statement->getStart() === $startNode->getStart()) {
             return [
-                new TextEdit($statement->getStart(), $statement->getWidth(), $assigment)
+                TextEdit::create($statement->getStart(), $statement->getWidth(), $assigment)
             ];
         }
 
         $indentation = mb_substr_count($statement->getLeadingCommentAndWhitespaceText(), ' ');
         
         return [
-            new TextEdit($statement->getStart(), 0, $assigment . str_repeat(' ', $indentation)),
-            new TextEdit($startNode->getStart(), strlen($extractedString), '$' . $variableName),
+            TextEdit::create($statement->getStart(), 0, $assigment . str_repeat(' ', $indentation)),
+            TextEdit::create($startNode->getStart(), strlen($extractedString), '$' . $variableName),
         ];
     }
 

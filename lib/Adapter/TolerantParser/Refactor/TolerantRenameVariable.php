@@ -8,13 +8,14 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 use Microsoft\PhpParser\Parser;
 use Microsoft\PhpParser\Node\Expression\Variable;
 use Microsoft\PhpParser\Node\SourceFileNode;
-use Microsoft\PhpParser\TextEdit;
 use Microsoft\PhpParser\Node;
 use Phpactor\CodeTransform\Domain\Refactor\RenameVariable;
 use Microsoft\PhpParser\FunctionLike;
 use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\Node\Parameter;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
+use Phpactor\TextDocument\TextEdit;
+use Phpactor\TextDocument\TextEdits;
 
 class TolerantRenameVariable implements RenameVariable
 {
@@ -35,7 +36,7 @@ class TolerantRenameVariable implements RenameVariable
         $scopeNode = $this->scopeNode($variable, $scope);
         $textEdits = $this->textEditsToRename($scopeNode, $variable, $newName);
 
-        return $sourceCode->withSource(TextEdit::applyEdits($textEdits, $sourceCode->__toString()));
+        return $sourceCode->withSource(TextEdits::fromTextEdits($textEdits)->apply($sourceCode->__toString()));
     }
 
     private function sourceNode(string $source): SourceFileNode
@@ -129,7 +130,7 @@ class TolerantRenameVariable implements RenameVariable
 
 
         if ($node instanceof Variable || $node instanceof UseVariableName) {
-            return new TextEdit(
+            return TextEdit::create(
                 $node->getStart(),
                 $node->getEndPosition() - $node->getStart(),
                 '$' . $newName
@@ -138,7 +139,7 @@ class TolerantRenameVariable implements RenameVariable
 
         if ($node instanceof Parameter) {
             /** @var Parameter $node */
-            return new TextEdit(
+            return TextEdit::create(
                 $node->variableName->getStartPosition(),
                 $node->variableName->getEndPosition() - $node->variableName->getStartPosition(),
                 '$' . $newName

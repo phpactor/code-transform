@@ -7,11 +7,12 @@ use Microsoft\PhpParser\Node\ClassConstDeclaration;
 use Microsoft\PhpParser\Node\MethodDeclaration;
 use Microsoft\PhpParser\Node\PropertyDeclaration;
 use Microsoft\PhpParser\Parser;
-use Microsoft\PhpParser\TextEdit;
 use Microsoft\PhpParser\Token;
 use Microsoft\PhpParser\TokenKind;
 use Phpactor\CodeTransform\Domain\Refactor\ChangeVisiblity;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\TextDocument\TextEdit;
+use Phpactor\TextDocument\TextEdits;
 
 class TolerantChangeVisiblity implements ChangeVisiblity
 {
@@ -42,9 +43,7 @@ class TolerantChangeVisiblity implements ChangeVisiblity
             return $source;
         }
 
-        return $source->withSource(TextEdit::applyEdits([
-            $textEdit
-        ], (string) $source));
+        return $source->withSource(TextEdits::one($textEdit)->apply($source));
     }
 
     /**
@@ -69,7 +68,7 @@ class TolerantChangeVisiblity implements ChangeVisiblity
 
     private function visiblityTextEdit(Token $modifier, $newVisiblity): TextEdit
     {
-        return new TextEdit($modifier->getStartPosition(), $modifier->getWidth(), $newVisiblity);
+        return TextEdit::create($modifier->getStartPosition(), $modifier->getWidth(), $newVisiblity);
     }
 
     private function resolveMemberNode(Node $node)

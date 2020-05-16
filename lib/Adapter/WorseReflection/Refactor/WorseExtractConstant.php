@@ -3,6 +3,8 @@
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
 use Phpactor\CodeTransform\Domain\Refactor\ExtractConstant;
+use Phpactor\TextDocument\TextEdit;
+use Phpactor\TextDocument\TextEdits;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Code;
@@ -12,7 +14,6 @@ use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\Node\StringLiteral;
 use Microsoft\PhpParser\Node\NumericLiteral;
 use Microsoft\PhpParser\Node;
-use Microsoft\PhpParser\TextEdit;
 use Phpactor\WorseReflection\Core\Inference\SymbolContext;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
@@ -96,7 +97,7 @@ class WorseExtractConstant implements ExtractConstant
             }
 
             if ($targetValue == $this->getComparableValue($node)) {
-                $textEdits[] = new TextEdit(
+                $textEdits[] = TextEdit::create(
                     $node->getStart(),
                     $node->getEndPosition() - $node->getStart(),
                     'self::' . $constantName
@@ -104,7 +105,7 @@ class WorseExtractConstant implements ExtractConstant
             }
         }
 
-        return $sourceCode->withSource(TextEdit::applyEdits($textEdits, $sourceCode->__toString()));
+        return $sourceCode->withSource(TextEdits::fromTextEdits($textEdits)->apply($sourceCode->__toString()));
     }
 
     private function getComparableValue(Node $node)
