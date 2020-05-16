@@ -9,6 +9,7 @@ use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyImportedExcep
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\AliasAlreadyUsedException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassIsCurrentClassException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyInNamespaceException;
+use Phpactor\TextDocument\TextEdits;
 
 class TolerantImportClassTest extends TolerantTestCase
 {
@@ -96,15 +97,13 @@ EOT
     {
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
         
-        $transformed = $this->importClass($source, $offset, $name, $alias);
-        return [$expected, $transformed];
+        $edits = $this->importClass($source, $offset, $name, $alias);
+        return [$expected, $edits->apply($source)];
     }
 
-    private function importClass($source, int $offset, string $name, string $alias = null)
+    private function importClass($source, int $offset, string $name, string $alias = null): TextEdits
     {
         $renameVariable = new TolerantImportClass($this->updater(), $this->parser());
-        $transformed = $renameVariable->importClass(SourceCode::fromString($source), $offset, $name, $alias);
-
-        return $transformed;
+        return $renameVariable->importClass(SourceCode::fromString($source), $offset, $name, $alias);
     }
 }
