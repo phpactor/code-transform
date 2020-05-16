@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "phpactor/code-builder": "~0.3",
+        "phpactor/code-builder": "^0.4",
         "webmozart/path-util": "~2.3",
         "phpactor/class-to-file": "~0.3",
         "phpactor/name-specification": "^0.1"

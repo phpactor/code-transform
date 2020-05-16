@@ -45,11 +45,10 @@ class ClassNameTest extends TestCase
 
     /**
      * @testdox It throws exception if classname is empty.
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Class name cannot be empty
      */
     public function testEmpty()
     {
+        $this->expectExceptionMessage('Class name cannot be empty');
         ClassName::fromString('');
     }
 }

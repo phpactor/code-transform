@@ -49,11 +49,6 @@ class TolerantExtractExpressionTest extends TolerantTestCase
             'foobar',
         ];
 
-        yield 'single node' => [
-            'extractExpression4.test',
-            'foobar',
-        ];
-
         yield 'single array expression' => [
             'extractExpression5.test',
             'foobar',
