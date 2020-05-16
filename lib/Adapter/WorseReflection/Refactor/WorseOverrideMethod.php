@@ -47,7 +47,7 @@ class WorseOverrideMethod implements OverrideMethod
         $methodBuilder = $this->getMethodPrototype($class, $method);
         $sourcePrototype = $this->getSourcePrototype($class, $method, $source, $methodBuilder);
 
-        return $this->updater->apply($sourcePrototype, Code::fromString((string) $source));
+        return $this->updater->textEditsFor($sourcePrototype, Code::fromString((string) $source))->apply($source);
     }
 
     private function getReflectionClass(SourceCode $source, string $className): ReflectionClass

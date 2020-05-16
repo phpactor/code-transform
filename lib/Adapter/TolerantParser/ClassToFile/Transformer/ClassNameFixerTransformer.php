@@ -12,9 +12,10 @@ use Microsoft\PhpParser\Node\Statement\TraitDeclaration;
 use Microsoft\PhpParser\Parser;
 use Phpactor\ClassFileConverter\Domain\FilePath;
 use Phpactor\ClassFileConverter\Domain\FileToClass;
-use Phpactor\CodeBuilder\Adapter\TolerantParser\TextEdit;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Transformer;
+use Phpactor\TextDocument\TextEdit;
+use Phpactor\TextDocument\TextEdits;
 use RuntimeException;
 
 class ClassNameFixerTransformer implements Transformer
@@ -60,7 +61,7 @@ class ClassNameFixerTransformer implements Transformer
             $edits[] = $textEdit;
         }
 
-        return $code->withSource(TextEdit::applyEdits($edits, (string) $code));
+        return $code->withSource(TextEdits::fromTextEdits($edits)->apply((string) $code));
     }
 
     /**
@@ -82,7 +83,7 @@ class ClassNameFixerTransformer implements Transformer
             return null;
         }
 
-        return new TextEdit($classLike->name->start, strlen($name), $correctClassName);
+        return TextEdit::create($classLike->name->start, strlen($name), $correctClassName);
     }
 
     /**
@@ -104,14 +105,14 @@ class ClassNameFixerTransformer implements Transformer
             }
 
 
-            return new TextEdit($scriptStart, 0, $statement);
+            return TextEdit::create($scriptStart, 0, $statement);
         }
 
         if (null === $namespaceDefinition) {
             return null;
         }
 
-        return new TextEdit(
+        return TextEdit::create(
             $namespaceDefinition->getStart(),
             $namespaceDefinition->getEndPosition() - $namespaceDefinition->getStart(),
             $statement

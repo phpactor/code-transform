@@ -83,7 +83,7 @@ class CompleteConstructor implements Transformer
             }
         }
 
-        $source = SourceCode::fromString($this->updater->apply($sourceCodeBuilder->build(), Code::fromString((string) $source)));
+        $source = SourceCode::fromString($this->updater->textEditsFor($sourceCodeBuilder->build(), Code::fromString((string) $source))->apply(Code::fromString((string) $source)));
 
         return $source;
     }

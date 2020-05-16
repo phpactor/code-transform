@@ -96,7 +96,7 @@ class WorseExtractMethod implements ExtractMethod
         );
 
         return $source->withSource(
-            (string) $this->updater->apply($prototype, Code::fromString((string) $source))
+            (string) $this->updater->textEditsFor($prototype, Code::fromString((string) $source))->apply($source)
         );
     }
 

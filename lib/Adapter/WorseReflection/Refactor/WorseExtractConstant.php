@@ -75,7 +75,7 @@ class WorseExtractConstant implements ExtractConstant
                 ->constant($constantName, $symbolInformation->value())
             ->end();
 
-        return $sourceCode->withSource($this->updater->apply($builder->build(), Code::fromString($sourceCode)));
+        return $sourceCode->withSource($this->updater->textEditsFor($builder->build(), Code::fromString($sourceCode))->apply($sourceCode));
     }
 
     private function replaceValues(SourceCode $sourceCode, int $offset, string $constantName): SourceCode

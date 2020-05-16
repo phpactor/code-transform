@@ -57,10 +57,10 @@ class WorseGenerateAccessor implements GenerateAccessor
         $prototype = $this->buildPrototype($property);
         $sourceCode = $this->sourceFromClassName($sourceCode, $property->class()->name());
 
-        return $sourceCode->withSource((string) $this->updater->apply(
+        return $sourceCode->withSource((string) $this->updater->textEditsFor(
             $prototype,
             Code::fromString((string) $sourceCode)
-        ));
+        )->apply(Code::fromString((string) $sourceCode)));
     }
 
     private function formatName(string $name)

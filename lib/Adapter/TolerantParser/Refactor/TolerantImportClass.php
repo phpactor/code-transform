@@ -90,7 +90,7 @@ class TolerantImportClass implements ImportClass
         $builder->use($name, $alias);
         $prototype = $builder->build();
 
-        return $source->withSource($this->updater->apply($prototype, Code::fromString((string) $source)));
+        return $source->withSource($this->updater->textEditsFor($prototype, Code::fromString((string) $source))->apply($source));
     }
 
     private function currentClassIsSameAsImportClass(Node $node, ClassName $className): bool

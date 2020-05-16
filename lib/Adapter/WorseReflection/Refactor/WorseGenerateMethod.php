@@ -57,7 +57,7 @@ class WorseGenerateMethod implements GenerateMethod
         $sourceCode = $this->resolveSourceCode($sourceCode, $methodCall, $visibility);
 
         return SourceCode::fromStringAndPath(
-            (string) $this->updater->apply($prototype, Code::fromString((string) $sourceCode)),
+            (string) $this->updater->textEditsFor($prototype, Code::fromString((string) $sourceCode))->apply($sourceCode),
             $sourceCode->path()
         );
     }

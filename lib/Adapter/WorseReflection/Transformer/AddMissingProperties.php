@@ -69,10 +69,10 @@ class AddMissingProperties implements Transformer
             $sourceBuilder->namespace($class->name()->namespace());
         }
 
-        $code = $this->updater->apply(
+        $code = $this->updater->textEditsFor(
             $sourceBuilder->build(),
             Code::fromString((string) $code)
-        );
+        )->apply($code);
 
         return SourceCode::fromString($code);
     }
