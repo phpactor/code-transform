@@ -11,7 +11,6 @@ class One {
 
 use Foobar\Barfoo;
 
-
 class One {
     public function hello() {
         return new Foobar($this->newMethod());

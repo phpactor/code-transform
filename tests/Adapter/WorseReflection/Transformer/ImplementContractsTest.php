@@ -431,7 +431,6 @@ EOT
 use Arg\Barg;
 use Barfoo\Dirt;
 
-
 interface Rabbit
 {
     public function dig(Arg\Barg $depth = 5): Barfoo\Dirt;
@@ -462,7 +461,6 @@ EOT
 <?php
 
 use Arg\Foo;
-
 
 interface Animal
 {

@@ -33,7 +33,6 @@ class PhpactorRocks
 
 use Carcar\Carcar;
 
-
 class PhpactorRocks
 {
     public function hello()
