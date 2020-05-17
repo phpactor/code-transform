@@ -57,6 +57,12 @@ class TolerantImportClassTest extends TolerantTestCase
             'Barfoo\Foobar',
             'Barfoo',
         ];
+
+        yield 'with alias and existing name' => [
+            'importClass7.test',
+            'Barfoo\Foobar',
+            'Barfoo',
+        ];
     }
 
     public function testThrowsExceptionIfClassAlreadyImported()

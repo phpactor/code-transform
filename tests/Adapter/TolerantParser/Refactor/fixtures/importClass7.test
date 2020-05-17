@@ -1,6 +1,8 @@
 // File: source
 <?php
 
+use Zed\Foobar
+
 Zoo::create();
 
 function (Foobar $foobar) {
@@ -10,6 +12,7 @@ function (Foobar $foobar) {
 <?php
 
 use Barfoo\Foobar as Barfoo;
+use Zed\Foobar
 
 Zoo::create();
 

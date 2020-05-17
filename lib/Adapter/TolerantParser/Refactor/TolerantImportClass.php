@@ -137,24 +137,12 @@ class TolerantImportClass implements ImportClass
     }
 
 
-    private function updateReferences(NamespacedNameInterface $node, string $name, string $alias, TextEdits $edits): TextEdits
+    private function updateReferences(Node $node, string $name, string $alias, TextEdits $edits): TextEdits
     {
-        foreach ($node->getRoot()->getDescendantNodes() as $childNode) {
-            if (!$childNode instanceof QualifiedName) {
-                continue;
-            }
-
-            if ((string)$childNode->getNamespacedName() != (string)$node->getNamespacedName()) {
-                continue;
-            }
-
-            $edits = $edits->add(TextEdit::create(
-                $childNode->getStart(),
-                $childNode->getEndPosition() - $childNode->getStart(),
-                $alias
-            ));
-        }
-
-        return $edits;
+        return $edits->add(TextEdit::create(
+            $node->getStart(),
+            $node->getEndPosition() - $node->getStart(),
+            $alias
+        ));
     }
 }
