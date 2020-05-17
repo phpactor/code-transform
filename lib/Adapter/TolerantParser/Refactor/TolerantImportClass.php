@@ -2,6 +2,9 @@
 
 namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 
+use Microsoft\PhpParser\ClassLike;
+use Microsoft\PhpParser\NamespacedNameInterface;
+use Microsoft\PhpParser\NamespacedNameTrait;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\SourceCode;
@@ -45,12 +48,16 @@ class TolerantImportClass implements ImportClass
         $sourceNode = $this->parser->parseSourceFile($source);
         $node = $sourceNode->getDescendantNodeAtPosition($offset);
 
+        if (!$node instanceof NamespacedNameInterface) {
+            return TextEdits::none();
+        }
+
         $this->checkIfAlreadyImported($node, $name, $alias);
 
         $edits = $this->addImport($source, $node, $name, $alias);
 
         if ($alias !== null) {
-            $edits = $this->updateReferences($node, $alias, $edits);
+            $edits = $this->updateReferences($node, $name, $alias, $edits);
         }
 
         return $edits;
@@ -92,6 +99,20 @@ class TolerantImportClass implements ImportClass
         }
     }
 
+    private function currentClassIsSameAsImportClass(Node $node, ClassName $className): bool
+    {
+        if (!$node instanceof ClassDeclaration) {
+            return false;
+        }
+
+        if ((string) $node->getNamespacedName() === (string) $className) {
+            return true;
+        }
+
+        return false;
+    }
+
+
     private function addImport(SourceCode $source, Node $node, string $name, string $alias = null): TextEdits
     {
         $builder = SourceCodeBuilder::create();
@@ -99,27 +120,6 @@ class TolerantImportClass implements ImportClass
         $prototype = $builder->build();
 
         return $this->updater->textEditsFor($prototype, Code::fromString((string) $source));
-    }
-
-    private function currentClassIsSameAsImportClass(Node $node, ClassName $className): bool
-    {
-        if ($node instanceof ClassDeclaration) {
-            return true;
-        }
-
-        /** @var ClassDeclaration|null $classNode */
-        $classNode = $node->getFirstAncestor(ClassDeclaration::class);
-
-        if (null === $classNode) {
-            return false;
-        }
-        $name = $classNode->getNamespacedName();
-
-        if ((string) $name === (string) $className) {
-            return true;
-        }
-
-        return false;
     }
 
     private function importClassInSameNamespace(Node $node, ClassName $className)
@@ -136,8 +136,25 @@ class TolerantImportClass implements ImportClass
         return false;
     }
 
-    private function updateReferences(Node $node, string $alias, TextEdits $edits): TextEdits
+
+    private function updateReferences(NamespacedNameInterface $node, string $name, string $alias, TextEdits $edits): TextEdits
     {
-        return $edits->add(TextEdit::create($node->getStart(), $node->getEndPosition() - $node->getStart(), $alias));
+        foreach ($node->getRoot()->getDescendantNodes() as $childNode) {
+            if (!$childNode instanceof QualifiedName) {
+                continue;
+            }
+
+            if ((string)$childNode->getNamespacedName() != (string)$node->getNamespacedName()) {
+                continue;
+            }
+
+            $edits = $edits->add(TextEdit::create(
+                $childNode->getStart(),
+                $childNode->getEndPosition() - $childNode->getStart(),
+                $alias
+            ));
+        }
+
+        return $edits;
     }
 }

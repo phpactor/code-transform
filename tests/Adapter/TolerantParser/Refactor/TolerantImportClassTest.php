@@ -51,6 +51,12 @@ class TolerantImportClassTest extends TolerantTestCase
             'Barfoo\Foobar',
             'Barfoo',
         ];
+
+        yield 'with multiple aliases' => [
+            'importClass6.test',
+            'Barfoo\Foobar',
+            'Barfoo',
+        ];
     }
 
     public function testThrowsExceptionIfClassAlreadyImported()
@@ -64,14 +70,7 @@ class TolerantImportClassTest extends TolerantTestCase
     {
         $this->expectException(ClassIsCurrentClassException::class);
         $this->expectExceptionMessage('Class "Foobar" is the current class');
-        $this->importClass('<?php class Foobar {}', 16, 'Foobar');
-    }
-
-    public function testThrowsExceptionIfImportedClassIsTheCurrentClass2()
-    {
-        $this->expectException(ClassIsCurrentClassException::class);
-        $this->expectExceptionMessage('Class "Foobar" is the current class');
-        $this->importClass('<?php class Foobar { function hello(Foobar $foobar) {}}', 21, 'Foobar');
+        $this->importClass('<?php class Foobar {}', 14, 'Foobar');
     }
 
     public function testThrowsExceptionIfAliasAlredayUsed()
