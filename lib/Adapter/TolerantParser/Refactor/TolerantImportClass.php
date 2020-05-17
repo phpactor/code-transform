@@ -2,9 +2,7 @@
 
 namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 
-use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\NamespacedNameInterface;
-use Microsoft\PhpParser\NamespacedNameTrait;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\SourceCode;
