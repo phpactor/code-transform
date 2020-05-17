@@ -17,6 +17,7 @@ use Phpactor\CodeTransform\Domain\Refactor\ImportClass\AliasAlreadyUsedException
 use Microsoft\PhpParser\Node\Statement\ClassDeclaration;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassIsCurrentClassException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyInNamespaceException;
+use Phpactor\TextDocument\TextEdit;
 use Phpactor\TextDocument\TextEdits;
 
 class TolerantImportClass implements ImportClass
@@ -38,7 +39,7 @@ class TolerantImportClass implements ImportClass
         $this->updater = $updater;
     }
 
-    public function importClass(SourceCode $source, int $offset, string $name, string $alias = null): TextEdits
+    public function importClass(SourceCode $source, int $offset, string $name, ?string $alias = null): TextEdits
     {
         $name = ClassName::fromString($name);
         $sourceNode = $this->parser->parseSourceFile($source);
@@ -46,7 +47,13 @@ class TolerantImportClass implements ImportClass
 
         $this->checkIfAlreadyImported($node, $name, $alias);
 
-        return $this->addImport($source, $node, $name, $alias);
+        $edits = $this->addImport($source, $node, $name, $alias);
+
+        if ($alias !== null) {
+            $edits = $this->updateReferences($node, $alias, $edits);
+        }
+
+        return $edits;
     }
 
     private function nameFromQualifiedName(QualifiedName $node): string
@@ -127,5 +134,10 @@ class TolerantImportClass implements ImportClass
         }
 
         return false;
+    }
+
+    private function updateReferences(Node $node, string $alias, TextEdits $edits): TextEdits
+    {
+        return $edits->add(TextEdit::create($node->getStart(), $node->getEndPosition() - $node->getStart(), $alias));
     }
 }
