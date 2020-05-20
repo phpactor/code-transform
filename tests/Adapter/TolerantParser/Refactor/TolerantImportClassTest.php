@@ -84,7 +84,12 @@ class TolerantImportClassTest extends TolerantTestCase
         $this->expectException(AliasAlreadyUsedException::class);
         $this->expectExceptionMessage('Alias "DateTime" is already used');
         $this->importClassFromTestFile('importClass1.test', 'Foobar', 'DateTime');
-        $this->importClass('<?php namespace Barfoo; class Foobar { function hello(Foobar $foobar) {}}', 21, 'Foobar');
+    }
+
+    public function testThrowsExceptionIfImportedClassHasSameNameAsCurrentClassName()
+    {
+        $this->expectException(ClassAlreadyImportedException::class);
+        $this->importClass('<?php namespace Barfoo; class Foobar extends Foobar', 47, 'BazBar\Foobar');
     }
 
     public function testThrowsExceptionIfImportedClassInSameNamespace()
@@ -107,7 +112,7 @@ EOT
     private function importClassFromTestFile(string $test, string $name, string $alias = null)
     {
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
-        
+
         $edits = $this->importClass($source, $offset, $name, $alias);
         return [$expected, $edits->apply($source)];
     }

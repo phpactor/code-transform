@@ -16,7 +16,7 @@ final class ClassName
         $this->name = $name;
     }
 
-    public static function fromString(string $name)
+    public static function fromString(string $name): self
     {
         return new self($name);
     }

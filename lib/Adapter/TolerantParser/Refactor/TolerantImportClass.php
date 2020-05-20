@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 
+use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\NamespacedNameInterface;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass;
 use Microsoft\PhpParser\Parser;
@@ -76,12 +77,17 @@ class TolerantImportClass implements ImportClass
         return $name->getText($node->getFileContents());
     }
 
-    private function checkIfAlreadyImported(Node $node, ClassName $className, string $alias = null)
+    private function checkIfAlreadyImported(Node $node, ClassName $className, ?string $alias = null)
     {
+        $currentClass = $this->currentClass($node);
         $imports = $node->getImportTablesForCurrentScope()[0];
 
         if (null === $alias && isset($imports[$className->short()])) {
             throw new ClassAlreadyImportedException($className->short(), $imports[$className->short()]);
+        }
+
+        if (null === $alias && $currentClass && $currentClass->short() === $className->short()) {
+            throw new ClassAlreadyImportedException($className->short(), $currentClass->__toString());
         }
 
         if ($alias && isset($imports[$alias])) {
@@ -142,5 +148,23 @@ class TolerantImportClass implements ImportClass
             $node->getEndPosition() - $node->getStart(),
             $alias
         ));
+    }
+
+    private function currentClass(Node $node): ?ClassName
+    {
+        $classDeclaration = $node->getFirstAncestor(ClassLike::class);
+
+        if (!$classDeclaration instanceof ClassDeclaration) {
+            return null;
+        }
+
+
+        $name = (string)$classDeclaration->getNamespacedName();
+
+        if (!$name) {
+            return null;
+        }
+
+        return ClassName::fromString($name);
     }
 }
