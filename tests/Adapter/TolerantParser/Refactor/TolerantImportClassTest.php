@@ -92,6 +92,12 @@ class TolerantImportClassTest extends TolerantTestCase
         $this->importClass('<?php namespace Barfoo; class Foobar extends Foobar', 47, 'BazBar\Foobar');
     }
 
+    public function testThrowsExceptionIfImportedClassHasSameNameAsCurrentInterfaceName()
+    {
+        $this->expectException(ClassAlreadyImportedException::class);
+        $this->importClass('<?php namespace Barfoo; interface Foobar extends Foobar', 50, 'BazBar\Foobar');
+    }
+
     public function testThrowsExceptionIfImportedClassInSameNamespace()
     {
         $this->expectException(ClassAlreadyInNamespaceException::class);

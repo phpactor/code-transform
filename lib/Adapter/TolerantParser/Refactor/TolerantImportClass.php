@@ -154,7 +154,7 @@ class TolerantImportClass implements ImportClass
     {
         $classDeclaration = $node->getFirstAncestor(ClassLike::class);
 
-        if (!$classDeclaration instanceof ClassDeclaration) {
+        if (!$classDeclaration instanceof NamespacedNameInterface) {
             return null;
         }
 
