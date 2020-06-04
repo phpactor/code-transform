@@ -31,12 +31,12 @@ class NameImport
         $this->alias = $alias;
     }
 
-    public static function class(string $name, ?string $alias = null): self
+    public static function forClass(string $name, ?string $alias = null): self
     {
         return new self(self::TYPE_CLASS, FullyQualifiedName::fromString($name), $alias);
     }
 
-    public static function function(string $name, ?string $alias = null): self
+    public static function forFunction(string $name, ?string $alias = null): self
     {
         return new self(self::TYPE_FUNCTION, FullyQualifiedName::fromString($name), $alias);
     }

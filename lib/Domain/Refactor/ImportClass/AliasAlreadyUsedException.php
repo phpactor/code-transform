@@ -14,7 +14,7 @@ class AliasAlreadyUsedException extends NameAlreadyUsedException
         parent::__construct(sprintf(
             '%s alias "%s" is already used',
             ucfirst($nameImport->type()),
-            $nameImport->name()->head()
+            $nameImport->alias()
         ));
 
         $this->name = $nameImport->name()->head()->__toString();

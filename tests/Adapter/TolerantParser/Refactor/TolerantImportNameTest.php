@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Tests\Adapter\TolerantParser\Refactor;
 
+use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameImport;
 use Phpactor\CodeTransform\Tests\Adapter\TolerantParser\TolerantTestCase;
 use Phpactor\CodeTransform\Adapter\TolerantParser\Refactor\TolerantImportName;
 use Phpactor\CodeTransform\Domain\SourceCode;
@@ -9,6 +10,7 @@ use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameAlreadyImportedExcept
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\AliasAlreadyUsedException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassIsCurrentClassException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameAlreadyInNamespaceException;
+use Phpactor\TextDocument\ByteOffset;
 use Phpactor\TextDocument\TextEdits;
 
 class TolerantImportNameTest extends TolerantTestCase
@@ -76,7 +78,7 @@ class TolerantImportNameTest extends TolerantTestCase
     {
         $this->expectException(ClassIsCurrentClassException::class);
         $this->expectExceptionMessage('Class "Foobar" is the current class');
-        $this->importClass('<?php class Foobar {}', 14, 'Foobar');
+        $this->importName('<?php class Foobar {}', 14, NameImport::forClass('Foobar'));
     }
 
     public function testThrowsExceptionIfAliasAlredayUsed()
@@ -89,13 +91,13 @@ class TolerantImportNameTest extends TolerantTestCase
     public function testThrowsExceptionIfImportedClassHasSameNameAsCurrentClassName()
     {
         $this->expectException(NameAlreadyImportedException::class);
-        $this->importClass('<?php namespace Barfoo; class Foobar extends Foobar', 47, 'BazBar\Foobar');
+        $this->importName('<?php namespace Barfoo; class Foobar extends Foobar', 47, NameImport::forClass('BazBar\Foobar'));
     }
 
     public function testThrowsExceptionIfImportedClassHasSameNameAsCurrentInterfaceName()
     {
         $this->expectException(NameAlreadyImportedException::class);
-        $this->importClass('<?php namespace Barfoo; interface Foobar extends Foobar', 50, 'BazBar\Foobar');
+        $this->importName('<?php namespace Barfoo; interface Foobar extends Foobar', 50, NameImport::forClass('BazBar\Foobar'));
     }
 
     public function testThrowsExceptionIfImportedClassInSameNamespace()
@@ -112,7 +114,7 @@ class Foobar {
 }
 EOT
         ;
-        $this->importClass($source, 64, 'Barfoo\Barfoo');
+        $this->importName($source, 64, NameImport::forClass('Barfoo\Barfoo'));
     }
 
     /**
@@ -145,25 +147,19 @@ EOT
         $edits = TextEdits::none();
 
         if ($type === 'class') {
-            $edits = $this->importClass($source, $offset, $name, $alias);
+            $edits = $this->importName($source, $offset, NameImport::forClass($name, $alias));
         }
 
         if ($type === 'function') {
-            $edits = $this->importFunction($source, $offset, $name, $alias);
+            $edits = $this->importName($source, $offset, NameImport::forFunction($name, $alias));
         }
 
         return [$expected, $edits->apply($source)];
     }
 
-    private function importClass($source, int $offset, string $name, string $alias = null): TextEdits
+    private function importName($source, int $offset, NameImport $nameImport): TextEdits
     {
         $importClass = (new TolerantImportName($this->updater(), $this->parser()));
-        return $importClass->importClass(SourceCode::fromString($source), $offset, $name, $alias);
-    }
-
-    private function importFunction($source, int $offset, string $name, string $alias = null): TextEdits
-    {
-        $importClass = (new TolerantImportName($this->updater(), $this->parser()));
-        return $importClass->importFunction(SourceCode::fromString($source), $offset, $name, $alias);
+        return $importClass->importName(SourceCode::fromString($source), ByteOffset::fromInt($offset), $nameImport);
     }
 }
