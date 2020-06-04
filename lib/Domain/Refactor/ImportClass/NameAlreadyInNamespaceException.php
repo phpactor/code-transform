@@ -11,15 +11,15 @@ class NameAlreadyInNamespaceException extends TransformException
      */
     private $name;
 
-    public function __construct(string $type, string $name)
+    public function __construct(NameImport $nameImport)
     {
         parent::__construct(sprintf(
             '%s "%s" is in the same namespace as current class',
-            ucfirst($type),
-            $name
+            ucfirst($nameImport->type()),
+            $nameImport->name()->head()
         ));
 
-        $this->name = $name;
+        $this->name = $nameImport->name()->head()->__toString();
     }
 
     public function name(): string

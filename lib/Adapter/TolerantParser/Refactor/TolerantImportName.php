@@ -4,6 +4,7 @@ namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 
 use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\NamespacedNameInterface;
+use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameImport;
 use Phpactor\CodeTransform\Domain\Refactor\ImportName;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\SourceCode;
@@ -19,14 +20,13 @@ use Phpactor\CodeTransform\Domain\Refactor\ImportClass\AliasAlreadyUsedException
 use Microsoft\PhpParser\Node\Statement\ClassDeclaration;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassIsCurrentClassException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameAlreadyInNamespaceException;
+use Phpactor\Name\FullyQualifiedName;
+use Phpactor\TextDocument\ByteOffset;
 use Phpactor\TextDocument\TextEdit;
 use Phpactor\TextDocument\TextEdits;
 
 class TolerantImportName implements ImportName
 {
-    private const TYPE_CLASS = 'class';
-    private const TYPE_FUNCTION = 'function';
-
     /**
      * @var Parser
      */
@@ -44,32 +44,21 @@ class TolerantImportName implements ImportName
         $this->updater = $updater;
     }
 
-    public function importClass(SourceCode $source, int $offset, string $name, ?string $alias = null): TextEdits
+    public function importName(SourceCode $source, ByteOffset $offset, NameImport $nameImport): TextEdits
     {
-        return $this->importName(self::TYPE_CLASS, $source, $offset, $name, $alias);
-    }
-
-    public function importFunction(SourceCode $source, int $offset, string $name, ?string $alias = null): TextEdits
-    {
-        return $this->importName(self::TYPE_FUNCTION, $source, $offset, $name, $alias);
-    }
-
-    public function importName(string $type, SourceCode $source, int $offset, string $name, ?string $alias = null): TextEdits
-    {
-        $name = ClassName::fromString($name);
         $sourceNode = $this->parser->parseSourceFile($source);
-        $node = $sourceNode->getDescendantNodeAtPosition($offset);
+        $node = $sourceNode->getDescendantNodeAtPosition($offset->toInt());
 
         if (!$node instanceof NamespacedNameInterface) {
             return TextEdits::none();
         }
 
-        $this->checkIfAlreadyImported($type, $node, $name, $alias);
+        $this->checkIfAlreadyImported($node, $nameImport);
 
-        $edits = $this->addImport($type, $source, $node, $name, $alias);
+        $edits = $this->addImport($source, $node, $nameImport);
 
-        if ($alias !== null) {
-            $edits = $this->updateReferences($node, $name, $alias, $edits);
+        if ($nameImport->alias() !== null) {
+            $edits = $this->updateReferences($node, $nameImport, $edits);
         }
 
         return $edits;
@@ -90,33 +79,33 @@ class TolerantImportName implements ImportName
         return $name->getText($node->getFileContents());
     }
 
-    private function checkIfAlreadyImported(string $type, Node $node, ClassName $className, ?string $alias = null)
+    private function checkIfAlreadyImported(Node $node, NameImport $nameImport)
     {
         $currentClass = $this->currentClass($node);
-        $imports = $node->getImportTablesForCurrentScope()[$this->resolveImportTableOffset($type)];
+        $imports = $node->getImportTablesForCurrentScope()[$this->resolveImportTableOffset($nameImport)];
 
-        if (null === $alias && isset($imports[$className->short()])) {
-            throw new NameAlreadyImportedException($type, $className->short(), $imports[$className->short()]);
+        if (null === $nameImport->alias() && isset($imports[$nameImport->name()->head()->__toString()])) {
+            throw new NameAlreadyImportedException($nameImport, $imports[$nameImport->name()->head()->__toString()]);
         }
 
-        if (null === $alias && $currentClass && $currentClass->short() === $className->short()) {
-            throw new NameAlreadyImportedException($type, $className->short(), $currentClass->__toString());
+        if (null === $nameImport->alias() && $currentClass && $currentClass->short() === $nameImport->name()->head()->__toString()) {
+            throw new NameAlreadyImportedException($nameImport, $currentClass->__toString());
         }
 
-        if ($alias && isset($imports[$alias])) {
-            throw new AliasAlreadyUsedException($type, $alias);
+        if ($nameImport->alias() && isset($imports[$nameImport->alias()])) {
+            throw new AliasAlreadyUsedException($nameImport);
         }
 
-        if ($type === self::TYPE_CLASS && $this->currentClassIsSameAsImportClass($node, $className)) {
-            throw new ClassIsCurrentClassException($type, $className->short());
+        if ($nameImport->isClass() && $this->currentClassIsSameAsImportClass($node, $nameImport->name())) {
+            throw new ClassIsCurrentClassException($nameImport);
         }
 
-        if ($this->importClassInSameNamespace($node, $className)) {
-            throw new NameAlreadyInNamespaceException($type, $className->short());
+        if ($this->importClassInSameNamespace($node, $nameImport->name())) {
+            throw new NameAlreadyInNamespaceException($nameImport);
         }
     }
 
-    private function currentClassIsSameAsImportClass(Node $node, ClassName $className): bool
+    private function currentClassIsSameAsImportClass(Node $node, FullyQualifiedName $className): bool
     {
         if (!$node instanceof ClassDeclaration) {
             return false;
@@ -130,24 +119,24 @@ class TolerantImportName implements ImportName
     }
 
 
-    private function addImport(string $type, SourceCode $source, Node $node, string $name, string $alias = null): TextEdits
+    private function addImport(SourceCode $source, Node $node, NameImport $nameImport): TextEdits
     {
         $builder = SourceCodeBuilder::create();
 
-        $this->addUse($type, $builder, $name, $alias);
+        $this->addUse($builder, $nameImport);
         $prototype = $builder->build();
 
         return $this->updater->textEditsFor($prototype, Code::fromString((string) $source));
     }
 
-    private function importClassInSameNamespace(Node $node, ClassName $className)
+    private function importClassInSameNamespace(Node $node, FullyQualifiedName $className)
     {
         $namespace = '';
         if ($definition = $node->getNamespaceDefinition()) {
             $namespace = (string) $definition->getFirstChildNode(QualifiedName::class);
         }
 
-        if ($className->namespace() == $namespace) {
+        if ($className->tail()->__toString() == $namespace) {
             return true;
         }
 
@@ -155,8 +144,14 @@ class TolerantImportName implements ImportName
     }
 
 
-    private function updateReferences(Node $node, string $name, string $alias, TextEdits $edits): TextEdits
+    private function updateReferences(Node $node, NameImport $nameImport, TextEdits $edits): TextEdits
     {
+        $alias = $nameImport->alias();
+
+        if (is_null($alias)) {
+            return $edits;
+        }
+
         return $edits->add(TextEdit::create(
             $node->getStart(),
             $node->getEndPosition() - $node->getStart(),
@@ -182,18 +177,18 @@ class TolerantImportName implements ImportName
         return ClassName::fromString($name);
     }
 
-    private function resolveImportTableOffset(string $type): int
+    private function resolveImportTableOffset(NameImport $nameImport): int
     {
-        return $type === self::TYPE_FUNCTION ? 1 : 0;
+        return $nameImport->isFunction() ? 1 : 0;
     }
 
-    private function addUse(string $type, SourceCodeBuilder $builder, string $name, ?string $alias): void
+    private function addUse(SourceCodeBuilder $builder, NameImport $nameImport): void
     {
-        if ($type === self::TYPE_FUNCTION) {
-            $builder->useFunction($name, $alias);
+        if ($nameImport->isFunction()) {
+            $builder->useFunction($nameImport->name()->__toString(), $nameImport->alias());
             return;
         }
 
-        $builder->use($name, $alias);
+        $builder->use($nameImport->name()->__toString(), $nameImport->alias());
     }
 }

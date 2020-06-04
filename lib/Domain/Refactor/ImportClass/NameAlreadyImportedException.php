@@ -14,15 +14,15 @@ class NameAlreadyImportedException extends NameAlreadyUsedException
      */
     private $existingName;
 
-    public function __construct(string $type, string $name, string $existingName)
+    public function __construct(NameImport $nameImport, string $existingName)
     {
         parent::__construct(sprintf(
             '%s "%s" is already imported',
-            ucfirst($type),
-            $name
+            ucfirst($nameImport->type()),
+            $nameImport->name()->head()
         ));
 
-        $this->name = $name;
+        $this->name = $nameImport->name()->head()->__toString();
         $this->existingName = $existingName;
     }
 
