@@ -14,10 +14,11 @@ class ClassAlreadyImportedException extends NameAlreadyUsedException
      */
     private $existingName;
 
-    public function __construct(string $name, string $existingName)
+    public function __construct(string $type, string $name, string $existingName)
     {
         parent::__construct(sprintf(
-            'Class "%s" is already imported',
+            '%s "%s" is already imported',
+            ucfirst($type),
             $name
         ));
 

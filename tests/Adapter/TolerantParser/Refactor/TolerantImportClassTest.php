@@ -18,7 +18,7 @@ class TolerantImportClassTest extends TolerantTestCase
      */
     public function testImportClass(string $test, string $name, string $alias = null)
     {
-        list($expected, $transformed) = $this->importClassFromTestFile($test, $name, $alias);
+        list($expected, $transformed) = $this->importNameFromTestFile('class', $test, $name, $alias);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -69,7 +69,7 @@ class TolerantImportClassTest extends TolerantTestCase
     {
         $this->expectException(ClassAlreadyImportedException::class);
         $this->expectExceptionMessage('Class "DateTime" is already imported');
-        $this->importClassFromTestFile('importClass1.test', 'DateTime');
+        $this->importNameFromTestFile('class', 'importClass1.test', 'DateTime');
     }
 
     public function testThrowsExceptionIfImportedClassIsTheCurrentClass1()
@@ -82,8 +82,8 @@ class TolerantImportClassTest extends TolerantTestCase
     public function testThrowsExceptionIfAliasAlredayUsed()
     {
         $this->expectException(AliasAlreadyUsedException::class);
-        $this->expectExceptionMessage('Alias "DateTime" is already used');
-        $this->importClassFromTestFile('importClass1.test', 'Foobar', 'DateTime');
+        $this->expectExceptionMessage('Class alias "DateTime" is already used');
+        $this->importNameFromTestFile('class', 'importClass1.test', 'Foobar', 'DateTime');
     }
 
     public function testThrowsExceptionIfImportedClassHasSameNameAsCurrentClassName()
@@ -115,17 +115,55 @@ EOT
         $this->importClass($source, 64, 'Barfoo\Barfoo');
     }
 
-    private function importClassFromTestFile(string $test, string $name, string $alias = null)
+    /**
+     * @dataProvider provideImportFunction
+     */
+    public function testImportFunction(string $test, string $name, string $alias = null)
+    {
+        list($expected, $transformed) = $this->importNameFromTestFile('function', $test, $name, $alias);
+
+        $this->assertEquals(trim($expected), trim($transformed));
+    }
+
+    public function provideImportFunction()
+    {
+        yield 'import function' => [
+            'importFunction1.test',
+            'Acme\foobar',
+        ];
+    }
+
+    public function testThrowsExceptionIfFunctionAlreadyImported(): void
+    {
+        $this->expectExceptionMessage('Function "foobar" is already imported');
+        $this->importNameFromTestFile('function', 'importFunction2.test', 'Acme\foobar');
+    }
+
+    private function importNameFromTestFile(string $type, string $test, string $name, string $alias = null)
     {
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
+        $edits = TextEdits::none();
 
-        $edits = $this->importClass($source, $offset, $name, $alias);
+        if ($type === 'class') {
+            $edits = $this->importClass($source, $offset, $name, $alias);
+        }
+
+        if ($type === 'function') {
+            $edits = $this->importFunction($source, $offset, $name, $alias);
+        }
+
         return [$expected, $edits->apply($source)];
     }
 
     private function importClass($source, int $offset, string $name, string $alias = null): TextEdits
     {
-        $renameVariable = new TolerantImportClass($this->updater(), $this->parser());
-        return $renameVariable->importClass(SourceCode::fromString($source), $offset, $name, $alias);
+        $importClass = (new TolerantImportClass($this->updater(), $this->parser()));
+        return $importClass->importClass(SourceCode::fromString($source), $offset, $name, $alias);
+    }
+
+    private function importFunction($source, int $offset, string $name, string $alias = null): TextEdits
+    {
+        $importClass = (new TolerantImportClass($this->updater(), $this->parser()));
+        return $importClass->importFunction(SourceCode::fromString($source), $offset, $name, $alias);
     }
 }

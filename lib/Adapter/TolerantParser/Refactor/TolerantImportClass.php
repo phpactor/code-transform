@@ -43,6 +43,16 @@ class TolerantImportClass implements ImportClass
 
     public function importClass(SourceCode $source, int $offset, string $name, ?string $alias = null): TextEdits
     {
+        return $this->importName('class', $source, $offset, $name, $alias);
+    }
+
+    public function importFunction(SourceCode $source, int $offset, string $name, ?string $alias = null): TextEdits
+    {
+        return $this->importName('function', $source, $offset, $name, $alias);
+    }
+
+    public function importName(string $type, SourceCode $source, int $offset, string $name, ?string $alias = null): TextEdits
+    {
         $name = ClassName::fromString($name);
         $sourceNode = $this->parser->parseSourceFile($source);
         $node = $sourceNode->getDescendantNodeAtPosition($offset);
@@ -51,9 +61,9 @@ class TolerantImportClass implements ImportClass
             return TextEdits::none();
         }
 
-        $this->checkIfAlreadyImported($node, $name, $alias);
+        $this->checkIfAlreadyImported($type, $node, $name, $alias);
 
-        $edits = $this->addImport($source, $node, $name, $alias);
+        $edits = $this->addImport($type, $source, $node, $name, $alias);
 
         if ($alias !== null) {
             $edits = $this->updateReferences($node, $name, $alias, $edits);
@@ -77,29 +87,29 @@ class TolerantImportClass implements ImportClass
         return $name->getText($node->getFileContents());
     }
 
-    private function checkIfAlreadyImported(Node $node, ClassName $className, ?string $alias = null)
+    private function checkIfAlreadyImported(string $type, Node $node, ClassName $className, ?string $alias = null)
     {
         $currentClass = $this->currentClass($node);
-        $imports = $node->getImportTablesForCurrentScope()[0];
+        $imports = $node->getImportTablesForCurrentScope()[$this->resolveImportTableOffset($type)];
 
         if (null === $alias && isset($imports[$className->short()])) {
-            throw new ClassAlreadyImportedException($className->short(), $imports[$className->short()]);
+            throw new ClassAlreadyImportedException($type, $className->short(), $imports[$className->short()]);
         }
 
         if (null === $alias && $currentClass && $currentClass->short() === $className->short()) {
-            throw new ClassAlreadyImportedException($className->short(), $currentClass->__toString());
+            throw new ClassAlreadyImportedException($type, $className->short(), $currentClass->__toString());
         }
 
         if ($alias && isset($imports[$alias])) {
-            throw new AliasAlreadyUsedException($alias);
+            throw new AliasAlreadyUsedException($type, $alias);
         }
 
         if ($this->currentClassIsSameAsImportClass($node, $className)) {
-            throw new ClassIsCurrentClassException($className->short());
+            throw new ClassIsCurrentClassException($type, $className->short());
         }
 
         if ($this->importClassInSameNamespace($node, $className)) {
-            throw new ClassAlreadyInNamespaceException($className->short());
+            throw new ClassAlreadyInNamespaceException($type, $className->short());
         }
     }
 
@@ -117,10 +127,11 @@ class TolerantImportClass implements ImportClass
     }
 
 
-    private function addImport(SourceCode $source, Node $node, string $name, string $alias = null): TextEdits
+    private function addImport(string $type, SourceCode $source, Node $node, string $name, string $alias = null): TextEdits
     {
         $builder = SourceCodeBuilder::create();
-        $builder->use($name, $alias);
+
+        $this->addUse($type, $builder, $name, $alias);
         $prototype = $builder->build();
 
         return $this->updater->textEditsFor($prototype, Code::fromString((string) $source));
@@ -166,5 +177,20 @@ class TolerantImportClass implements ImportClass
         }
 
         return ClassName::fromString($name);
+    }
+
+    private function resolveImportTableOffset(string $type): int
+    {
+        return $type === 'function' ? 1 : 0;
+    }
+
+    private function addUse(string $type, SourceCodeBuilder $builder, string $name, ?string $alias): void
+    {
+        if ($type === 'function') {
+            $builder->useFunction($name, $alias);
+            return;
+        }
+
+        $builder->use($name, $alias);
     }
 }

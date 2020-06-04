@@ -9,10 +9,11 @@ class AliasAlreadyUsedException extends NameAlreadyUsedException
      */
     private $name;
 
-    public function __construct(string $name)
+    public function __construct(string $type, string $name)
     {
         parent::__construct(sprintf(
-            'Alias "%s" is already used',
+            '%s alias "%s" is already used',
+            ucfirst($type),
             $name
         ));
 

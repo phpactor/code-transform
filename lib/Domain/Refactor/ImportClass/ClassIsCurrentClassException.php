@@ -11,10 +11,11 @@ class ClassIsCurrentClassException extends TransformException
      */
     private $name;
 
-    public function __construct(string $name)
+    public function __construct(string $type, string $name)
     {
         parent::__construct(sprintf(
-            'Class "%s" is the current class',
+            '%s "%s" is the current class',
+            ucfirst($type),
             $name
         ));
 
