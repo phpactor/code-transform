@@ -4,7 +4,7 @@ namespace Phpactor\CodeTransform\Domain\Refactor\ImportClass;
 
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 
-class ClassAlreadyInNamespaceException extends TransformException
+class NameAlreadyInNamespaceException extends TransformException
 {
     /**
      * @var string

@@ -2,7 +2,7 @@
 
 namespace Phpactor\CodeTransform\Domain\Refactor\ImportClass;
 
-class ClassAlreadyImportedException extends NameAlreadyUsedException
+class NameAlreadyImportedException extends NameAlreadyUsedException
 {
     /**
      * @var string

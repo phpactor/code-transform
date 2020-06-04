@@ -4,12 +4,12 @@ namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 
 use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\NamespacedNameInterface;
-use Phpactor\CodeTransform\Domain\Refactor\ImportClass;
+use Phpactor\CodeTransform\Domain\Refactor\ImportName;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Microsoft\PhpParser\Node\QualifiedName;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
-use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyImportedException;
+use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameAlreadyImportedException;
 use Phpactor\CodeTransform\Domain\ClassName;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
@@ -18,12 +18,15 @@ use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\AliasAlreadyUsedException;
 use Microsoft\PhpParser\Node\Statement\ClassDeclaration;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassIsCurrentClassException;
-use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassAlreadyInNamespaceException;
+use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameAlreadyInNamespaceException;
 use Phpactor\TextDocument\TextEdit;
 use Phpactor\TextDocument\TextEdits;
 
-class TolerantImportClass implements ImportClass
+class TolerantImportName implements ImportName
 {
+    private const TYPE_CLASS = 'class';
+    private const TYPE_FUNCTION = 'function';
+
     /**
      * @var Parser
      */
@@ -43,12 +46,12 @@ class TolerantImportClass implements ImportClass
 
     public function importClass(SourceCode $source, int $offset, string $name, ?string $alias = null): TextEdits
     {
-        return $this->importName('class', $source, $offset, $name, $alias);
+        return $this->importName(self::TYPE_CLASS, $source, $offset, $name, $alias);
     }
 
     public function importFunction(SourceCode $source, int $offset, string $name, ?string $alias = null): TextEdits
     {
-        return $this->importName('function', $source, $offset, $name, $alias);
+        return $this->importName(self::TYPE_FUNCTION, $source, $offset, $name, $alias);
     }
 
     public function importName(string $type, SourceCode $source, int $offset, string $name, ?string $alias = null): TextEdits
@@ -93,23 +96,23 @@ class TolerantImportClass implements ImportClass
         $imports = $node->getImportTablesForCurrentScope()[$this->resolveImportTableOffset($type)];
 
         if (null === $alias && isset($imports[$className->short()])) {
-            throw new ClassAlreadyImportedException($type, $className->short(), $imports[$className->short()]);
+            throw new NameAlreadyImportedException($type, $className->short(), $imports[$className->short()]);
         }
 
         if (null === $alias && $currentClass && $currentClass->short() === $className->short()) {
-            throw new ClassAlreadyImportedException($type, $className->short(), $currentClass->__toString());
+            throw new NameAlreadyImportedException($type, $className->short(), $currentClass->__toString());
         }
 
         if ($alias && isset($imports[$alias])) {
             throw new AliasAlreadyUsedException($type, $alias);
         }
 
-        if ($this->currentClassIsSameAsImportClass($node, $className)) {
+        if ($type === self::TYPE_CLASS && $this->currentClassIsSameAsImportClass($node, $className)) {
             throw new ClassIsCurrentClassException($type, $className->short());
         }
 
         if ($this->importClassInSameNamespace($node, $className)) {
-            throw new ClassAlreadyInNamespaceException($type, $className->short());
+            throw new NameAlreadyInNamespaceException($type, $className->short());
         }
     }
 
@@ -181,12 +184,12 @@ class TolerantImportClass implements ImportClass
 
     private function resolveImportTableOffset(string $type): int
     {
-        return $type === 'function' ? 1 : 0;
+        return $type === self::TYPE_FUNCTION ? 1 : 0;
     }
 
     private function addUse(string $type, SourceCodeBuilder $builder, string $name, ?string $alias): void
     {
-        if ($type === 'function') {
+        if ($type === self::TYPE_FUNCTION) {
             $builder->useFunction($name, $alias);
             return;
         }

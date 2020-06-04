@@ -5,7 +5,7 @@ namespace Phpactor\CodeTransform\Domain\Refactor;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\TextDocument\TextEdits;
 
-interface ImportClass
+interface ImportName
 {
     public function importClass(SourceCode $source, int $offset, string $name, string $alias = null): TextEdits;
 
