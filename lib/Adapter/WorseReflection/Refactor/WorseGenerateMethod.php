@@ -76,7 +76,7 @@ class WorseGenerateMethod implements GenerateMethod
         return $sourceCode;
     }
 
-    private function contextType(SourceCode $sourceCode, int $offset): Type
+    private function contextType(SourceCode $sourceCode, int $offset): ?Type
     {
         $worseSourceCode = WorseSourceCode::fromPathAndString((string) $sourceCode->path(), (string) $sourceCode);
         $reflectionOffset = $this->reflector->reflectOffset($worseSourceCode, $offset);
@@ -87,6 +87,8 @@ class WorseGenerateMethod implements GenerateMethod
         foreach ($reflectionOffset->frame()->locals()->byName('$this') as $variable) {
             return $variable->symbolContext()->type();
         }
+
+        return null;
     }
 
     private function addMethodCallToBuilder(
@@ -134,8 +136,12 @@ class WorseGenerateMethod implements GenerateMethod
         return $builder->build();
     }
 
-    private function determineVisibility(Type $contextType, ReflectionClassLike $targetClass): Visibility
+    private function determineVisibility(?Type $contextType, ReflectionClassLike $targetClass): Visibility
     {
+        if (null === $contextType) {
+            return Visibility::public();
+        }
+
         if ($contextType->isClass() && $contextType->className() == $targetClass->name()) {
             return Visibility::private();
         }
