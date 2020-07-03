@@ -65,6 +65,12 @@ class TolerantImportNameTest extends TolerantTestCase
             'Barfoo\Foobar',
             'Barfoo',
         ];
+
+        yield 'with class in root namespace' => [
+            'importClass8.test',
+            'Foobar',
+        ];
+
     }
 
     public function testThrowsExceptionIfClassAlreadyImported()

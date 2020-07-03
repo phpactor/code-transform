@@ -136,7 +136,7 @@ class TolerantImportName implements ImportName
             $namespace = (string) $definition->getFirstChildNode(QualifiedName::class);
         }
 
-        if ($className->tail()->__toString() == $namespace) {
+        if ($className->count() > 1 && $className->tail()->__toString() == $namespace) {
             return true;
         }
 
