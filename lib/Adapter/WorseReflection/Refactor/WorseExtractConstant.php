@@ -53,7 +53,7 @@ class WorseExtractConstant implements ExtractConstant
         return $this->addConstant($sourceCode, $symbolInformation, $constantName);
     }
 
-    private function addConstant(SourceCode $sourceCode, SymbolContext $symbolInformation, string $constantName)
+    private function addConstant(SourceCode $sourceCode, SymbolContext $symbolInformation, string $constantName): SourceCode
     {
         $symbol = $symbolInformation->symbol();
 
@@ -108,7 +108,7 @@ class WorseExtractConstant implements ExtractConstant
         return $sourceCode->withSource(TextEdits::fromTextEdits($textEdits)->apply($sourceCode->__toString()));
     }
 
-    private function getComparableValue(Node $node)
+    private function getComparableValue(Node $node): string
     {
         if ($node instanceof StringLiteral) {
             return $node->getStringContentsText();

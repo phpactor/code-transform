@@ -86,10 +86,7 @@ class ClassNameFixerTransformer implements Transformer
         return TextEdit::create($classLike->name->start, strlen($name), $correctClassName);
     }
 
-    /**
-     * @return TextEdit|null
-     */
-    private function fixNamespace(SourceFileNode $rootNode, $correctNamespace)
+    private function fixNamespace(SourceFileNode $rootNode, string $correctNamespace): ?TextEdit
     {
         $namespaceDefinition = $rootNode->getFirstDescendantNode(NamespaceDefinition::class);
         $statement = sprintf('namespace %s;', $correctNamespace);

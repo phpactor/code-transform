@@ -53,7 +53,7 @@ class TolerantImportName implements ImportName
             return TextEdits::none();
         }
 
-        $this->checkIfAlreadyImported($node, $nameImport);
+        $this->assertNotAlreadyImported($node, $nameImport);
 
         $edits = $this->addImport($source, $node, $nameImport);
 
@@ -79,7 +79,7 @@ class TolerantImportName implements ImportName
         return $name->getText($node->getFileContents());
     }
 
-    private function checkIfAlreadyImported(Node $node, NameImport $nameImport)
+    private function assertNotAlreadyImported(Node $node, NameImport $nameImport): void
     {
         $currentClass = $this->currentClass($node);
         $imports = $node->getImportTablesForCurrentScope()[$this->resolveImportTableOffset($nameImport)];
@@ -129,7 +129,7 @@ class TolerantImportName implements ImportName
         return $this->updater->textEditsFor($prototype, Code::fromString((string) $source));
     }
 
-    private function importClassInSameNamespace(Node $node, FullyQualifiedName $className)
+    private function importClassInSameNamespace(Node $node, FullyQualifiedName $className): bool
     {
         $namespace = '';
         if ($definition = $node->getNamespaceDefinition()) {

@@ -37,6 +37,7 @@ class TolerantChangeVisiblity implements ChangeVisiblity
             return $source;
         }
 
+        /** @phpstan-ignore-next-line */
         $textEdit = $this->resolveNewVisiblityTextEdit($node);
 
         if (null === $textEdit) {
@@ -64,14 +65,16 @@ class TolerantChangeVisiblity implements ChangeVisiblity
                 return $this->visiblityTextEdit($modifier, 'public');
             }
         }
+
+        return null;
     }
 
-    private function visiblityTextEdit(Token $modifier, $newVisiblity): TextEdit
+    private function visiblityTextEdit(Token $modifier, string $newVisiblity): TextEdit
     {
         return TextEdit::create($modifier->getStartPosition(), $modifier->getWidth(), $newVisiblity);
     }
 
-    private function resolveMemberNode(Node $node)
+    private function resolveMemberNode(Node $node): ?Node
     {
         if (!(
             $node instanceof MethodDeclaration ||

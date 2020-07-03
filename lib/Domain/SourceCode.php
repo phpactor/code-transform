@@ -56,12 +56,12 @@ final class SourceCode
         return new self($this->code, $path);
     }
 
-    public function path()
+    public function path(): ?string
     {
         return $this->path;
     }
 
-    public function extractSelection(int $offsetStart, int $offsetEnd)
+    public function extractSelection(int $offsetStart, int $offsetEnd): string
     {
         return substr($this->code, $offsetStart, $offsetEnd - $offsetStart);
     }
@@ -74,7 +74,10 @@ final class SourceCode
         return self::withSource($start . $replacement . $end);
     }
 
-    public static function fromUnknown($code)
+    /**
+     * @param mixed $code
+     */
+    public static function fromUnknown($code): SourceCode
     {
         if ($code instanceof SourceCode) {
             return $code;

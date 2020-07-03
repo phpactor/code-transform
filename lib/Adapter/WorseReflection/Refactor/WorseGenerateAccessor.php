@@ -3,6 +3,7 @@
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
 use InvalidArgumentException;
+use Phpactor\CodeBuilder\Domain\Prototype\SourceCode as PrototypeSourceCode;
 use RuntimeException;
 use Phpactor\WorseReflection\Core\ClassName;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
@@ -52,7 +53,7 @@ class WorseGenerateAccessor implements GenerateAccessor
     {
         $property = $this->class((string) $sourceCode, $offset)
              ->properties()
-             ->offsetGet($propertyName);
+             ->get($propertyName);
 
         $prototype = $this->buildPrototype($property);
         $sourceCode = $this->sourceFromClassName($sourceCode, $property->class()->name());
@@ -63,7 +64,7 @@ class WorseGenerateAccessor implements GenerateAccessor
         )->apply(Code::fromString((string) $sourceCode)));
     }
 
-    private function formatName(string $name)
+    private function formatName(string $name): string
     {
         if ($this->upperCaseFirst) {
             $name = ucfirst($name);
@@ -72,7 +73,7 @@ class WorseGenerateAccessor implements GenerateAccessor
         return $this->prefix . $name;
     }
 
-    private function buildPrototype(ReflectionProperty $property)
+    private function buildPrototype(ReflectionProperty $property): PrototypeSourceCode
     {
         $builder = SourceCodeBuilder::create();
         $className = $property->class()->name();

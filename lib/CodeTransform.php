@@ -27,6 +27,9 @@ class CodeTransform
         return $this->transformers;
     }
 
+    /**
+     * @param mixed $code
+     */
     public function transform($code, array $transformations): SourceCode
     {
         $code = SourceCode::fromUnknown($code);

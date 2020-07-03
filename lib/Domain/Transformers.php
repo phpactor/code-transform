@@ -2,9 +2,12 @@
 
 namespace Phpactor\CodeTransform\Domain;
 
+/**
+ * @extends AbstractCollection<Transformer>
+ */
 final class Transformers extends AbstractCollection
 {
-    public function applyTo(SourceCode $code)
+    public function applyTo(SourceCode $code): SourceCode
     {
         foreach ($this as $transformer) {
             $code = $transformer->transform($code);
@@ -13,7 +16,7 @@ final class Transformers extends AbstractCollection
         return $code;
     }
 
-    public function in(array $transformerNames)
+    public function in(array $transformerNames): self
     {
         $transformers = [];
 

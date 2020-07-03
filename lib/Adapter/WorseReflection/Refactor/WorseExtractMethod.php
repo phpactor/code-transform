@@ -100,7 +100,7 @@ class WorseExtractMethod implements ExtractMethod
         );
     }
 
-    private function parameterVariables(Assignments $locals, string $selection, int $offsetStart)
+    private function parameterVariables(Assignments $locals, string $selection, int $offsetStart): array
     {
         $variableNames = $this->variableNames($selection);
 
@@ -115,7 +115,7 @@ class WorseExtractMethod implements ExtractMethod
         return $parameterVariables;
     }
 
-    private function returnVariables(Assignments $locals, ReflectionMethod $reflectionMethod, string $source, int $offsetStart, int $offsetEnd)
+    private function returnVariables(Assignments $locals, ReflectionMethod $reflectionMethod, string $source, int $offsetStart, int $offsetEnd): array
     {
         // variables that are:
         //
@@ -144,7 +144,7 @@ class WorseExtractMethod implements ExtractMethod
         return $returnVariables;
     }
 
-    private function removeIndentation(string $selection)
+    private function removeIndentation(string $selection): string
     {
         return TextUtils::removeIndentation($selection);
     }
@@ -191,7 +191,7 @@ class WorseExtractMethod implements ExtractMethod
         return $member;
     }
 
-    private function addParametersAndGetArgs(array $freeVariables, $methodBuilder, SourceCodeBuilder $builder): array
+    private function addParametersAndGetArgs(array $freeVariables, MethodBuilder $methodBuilder, SourceCodeBuilder $builder): array
     {
         $args = [];
 
@@ -225,7 +225,7 @@ class WorseExtractMethod implements ExtractMethod
         )->frame()->locals();
     }
 
-    private function variableNames(string $source)
+    private function variableNames(string $source): array
     {
         $node = $this->parseSelection($source);
         $variables = [];
@@ -244,7 +244,7 @@ class WorseExtractMethod implements ExtractMethod
         return array_values($variables);
     }
 
-    private function addReturnAndGetAssignment(array $returnVariables, MethodBuilder $methodBuilder, array $args)
+    private function addReturnAndGetAssignment(array $returnVariables, MethodBuilder $methodBuilder, array $args): ?string
     {
         $returnVariables = array_filter($returnVariables, function (Variable $variable) {
             return false === in_array($variable->name(), ['self', 'this']);
@@ -289,7 +289,7 @@ class WorseExtractMethod implements ExtractMethod
         return 'list(' . $names . ')';
     }
 
-    private function replacement(string $name, array $args, string $selection, ?string $returnAssignment)
+    private function replacement(string $name, array $args, string $selection, ?string $returnAssignment): string
     {
         $indentation = str_repeat(' ', TextUtils::stringIndentation($selection));
         $callString = '$this->'  . $name . '(' . implode(', ', $args) . ');';
@@ -308,7 +308,7 @@ class WorseExtractMethod implements ExtractMethod
         return $indentation . $returnAssignment . ' = ' . $callString;
     }
 
-    private function isSelectionAnExpression(SourceCode $source, int $offsetStart, int $offsetEnd)
+    private function isSelectionAnExpression(SourceCode $source, int $offsetStart, int $offsetEnd): bool
     {
         $node = $this->parser->parseSourceFile($source->__toString());
         $endNode = $node->getDescendantNodeAtPosition($offsetEnd);
@@ -328,7 +328,7 @@ class WorseExtractMethod implements ExtractMethod
         return !$endNode->parent instanceof CompoundStatementNode;
     }
 
-    private function addExpressionReturn($newMethodBody, SourceCode $source, int $offsetEnd, MethodBuilder $methodBuilder): string
+    private function addExpressionReturn(string $newMethodBody, SourceCode $source, int $offsetEnd, MethodBuilder $methodBuilder): string
     {
         $newMethodBody = 'return ' . $newMethodBody .';';
         $offset = $this->reflector->reflectOffset($source->__toString(), $offsetEnd);

@@ -3,6 +3,7 @@
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
 use Phpactor\CodeBuilder\Domain\Code;
+use Phpactor\CodeBuilder\Domain\Prototype\SourceCode as PhpactorSourceCode;
 use Phpactor\CodeBuilder\Domain\Prototype\Visibility;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeTransform\Domain\Refactor\GenerateMethod;
@@ -45,7 +46,7 @@ class WorseGenerateMethod implements GenerateMethod
         $this->factory = $factory;
     }
 
-    public function generateMethod(SourceCode $sourceCode, int $offset, $methodName = null): SourceCode
+    public function generateMethod(SourceCode $sourceCode, int $offset, ?string $methodName = null): SourceCode
     {
         $contextType = $this->contextType($sourceCode, $offset);
         $worseSourceCode = WorseSourceCode::fromPathAndString((string) $sourceCode->path(), (string) $sourceCode);
@@ -62,7 +63,7 @@ class WorseGenerateMethod implements GenerateMethod
         );
     }
 
-    private function resolveSourceCode(SourceCode $sourceCode, ReflectionMethodCall $methodCall, $visibility)
+    private function resolveSourceCode(SourceCode $sourceCode, ReflectionMethodCall $methodCall, string $visibility): SourceCode
     {
         $containerSourceCode = SourceCode::fromStringAndPath(
             (string) $methodCall->class()->sourceCode(),
@@ -95,8 +96,8 @@ class WorseGenerateMethod implements GenerateMethod
         ReflectionMethodCall $methodCall,
         Visibility $visibility,
         bool $static,
-        $methodName
-    ) {
+        ?string $methodName
+    ):  PhpactorSourceCode {
         $methodName = $methodName ?: $methodCall->name();
 
         $reflectionClass = $methodCall->class();
@@ -149,7 +150,7 @@ class WorseGenerateMethod implements GenerateMethod
         return Visibility::public();
     }
 
-    private function validate(ReflectionMethodCall $methodCall)
+    private function validate(ReflectionMethodCall $methodCall): void
     {
         if (false === $methodCall->class()->isClass() && false === $methodCall->class()->isInterface()) {
             throw new TransformException(sprintf(

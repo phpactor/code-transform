@@ -6,6 +6,9 @@ use ArrayIterator;
 use Iterator;
 use IteratorAggregate;
 
+/**
+ * @implements IteratorAggregate<NameWithByteOffset>
+ */
 class NameWithByteOffsets implements IteratorAggregate
 {
     private $nameWithByteOffsets;

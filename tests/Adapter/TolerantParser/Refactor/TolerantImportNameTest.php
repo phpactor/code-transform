@@ -70,7 +70,6 @@ class TolerantImportNameTest extends TolerantTestCase
             'importClass8.test',
             'Foobar',
         ];
-
     }
 
     public function testThrowsExceptionIfClassAlreadyImported()

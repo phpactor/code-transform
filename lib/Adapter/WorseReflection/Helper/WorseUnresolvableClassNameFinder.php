@@ -63,7 +63,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         return $unresolvedNames;
     }
 
-    private function appendUnresolvedName(QualifiedName $name, array $unresolvedNames)
+    private function appendUnresolvedName(QualifiedName $name, array $unresolvedNames): array
     {
         $nameText = (string)$name->getResolvedName();
 
@@ -86,7 +86,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         return $unresolvedNames;
     }
 
-    private function descendants($node): array
+    private function descendants(Node $node): array
     {
         $descendants = [];
         foreach ($node->getChildNodes() as $childNode) {

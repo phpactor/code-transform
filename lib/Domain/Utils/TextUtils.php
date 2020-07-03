@@ -4,7 +4,7 @@ namespace Phpactor\CodeTransform\Domain\Utils;
 
 class TextUtils
 {
-    public static function removeIndentation(string $string)
+    public static function removeIndentation(string $string): string
     {
         $indentation = null;
         $lines = explode(PHP_EOL, $string);
@@ -43,7 +43,7 @@ class TextUtils
         return trim(implode(PHP_EOL, $lines), PHP_EOL);
     }
 
-    public static function stringIndentation(string $string)
+    public static function stringIndentation(string $string): int
     {
         $lines = explode(PHP_EOL, $string);
 

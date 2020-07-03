@@ -2,10 +2,20 @@
 
 namespace Phpactor\CodeTransform\Domain;
 
+/**
+ * @template T
+ * @implements \IteratorAggregate<string,T>
+ */
 abstract class AbstractCollection implements \IteratorAggregate
 {
+    /**
+     * @var array<string, object>
+     */
     private $elements = [];
 
+    /**
+     * @param object[] $elements
+     */
     public function __construct(array $elements)
     {
         foreach ($elements as $name => $element) {
@@ -16,25 +26,33 @@ abstract class AbstractCollection implements \IteratorAggregate
                     $type
                 ));
             }
-            $this->elements[$name] = $element;
+            $this->elements[(string)$name] = $element;
         }
     }
 
+    /**
+     * @return static
+     */
     public static function fromArray(array $elements)
     {
+        /** @phpstan-ignore-next-line */
         return new static($elements);
     }
 
     public function getIterator()
     {
+        /** @phpstan-ignore-next-line */
         return new \ArrayIterator($this->elements);
     }
 
-    public function names()
+    public function names(): array
     {
         return array_keys($this->elements);
     }
 
+    /**
+     * @return object
+     */
     public function get(string $name)
     {
         if (!isset($this->elements[$name])) {

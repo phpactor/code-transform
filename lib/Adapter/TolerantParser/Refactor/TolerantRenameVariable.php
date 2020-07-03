@@ -104,28 +104,28 @@ class TolerantRenameVariable implements RenameVariable
         return $scopeNode;
     }
 
-    private function variableName(Node $variable)
+    private function variableName(Node $variable): string
     {
         if ($variable instanceof Parameter) {
             $name = $variable->variableName->getText($variable->getFileContents());
-            return $name;
+            return (string)$name;
         }
             
         return $variable->getText();
     }
 
-    private function textEditForRenameFromNode(Node $variable, Node $node, string $newName)
+    private function textEditForRenameFromNode(Node $variable, Node $node, string $newName): ?TextEdit
     {
         if (
             false === $node instanceof UseVariableName &&
             false === $node instanceof Variable &&
             false === $node instanceof Parameter
         ) {
-            return;
+            return null;
         }
 
         if ($this->variableName($variable) !== $this->variableName($node)) {
-            return;
+            return null;
         }
 
 

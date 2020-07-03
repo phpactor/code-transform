@@ -2,6 +2,8 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
+use Phpactor\CodeBuilder\Domain\Builder\MethodBuilder;
+use Phpactor\CodeBuilder\Domain\Prototype\SourceCode as PhpactorSourceCode;
 use Phpactor\CodeTransform\Domain\Refactor\OverrideMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\TextDocument\TextDocumentBuilder;
@@ -39,7 +41,7 @@ class WorseOverrideMethod implements OverrideMethod
         $this->reflector = $reflector;
     }
 
-    public function overrideMethod(SourceCode $source, string $className, string $methodName)
+    public function overrideMethod(SourceCode $source, string $className, string $methodName): string
     {
         $class = $this->getReflectionClass($source, $className);
         $method = $this->getAncestorReflectionMethod($class, $methodName);
@@ -62,7 +64,7 @@ class WorseOverrideMethod implements OverrideMethod
         return $classes->get($className);
     }
 
-    private function getMethodPrototype(ReflectionClass $class, ReflectionMethod $method)
+    private function getMethodPrototype(ReflectionClass $class, ReflectionMethod $method): MethodBuilder
     {
         /** @var ReflectionMethod $method */
         $builder = $this->factory->fromSource(
@@ -86,7 +88,7 @@ class WorseOverrideMethod implements OverrideMethod
         return $class->parent()->methods()->get($methodName);
     }
 
-    private function getSourcePrototype(ReflectionClass $class, ReflectionMethod $method, SourceCode $source, $methodBuilder)
+    private function getSourcePrototype(ReflectionClass $class, ReflectionMethod $method, SourceCode $source, MethodBuilder $methodBuilder): PhpactorSourceCode
     {
         $sourceBuilder = $this->factory->fromSource($source);
         $sourceBuilder->class($class->name()->short())->add($methodBuilder);
@@ -95,7 +97,7 @@ class WorseOverrideMethod implements OverrideMethod
         return $sourceBuilder->build();
     }
 
-    private function importClasses(ReflectionClass $class, ReflectionMethod $method, SourceCodeBuilder $sourceBuilder)
+    private function importClasses(ReflectionClass $class, ReflectionMethod $method, SourceCodeBuilder $sourceBuilder): void
     {
         $usedClasses = [];
 

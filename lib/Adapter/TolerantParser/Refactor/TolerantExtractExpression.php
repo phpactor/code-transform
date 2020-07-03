@@ -58,13 +58,16 @@ class TolerantExtractExpression implements ExtractExpression
         return $source->withSource(TextEdits::fromTextEdits($edits)->apply((string) $source));
     }
 
+    /**
+     * @return array<TextEdit>
+     */
     private function resolveEdits(
         Node $statement,
         Node $startNode,
         string $extractedString,
         string $assigment,
         string $variableName
-    ) {
+    ): array {
         if ($statement->getStart() === $startNode->getStart()) {
             return [
                 TextEdit::create($statement->getStart(), $statement->getWidth(), $assigment)

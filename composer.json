@@ -19,7 +19,7 @@
     "require-dev": {
         "phpactor/worse-reflection": "~0.3",
         "phpactor/test-utils": "^1.0@dev",
-        "phpstan/phpstan": "~0.11.0",
+        "phpstan/phpstan": "~0.12.0",
         "phpunit/phpunit": "^8.0",
         "friendsofphp/php-cs-fixer": "~2.15.0"
     },

@@ -1,7 +1,6 @@
-includes:
-    - vendor/phpstan/phpstan/conf/config.level7.neon
-
 parameters:
+    checkMissingIterableValueType: false
+    level: 7
     inferPrivatePropertyTypeFromConstructor: true
     ignoreErrors:
         
