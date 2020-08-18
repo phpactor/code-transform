@@ -173,10 +173,19 @@ EOT
 EOT
             ,[
                 new NameWithByteOffset(
-                    QualifiedName::fromString('foo'),
+                    QualifiedName::fromString('Foobar\foo'),
                     ByteOffset::fromInt(24),
                     NameWithByteOffset::TYPE_FUNCTION
                 ),
+            ]
+        ];
+
+        yield 'resolveable namespaced function' => [
+            <<<'EOT'
+// File: test.php
+<?php namespace Foobar; function foo() {} foo();
+EOT
+            ,[
             ]
         ];
     }

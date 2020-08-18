@@ -71,7 +71,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         // Parser returns "NULL" for unqualified namespaced function / constant
         // names, but will return the FQN for references...
         if (!$resolvedName && $name->parent instanceof CallExpression) {
-            return $this->appendUnresolvedFunctionName($name->getText(), $unresolvedNames, $name);
+            return $this->appendUnresolvedFunctionName($name->getNamespacedName()->__toString(), $unresolvedNames, $name);
         }
 
         // If node cannot provide a "resolved" name then this is not a valid
@@ -110,7 +110,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
     private function appendUnresolvedFunctionName(string $nameText, array $unresolvedNames, QualifiedName $name): array
     {
         try {
-            $class = $this->reflector->reflectFunction($nameText);
+            $this->reflector->reflectFunction($nameText);
         } catch (NotFound $notFound) {
             $unresolvedNames[] = new NameWithByteOffset(
                 PhpactorQualifiedName::fromString($nameText),
