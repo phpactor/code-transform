@@ -54,4 +54,9 @@ final class NameWithByteOffset
     {
         return $this->name;
     }
+
+    public function type(): string
+    {
+        return $this->type;
+    }
 }
