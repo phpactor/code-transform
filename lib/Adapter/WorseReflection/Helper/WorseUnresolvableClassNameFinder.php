@@ -3,6 +3,7 @@
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Helper;
 
 use Microsoft\PhpParser\Node;
+use Microsoft\PhpParser\Node\Expression\CallExpression;
 use Microsoft\PhpParser\Node\QualifiedName;
 use Phpactor\CodeTransform\Domain\NameWithByteOffset;
 use Phpactor\CodeTransform\Domain\NameWithByteOffsets;
@@ -13,7 +14,7 @@ use Phpactor\CodeTransform\Domain\Helper\UnresolvableClassNameFinder;
 use Phpactor\TextDocument\ByteOffset;
 use Phpactor\TextDocument\TextDocument;
 use Phpactor\WorseReflection\Core\Exception\NotFound;
-use Phpactor\WorseReflection\Core\Reflector\ClassReflector;
+use Phpactor\WorseReflection\Reflector;
 
 class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
 {
@@ -23,11 +24,11 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
     private $parser;
 
     /**
-     * @var ClassReflector
+     * @var Reflector
      */
     private $reflector;
 
-    public function __construct(ClassReflector $reflector, Parser $parser = null)
+    public function __construct(Reflector $reflector, Parser $parser = null)
     {
         $this->parser = $parser ?: new Parser();
         $this->reflector = $reflector;
@@ -74,15 +75,42 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
             return $unresolvedNames;
         }
 
+        $type = NameWithByteOffset::TYPE_CLASS;
+
+        if ($name->parent instanceof CallExpression) {
+            return $this->appendUnresolvedFunctionName($nameText, $unresolvedNames, $name);
+        }
+
+        return $this->appendUnresolvedClassName($nameText, $unresolvedNames, $name);
+    }
+
+    private function appendUnresolvedClassName(string $nameText, array $unresolvedNames, QualifiedName $name): array
+    {
         try {
             $class = $this->reflector->reflectClassLike($nameText);
         } catch (NotFound $notFound) {
             $unresolvedNames[] = new NameWithByteOffset(
                 PhpactorQualifiedName::fromString($nameText),
-                ByteOffset::fromInt($name->getStart())
+                ByteOffset::fromInt($name->getStart()),
+                NameWithByteOffset::TYPE_CLASS
             );
         }
+        
+        return $unresolvedNames;
+    }
 
+    private function appendUnresolvedFunctionName(string $nameText, array $unresolvedNames, QualifiedName $name): array
+    {
+        try {
+            $class = $this->reflector->reflectFunction($nameText);
+        } catch (NotFound $notFound) {
+            $unresolvedNames[] = new NameWithByteOffset(
+                PhpactorQualifiedName::fromString($nameText),
+                ByteOffset::fromInt($name->getStart()),
+                NameWithByteOffset::TYPE_FUNCTION
+            );
+        }
+        
         return $unresolvedNames;
     }
 

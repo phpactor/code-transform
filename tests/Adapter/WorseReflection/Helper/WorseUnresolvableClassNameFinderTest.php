@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Helper;
 
+use Generator;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Helper\WorseUnresolvableClassNameFinder;
 use Phpactor\CodeTransform\Domain\NameWithByteOffset;
 use Phpactor\CodeTransform\Domain\NameWithByteOffsets;
@@ -13,6 +14,7 @@ use Phpactor\TextDocument\TextDocumentBuilder;
 class WorseUnresolvableClassNameFinderTest extends WorseTestCase
 {
     /**
+     * @dataProvider provideReturnsUnresolableFunctions
      * @dataProvider provideReturnsUnresolableClass
      */
     public function testReturnsUnresolableClass(string $manifest, array $expectedNames)
@@ -24,9 +26,10 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
         $finder = new WorseUnresolvableClassNameFinder(
             $this->reflectorFor($source)
         );
-        $this->assertEquals(new NameWithByteOffsets(...$expectedNames), $finder->find(
+        $found = $finder->find(
             TextDocumentBuilder::create($source)->build()
-        ));
+        );
+        $this->assertEquals(new NameWithByteOffsets(...$expectedNames), $found);
     }
 
     public function provideReturnsUnresolableClass()
@@ -134,6 +137,32 @@ class Barfoo {
 EOT
 ,
             [
+            ]
+        ];
+    }
+
+    public function provideReturnsUnresolableFunctions(): Generator
+    {
+        yield 'resolvable function' => [
+            <<<'EOT'
+// File: test.php
+<?php function bar() {} bar();
+EOT
+            , [
+            ]
+        ];
+
+        yield 'unresolvable function' => [
+            <<<'EOT'
+// File: test.php
+<?php foo();
+EOT
+            ,[
+                new NameWithByteOffset(
+                    QualifiedName::fromString('foo'),
+                    ByteOffset::fromInt(6),
+                    NameWithByteOffset::TYPE_FUNCTION
+                ),
             ]
         ];
     }
