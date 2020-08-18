@@ -84,7 +84,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         // Function names in global namespace have a "resolved name"
         // (inconsistent parser behavior)
         if ($name->parent instanceof CallExpression) {
-            return $this->appendUnresolvedFunctionName($name->getText(), $unresolvedNames, $name);
+            return $this->appendUnresolvedFunctionName($name->getResolvedName() ?? $name->getText(), $unresolvedNames, $name);
         }
 
         $type = NameWithByteOffset::TYPE_CLASS;
