@@ -165,5 +165,19 @@ EOT
                 ),
             ]
         ];
+
+        yield 'namespaced unresolveable function' => [
+            <<<'EOT'
+// File: test.php
+<?php namespace Foobar; foo();
+EOT
+            ,[
+                new NameWithByteOffset(
+                    QualifiedName::fromString('foo'),
+                    ByteOffset::fromInt(24),
+                    NameWithByteOffset::TYPE_FUNCTION
+                ),
+            ]
+        ];
     }
 }

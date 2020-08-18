@@ -66,22 +66,30 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
 
     private function appendUnresolvedName(QualifiedName $name, array $unresolvedNames): array
     {
-        $nameText = (string)$name->getResolvedName();
+        $resolvedName = (string)$name->getResolvedName();
+
+        // Parser returns "NULL" for unqualified namespaced function / constant
+        // names, but will return the FQN for references...
+        if (!$resolvedName && $name->parent instanceof CallExpression) {
+            return $this->appendUnresolvedFunctionName($name->getText(), $unresolvedNames, $name);
+        }
 
         // If node cannot provide a "resolved" name then this is not a valid
         // candidate (e.g. it may be part of a namespace statement) and we can
         // ignore it.
-        if (!$nameText || in_array($nameText, ['self', 'static'])) {
+        if (!$resolvedName || in_array($resolvedName, ['self', 'static'])) {
             return $unresolvedNames;
+        }
+
+        // Function names in global namespace have a "resolved name"
+        // (inconsistent parser behavior)
+        if ($name->parent instanceof CallExpression) {
+            return $this->appendUnresolvedFunctionName($name->getText(), $unresolvedNames, $name);
         }
 
         $type = NameWithByteOffset::TYPE_CLASS;
 
-        if ($name->parent instanceof CallExpression) {
-            return $this->appendUnresolvedFunctionName($nameText, $unresolvedNames, $name);
-        }
-
-        return $this->appendUnresolvedClassName($nameText, $unresolvedNames, $name);
+        return $this->appendUnresolvedClassName($resolvedName, $unresolvedNames, $name);
     }
 
     private function appendUnresolvedClassName(string $nameText, array $unresolvedNames, QualifiedName $name): array
