@@ -2,11 +2,14 @@
 
 namespace Phpactor\CodeTransform\Domain;
 
+use Countable;
+
+
 /**
  * @template T
  * @implements \IteratorAggregate<string,T>
  */
-abstract class AbstractCollection implements \IteratorAggregate
+abstract class AbstractCollection implements \IteratorAggregate, Countable
 {
     /**
      * @var array<string, object>
@@ -64,6 +67,11 @@ abstract class AbstractCollection implements \IteratorAggregate
         }
 
         return $this->elements[$name];
+    }
+
+    public function count(): int
+    {
+        return count($this->elements);
     }
 
     abstract protected function type(): string;

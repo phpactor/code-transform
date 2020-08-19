@@ -85,6 +85,7 @@ class ClassNameFixerTransformer implements Transformer
     private function fixNamespace(SourceFileNode $rootNode, string $correctNamespace): ?TextEdit
     {
         $namespaceDefinition = $rootNode->getFirstDescendantNode(NamespaceDefinition::class);
+        assert($namespaceDefinition instanceof NamespaceDefinition || is_null($namespaceDefinition));
         $statement = sprintf('namespace %s;', $correctNamespace);
 
         if ($correctNamespace && null === $namespaceDefinition) {
@@ -103,6 +104,12 @@ class ClassNameFixerTransformer implements Transformer
 
         if (null === $namespaceDefinition) {
             return null;
+        }
+
+        if ($namespaceDefinition->name) {
+            if ($namespaceDefinition->name->__toString() === $correctNamespace) {
+                return null;
+            }
         }
 
         return TextEdit::create(
@@ -162,6 +169,7 @@ class ClassNameFixerTransformer implements Transformer
         );
         
         $classFqn = $candidates->best();
+
         return $classFqn;
     }
 }

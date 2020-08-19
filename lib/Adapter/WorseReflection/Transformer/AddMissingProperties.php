@@ -23,6 +23,8 @@ use Phpactor\WorseReflection\Core\Reflection\ReflectionClassLike;
 
 class AddMissingProperties implements Transformer
 {
+    private const LENGTH_OF_THIS_PREFIX = 7;
+
     /**
      * @var Reflector
      */
@@ -116,7 +118,7 @@ class AddMissingProperties implements Transformer
                     $diagnostics[] = new Diagnostic(
                         ByteOffsetRange::fromInts(
                             $assignedProperty->offset()->toInt(),
-                            $assignedProperty->offset()->toInt() + strlen($assignedProperty->name())
+                            $assignedProperty->offset()->toInt() + self::LENGTH_OF_THIS_PREFIX + strlen($assignedProperty->name())
                         ),
                         sprintf('Assigning to non existant property "%s"', $assignedProperty->name()),
                         Diagnostic::WARNING

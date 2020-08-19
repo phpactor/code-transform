@@ -3,7 +3,7 @@
 namespace Phpactor\CodeTransform\Domain;
 
 /**
- * @extends AbstractCollection<Generator>
+ * @extends AbstractCollection<Diagnostic>
  */
 class Diagnostics extends AbstractCollection
 {
