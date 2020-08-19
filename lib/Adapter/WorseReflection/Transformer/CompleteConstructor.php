@@ -2,9 +2,18 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Transformer;
 
+use Generator;
+use Phpactor\CodeTransform\Domain\Diagnostic;
+use Phpactor\CodeTransform\Domain\Diagnostics;
+use Phpactor\CodeTransform\Domain\IsApplicable;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\TextDocument\ByteOffset;
+use Phpactor\TextDocument\ByteOffsetRange;
+use Phpactor\TextDocument\TextDocument;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionInterface;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionParameter;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
@@ -32,21 +41,12 @@ class CompleteConstructor implements Transformer
 
     public function transform(SourceCode $source): SourceCode
     {
-        $classes = $this->reflector->reflectClassesIn(WorseSourceCode::fromString((string) $source));
         $edits = [];
         $sourceCodeBuilder = SourceCodeBuilder::create();
 
-        foreach ($classes as $class) {
-            if ($class instanceof ReflectionInterface) {
-                continue;
-            }
+        foreach ($this->candidateClasses($source) as $class) {
 
             $classBuilder = $sourceCodeBuilder->class($class->name()->short());
-
-            if (!$class->methods()->has('__construct')) {
-                continue;
-            }
-
             $methodBuilder = $classBuilder->method('__construct');
             $constructMethod = $class->methods()->get('__construct');
             $methodBody = (string) $constructMethod->body();
@@ -86,5 +86,61 @@ class CompleteConstructor implements Transformer
         $source = SourceCode::fromString($this->updater->textEditsFor($sourceCodeBuilder->build(), Code::fromString((string) $source))->apply(Code::fromString((string) $source)));
 
         return $source;
+    }
+
+    /**
+     * @return array<ReflectionClass>
+     */
+    private function candidateClasses(SourceCode $source): Generator
+    {
+        $classes = $this->reflector->reflectClassesIn(WorseSourceCode::fromString((string) $source));
+        foreach ($classes as $class) {
+            if ($class instanceof ReflectionInterface) {
+                continue;
+            }
+        
+            if (!$class->methods()->has('__construct')) {
+                continue;
+            }
+
+            yield $class;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function diagnostics(SourceCode $source): Diagnostics
+    {
+        $diagnostics = [];
+        foreach ($this->candidateClasses($source) as $class) {
+            $constructMethod = $class->methods()->get('__construct');
+            assert($constructMethod instanceof ReflectionMethod);
+            foreach ($constructMethod->parameters() as $parameter) {
+                assert($parameter instanceof ReflectionParameter);
+                $frame = $constructMethod->frame();
+
+                $isUsed = $frame->locals()->byName($parameter->name())->count() > 0;
+                $hasProperty = $class->properties()->has($parameter->name());
+
+                if ($isUsed && $hasProperty) {
+                    continue;
+                }
+
+                $diagnostics[] = new Diagnostic(
+                    new ByteOffsetRange(
+                        ByteOffset::fromInt($parameter->position()->start()),
+                        ByteOffset::fromInt($parameter->position()->end()),
+                    ),
+                    sprintf(
+                        'Parameter "%s" may not have been assigned',
+                        $parameter->name()
+                    ),
+                    Diagnostic::WARNING
+                );
+            }
+        }
+
+        return new Diagnostics($diagnostics);
     }
 }

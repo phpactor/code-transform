@@ -2,9 +2,13 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Transformer;
 
+use Phpactor\CodeTransform\Domain\Diagnostic;
+use Phpactor\CodeTransform\Domain\Diagnostics;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\TextDocument\ByteOffsetRange;
 use Phpactor\WorseReflection\Core\Inference\Variable;
+use Phpactor\WorseReflection\Core\Reflection\ReflectionMember;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
 use Phpactor\CodeBuilder\Domain\Updater;
@@ -89,5 +93,39 @@ class AddMissingProperties implements Transformer
         }
 
         return $sourceBuilder->class($name);
+    }
+
+    public function diagnostics(SourceCode $code): Diagnostics
+    {
+        $diagnostics = [];
+        $classes = $this->reflector->reflectClassesIn(
+            WorseSourceCode::fromString((string) $code)
+        );
+
+        /** @var ReflectionClass $class */
+        foreach ($classes as $class) {
+            foreach ($class->methods()->belongingTo($class->name()) as $method) {
+                assert($method instanceof ReflectionMember);
+                $frame = $method->frame();
+
+                foreach ($frame->properties() as $assignedProperty) {
+                    assert($assignedProperty instanceof Variable);
+                    if ($class->properties()->has($assignedProperty->name())) {
+                        continue;
+                    }
+
+                    $diagnostics[] = new Diagnostic(
+                        ByteOffsetRange::fromInts(
+                            $assignedProperty->offset()->toInt(),
+                            $assignedProperty->offset()->toInt() + strlen($assignedProperty->name())
+                        ),
+                        sprintf('Assigning to non existant property "%s"', $assignedProperty->name()),
+                        Diagnostic::WARNING
+                    );
+                }
+            }
+        }
+
+        return new Diagnostics($diagnostics);
     }
 }

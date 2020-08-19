@@ -10,9 +10,44 @@ use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 class CompleteConstructorTest extends WorseTestCase
 {
     /**
+     * @dataProvider provideDiagnostics
+     */
+    public function testDiagnostics(string $example, int $expectedCount)
+    {
+        $source = SourceCode::fromString($example);
+        $transformer = new CompleteConstructor($this->reflectorFor($example), $this->updater());
+        $this->assertCount($expectedCount, $transformer->diagnostics($source));
+    }
+
+    public function provideDiagnostics()
+    {
+        yield 'empty' => [
+            <<<'EOT'
+<?php
+EOT
+        , 0
+        ];
+
+        yield 'unassigned constructor' => [
+            <<<'EOT'
+<?php class Foo { function __construct($string) {} }
+EOT
+        , 1
+        ];
+
+        yield 'assigned constructor without property' => [
+            <<<'EOT'
+<?php class Foo { function __construct($string) { $this->string = $string; } }
+EOT
+        , 1
+        ];
+    }
+
+
+    /**
      * @dataProvider provideCompleteConstructor
      */
-    public function testCompleteConstructor(string $example, string $expected)
+    public function testCompleteConstructor(string $example, string $expected): void
     {
         $source = SourceCode::fromString($example);
         $transformer = new CompleteConstructor($this->reflectorFor($example), $this->updater());

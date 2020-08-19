@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Transformer;
 
+use Phpactor\CodeTransform\Domain\Diagnostics;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\WorseReflection\Reflector;
@@ -35,6 +36,11 @@ class ImplementContracts implements Transformer
         $this->updater = $updater;
         $this->reflector = $reflector;
         $this->factory = $factory;
+    }
+
+    public function diagnostics(SourceCode $code): Diagnostics
+    {
+        return Diagnostics::empty();
     }
 
     public function transform(SourceCode $source): SourceCode

@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Transformer;
 
+use Generator;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Transformer\AddMissingProperties;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
@@ -372,6 +373,38 @@ trait Foobar
 }
 EOT
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideDiagnostics
+     */
+    public function testDiagnostics(string $example, int $diagnosticsCount): void
+    {
+        $source = SourceCode::fromString($example);
+        $transformer = new AddMissingProperties($this->reflectorFor($example), $this->updater());
+        $diagnostics = $transformer->diagnostics($source);
+        $this->assertCount($diagnosticsCount, $diagnostics);
+    }
+
+    /**
+     * @return Generator<mixed>
+     */
+    public function provideDiagnostics(): Generator
+    {
+        yield 'empty' => [
+            '<?php',
+            0
+        ];
+
+        yield 'missing properties' => [
+            '<?php class A { public function bar() { $this->bar = "foo"; } }',
+            1
+        ];
+
+        yield 'not missing properties' => [
+            '<?php class A { private $bar; public function bar() { $this->bar = "foo"; } }',
+            0
         ];
     }
 }
