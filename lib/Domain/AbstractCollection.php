@@ -4,7 +4,6 @@ namespace Phpactor\CodeTransform\Domain;
 
 use Countable;
 
-
 /**
  * @template T
  * @implements \IteratorAggregate<string,T>
@@ -12,12 +11,12 @@ use Countable;
 abstract class AbstractCollection implements \IteratorAggregate, Countable
 {
     /**
-     * @var array<string, object>
+     * @var array<string, T>
      */
     private $elements = [];
 
     /**
-     * @param object[] $elements
+     * @param T[] $elements
      */
     public function __construct(array $elements)
     {
@@ -44,7 +43,6 @@ abstract class AbstractCollection implements \IteratorAggregate, Countable
 
     public function getIterator()
     {
-        /** @phpstan-ignore-next-line */
         return new \ArrayIterator($this->elements);
     }
 
