@@ -10,7 +10,8 @@ final class Transformers extends AbstractCollection
     public function applyTo(SourceCode $code): SourceCode
     {
         foreach ($this as $transformer) {
-            $code = $transformer->transform($code);
+            assert($transformer instanceof Transformer);
+            $code = SourceCode::fromStringAndPath($transformer->transform($code)->apply($code), $code->path());
         }
 
         return $code;

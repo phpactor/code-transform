@@ -57,7 +57,8 @@ class ImplementContracts implements Transformer
                     $class->position()->end()
                 ),
                 sprintf(
-                    'Missing methods "%s"', implode('", "', array_map(function (ReflectionMethod $method) {
+                    'Missing methods "%s"',
+                    implode('", "', array_map(function (ReflectionMethod $method) {
                         return $method->name();
                     }, $missingMethods))
                 ),

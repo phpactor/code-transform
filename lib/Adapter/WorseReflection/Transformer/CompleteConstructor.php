@@ -5,12 +5,10 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Transformer;
 use Generator;
 use Phpactor\CodeTransform\Domain\Diagnostic;
 use Phpactor\CodeTransform\Domain\Diagnostics;
-use Phpactor\CodeTransform\Domain\IsApplicable;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\TextDocument\ByteOffset;
 use Phpactor\TextDocument\ByteOffsetRange;
-use Phpactor\TextDocument\TextDocument;
 use Phpactor\TextDocument\TextEdits;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionInterface;
@@ -46,7 +44,6 @@ class CompleteConstructor implements Transformer
         $sourceCodeBuilder = SourceCodeBuilder::create();
 
         foreach ($this->candidateClasses($source) as $class) {
-
             $classBuilder = $sourceCodeBuilder->class($class->name()->short());
             $methodBuilder = $classBuilder->method('__construct');
             $constructMethod = $class->methods()->get('__construct');

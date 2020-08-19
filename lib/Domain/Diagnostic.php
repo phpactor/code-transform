@@ -2,7 +2,6 @@
 
 namespace Phpactor\CodeTransform\Domain;
 
-use Phpactor\TextDocument\ByteOffset;
 use Phpactor\TextDocument\ByteOffsetRange;
 
 class Diagnostic
@@ -31,8 +30,7 @@ class Diagnostic
         ByteOffsetRange $range,
         string $message,
         int $severity
-    )
-    {
+    ) {
         $this->message = $message;
         $this->severity = $severity;
         $this->range = $range;

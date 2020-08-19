@@ -2,6 +2,9 @@
 
 namespace Phpactor\CodeTransform\Domain;
 
+/**
+ * @extends AbstractCollection<Generator>
+ */
 class Diagnostics extends AbstractCollection
 {
     protected function type(): string
