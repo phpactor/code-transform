@@ -2,9 +2,11 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Transformer;
 
+use Phpactor\CodeTransform\Domain\Diagnostic;
 use Phpactor\CodeTransform\Domain\Diagnostics;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\TextDocument\ByteOffsetRange;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
@@ -38,9 +40,31 @@ class ImplementContracts implements Transformer
         $this->factory = $factory;
     }
 
-    public function diagnostics(SourceCode $code): Diagnostics
+    public function diagnostics(SourceCode $source): Diagnostics
     {
-        return Diagnostics::empty();
+        $diagnostics = [];
+        $classes = $this->reflector->reflectClassesIn(WorseSourceCode::fromString((string) $source));
+        foreach ($classes->concrete() as $class) {
+            assert($class instanceof ReflectionClass);
+            $missingMethods = $this->missingClassMethods($class);
+            if (0 === count($missingMethods)) {
+                continue;
+            }
+            $diagnostics[] = new Diagnostic(
+                ByteOffsetRange::fromInts(
+                    $class->position()->start(),
+                    $class->position()->end()
+                ),
+                sprintf(
+                    'Missing methods "%s"', implode('", "', array_map(function (ReflectionMethod $method) {
+                        return $method->name();
+                    }, $missingMethods))
+                ),
+                Diagnostic::ERROR
+            );
+        }
+
+        return new Diagnostics($diagnostics);
     }
 
     public function transform(SourceCode $source): SourceCode

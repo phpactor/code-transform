@@ -2,6 +2,7 @@
 
 namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Transformer;
 
+use Generator;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Transformer\ImplementContracts;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
@@ -476,4 +477,59 @@ EOT
             ],
         ];
     }
+
+    /**
+     * @dataProvider provideDiagnostics
+     */
+    public function testDiagnostics(string $example, int $expectedCount): void
+    {
+        $source = SourceCode::fromString($example);
+        $transformer = new ImplementContracts(
+            $this->reflectorFor($example),
+            $this->updater(),
+            $this->builderFactory($this->reflectorFor($example))
+        );
+        $this->assertCount($expectedCount, $transformer->diagnostics($source));
+    }
+
+    /**
+     * @return Generator<mixed>
+     */
+    public function provideDiagnostics(): Generator
+    {
+        yield 'empty' => [
+            <<<'EOT'
+<?php
+EOT
+        , 0
+        ];
+
+        yield 'missing method' => [
+            <<<'EOT'
+<?php
+
+interface A { public function barfoo(): void; }
+
+class B implements A
+{
+}
+EOT
+        , 1
+        ];
+
+        yield 'not missing method' => [
+            <<<'EOT'
+<?php
+
+interface A { public function barfoo(): void; }
+
+class B implements A
+{
+    public function barfoo() {}
+}
+EOT
+        , 0
+        ];
+    }
+
 }
