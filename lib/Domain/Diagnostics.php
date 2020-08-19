@@ -9,7 +9,7 @@ class Diagnostics extends AbstractCollection
         return Diagnostic::class;
     }
 
-    public static function empty(): self
+    public static function none(): self
     {
         return new self([]);
     }

@@ -46,7 +46,7 @@ class AddMissingProperties implements Transformer
         );
 
         if ($classes->count() === 0) {
-            return $code;
+            return TextEdits::none();
         }
 
         $sourceBuilder = SourceCodeBuilder::create();

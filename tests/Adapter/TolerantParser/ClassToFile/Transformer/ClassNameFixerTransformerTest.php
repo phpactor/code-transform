@@ -16,45 +16,58 @@ class ClassNameFixerTransformerTest extends AdapterTestCase
     /**
      * @dataProvider provideFixClassName
      */
-    public function testFixClassName(string $filePath, string $test)
+    public function testFixClassName(string $filePath, string $test, int $diagnosticCount): void
     {
         $workspace = $this->workspace();
         $workspace->reset();
-        $workspace->loadManifest(file_get_contents(__DIR__ . '/fixtures/' . $test));
-        $source = $workspace->getContents($filePath);
+        $workspace->loadManifest((string)file_get_contents(__DIR__ . '/fixtures/' . $test));
         $expected = $workspace->getContents('expected');
 
         $transformer = $this->createTransformer($workspace);
-        $transformed = $transformer->transform(SourceCode::fromStringAndPath($source, $this->workspace()->path($filePath)));
 
-        $this->assertEquals(trim($expected), trim($transformed));
+        $source = SourceCode::fromStringAndPath(
+            $workspace->getContents($filePath),
+            $this->workspace()->path($filePath)
+        );
+
+        $diagnostics = $transformer->diagnostics($source);
+        $this->assertCount($diagnosticCount, $diagnostics);
+        $transformed = $transformer->transform($source);
+
+        $this->assertEquals(trim($expected), trim($transformed->apply($source)));
     }
 
     public function provideFixClassName()
     {
         yield 'no op' => [
             'FileOne.php',
-            'fixNamespace0.test'
+            'fixNamespace0.test',
+            0
         ];
         yield 'fix file with missing namespace' => [
             'PathTo/FileOne.php',
-            'fixNamespace1.test'
+            'fixNamespace1.test',
+            1
         ];
         yield 'fix file with namespace' => [
             'PathTo/FileOne.php',
-            'fixNamespace2.test'
+            'fixNamespace2.test',
+            1
         ];
         yield 'fix class name' => [
             'FileOne.php',
-            'fixNamespace3.test'
+            'fixNamespace3.test',
+            1
         ];
         yield 'fix class name with same line bracket' => [
             'FileOne.php',
-            'fixNamespace4.test'
+            'fixNamespace4.test',
+            1
         ];
         yield 'fix class name and namespace' => [
             'Phpactor/Test/Foobar/FileOne.php',
-            'fixNamespace5.test'
+            'fixNamespace5.test',
+            2
         ];
     }
 
@@ -66,7 +79,7 @@ class ClassNameFixerTransformerTest extends AdapterTestCase
         $transformed = $transformer->transform(SourceCode::fromString('hello'));
     }
 
-    public function testOnEmptyFile()
+    public function testOnEmptyFile(): void
     {
         $workspace = $this->workspace();
         $workspace->reset();
@@ -74,14 +87,15 @@ class ClassNameFixerTransformerTest extends AdapterTestCase
         $source = $workspace->getContents('PathTo/FileOne.php');
         $expected = $workspace->getContents('expected');
         $transformer = $this->createTransformer($workspace);
-        $transformed = $transformer->transform(SourceCode::fromStringAndPath('', $this->workspace()->path('/PathTo/FileOne.php')));
+        $source = SourceCode::fromStringAndPath('', $this->workspace()->path('/PathTo/FileOne.php'));
+        $transformed = $transformer->transform($source);
         $this->assertEquals(<<<'EOT'
 <?php
 
 namespace PathTo;
 
 EOT
-        , (string) $transformed);
+        , (string) $transformed->apply($source));
     }
 
     private function initComposer(Workspace $workspace)
@@ -110,7 +124,7 @@ EOT
         return $this->initComposer($workspace);
     }
 
-    private function createTransformer(Workspace $workspace)
+    private function createTransformer(Workspace $workspace): ClassNameFixerTransformer
     {
         $autoload = $this->initComposer($workspace);
         $fileToClass = new ComposerFileToClass($autoload);

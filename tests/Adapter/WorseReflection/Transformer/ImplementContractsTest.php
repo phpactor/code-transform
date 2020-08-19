@@ -12,13 +12,13 @@ class ImplementContractsTest extends WorseTestCase
     /**
      * @dataProvider provideCompleteConstructor
      */
-    public function testImplementContracts(string $example, string $expected)
+    public function testImplementContracts(string $example, string $expected): void
     {
         $source = SourceCode::fromString($example);
         $reflector = $this->reflectorFor($example);
         $transformer = new ImplementContracts($reflector, $this->updater(), $this->builderFactory($reflector));
-        $source = $transformer->transform($source);
-        $this->assertEquals((string) $expected, (string) $source);
+        $transformed = $transformer->transform($source);
+        $this->assertEquals((string) $expected, (string) $transformed->apply($source));
     }
 
     public function provideCompleteConstructor()

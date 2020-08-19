@@ -16,8 +16,8 @@ class AddMissingPropertiesTest extends WorseTestCase
     {
         $source = SourceCode::fromString($example);
         $transformer = new AddMissingProperties($this->reflectorFor($example), $this->updater());
-        $source = $transformer->transform($source);
-        $this->assertEquals((string) $expected, (string) $source);
+        $transformed = $transformer->transform(SourceCode::fromString($source));
+        $this->assertEquals((string) $expected, (string) $transformed->apply($source));
     }
 
     public function provideCompleteConstructor()

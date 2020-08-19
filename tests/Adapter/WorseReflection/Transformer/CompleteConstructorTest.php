@@ -51,8 +51,8 @@ EOT
     {
         $source = SourceCode::fromString($example);
         $transformer = new CompleteConstructor($this->reflectorFor($example), $this->updater());
-        $source = $transformer->transform($source);
-        $this->assertEquals((string) $expected, (string) $source);
+        $transformed = $transformer->transform($source);
+        $this->assertEquals((string) $expected, (string) $transformed->apply($source));
     }
 
     public function provideCompleteConstructor()

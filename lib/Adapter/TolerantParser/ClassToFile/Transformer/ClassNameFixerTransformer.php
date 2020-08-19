@@ -10,10 +10,14 @@ use Microsoft\PhpParser\Node\Statement\InterfaceDeclaration;
 use Microsoft\PhpParser\Node\Statement\NamespaceDefinition;
 use Microsoft\PhpParser\Node\Statement\TraitDeclaration;
 use Microsoft\PhpParser\Parser;
+use Phpactor\ClassFileConverter\Domain\ClassName;
 use Phpactor\ClassFileConverter\Domain\FilePath;
 use Phpactor\ClassFileConverter\Domain\FileToClass;
+use Phpactor\CodeTransform\Domain\Diagnostic;
+use Phpactor\CodeTransform\Domain\Diagnostics;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Transformer;
+use Phpactor\TextDocument\ByteOffsetRange;
 use Phpactor\TextDocument\TextEdit;
 use Phpactor\TextDocument\TextEdits;
 use RuntimeException;
@@ -36,17 +40,9 @@ class ClassNameFixerTransformer implements Transformer
         $this->parser = $parser ?: new Parser();
     }
 
-    public function transform(SourceCode $code): SourceCode
+    public function transform(SourceCode $code): TextEdits
     {
-        if (!$code->path()) {
-            throw new RuntimeException('Source code has no path associated with it');
-        }
-
-        $candidates = $this->fileToClass->fileToClassCandidates(
-            FilePath::fromString((string) $code->path())
-        );
-
-        $classFqn = $candidates->best();
+        $classFqn = $this->determineClassFqn($code);
         $correctClassName = $classFqn->name();
         $correctNamespace = $classFqn->namespace();
 
@@ -61,7 +57,7 @@ class ClassNameFixerTransformer implements Transformer
             $edits[] = $textEdit;
         }
 
-        return $code->withSource(TextEdits::fromTextEdits($edits)->apply((string) $code));
+        return TextEdits::fromTextEdits($edits);
     }
 
     /**
@@ -114,5 +110,58 @@ class ClassNameFixerTransformer implements Transformer
             $namespaceDefinition->getEndPosition() - $namespaceDefinition->getStart(),
             $statement
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function diagnostics(SourceCode $code): Diagnostics
+    {
+        $rootNode = $this->parser->parseSourceFile((string) $code);
+        $classFqn = $this->determineClassFqn($code);
+        $correctClassName = $classFqn->name();
+        $correctNamespace = $classFqn->namespace();
+
+        $diagnostics = [];
+
+        if (null !== $this->fixNamespace($rootNode, $correctNamespace)) {
+            $namespaceDefinition = $rootNode->getFirstDescendantNode(NamespaceDefinition::class);
+            $diagnostics[] = new Diagnostic(
+                ByteOffsetRange::fromInts(
+                    $namespaceDefinition ? $namespaceDefinition->getStart() : 0,
+                    $namespaceDefinition ? $namespaceDefinition->getEndPosition() : 0,
+                ),
+                sprintf('Namespace should probably be "%s"', $correctNamespace),
+                Diagnostic::WARNING
+            );
+        }
+        if (null !== $edits = $this->fixClassName($rootNode, $correctClassName)) {
+            $classLike = $rootNode->getFirstDescendantNode(ClassLike::class);
+
+            $diagnostics[] = new Diagnostic(
+                ByteOffsetRange::fromInts(
+                    $classLike ? $classLike->getStart() : 0,
+                    $classLike ? $classLike->getEndPosition() : 0
+                ),
+                sprintf('Class name should probably be "%s"', $correctClassName),
+                Diagnostic::WARNING
+            );
+        }
+
+        return new Diagnostics($diagnostics);
+    }
+
+    private function determineClassFqn(SourceCode $code): ClassName
+    {
+        if (!$code->path()) {
+            throw new RuntimeException('Source code has no path associated with it');
+        }
+        
+        $candidates = $this->fileToClass->fileToClassCandidates(
+            FilePath::fromString((string) $code->path())
+        );
+        
+        $classFqn = $candidates->best();
+        return $classFqn;
     }
 }
