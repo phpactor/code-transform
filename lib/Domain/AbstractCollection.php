@@ -54,7 +54,7 @@ abstract class AbstractCollection implements \IteratorAggregate, Countable
     }
 
     /**
-     * @return object
+     * @return T
      */
     public function get(string $name)
     {
