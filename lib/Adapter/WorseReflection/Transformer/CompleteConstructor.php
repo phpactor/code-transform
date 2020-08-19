@@ -11,6 +11,7 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\TextDocument\ByteOffset;
 use Phpactor\TextDocument\ByteOffsetRange;
 use Phpactor\TextDocument\TextDocument;
+use Phpactor\TextDocument\TextEdits;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionInterface;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
@@ -39,7 +40,7 @@ class CompleteConstructor implements Transformer
         $this->reflector = $reflector;
     }
 
-    public function transform(SourceCode $source): SourceCode
+    public function transform(SourceCode $source): TextEdits
     {
         $edits = [];
         $sourceCodeBuilder = SourceCodeBuilder::create();
@@ -83,13 +84,11 @@ class CompleteConstructor implements Transformer
             }
         }
 
-        $source = SourceCode::fromString($this->updater->textEditsFor($sourceCodeBuilder->build(), Code::fromString((string) $source))->apply(Code::fromString((string) $source)));
-
-        return $source;
+        return $this->updater->textEditsFor($sourceCodeBuilder->build(), Code::fromString((string) $source));
     }
 
     /**
-     * @return array<ReflectionClass>
+     * @return Generator<ReflectionClass>
      */
     private function candidateClasses(SourceCode $source): Generator
     {

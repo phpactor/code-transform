@@ -7,6 +7,7 @@ use Phpactor\CodeTransform\Domain\Diagnostics;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\TextDocument\ByteOffsetRange;
+use Phpactor\TextDocument\TextEdits;
 use Phpactor\WorseReflection\Core\Inference\Variable;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMember;
 use Phpactor\WorseReflection\Reflector;
@@ -38,7 +39,7 @@ class AddMissingProperties implements Transformer
         $this->reflector = $reflector;
     }
 
-    public function transform(SourceCode $code): SourceCode
+    public function transform(SourceCode $code): TextEdits
     {
         $classes = $this->reflector->reflectClassesIn(
             WorseSourceCode::fromString((string) $code)
@@ -73,12 +74,10 @@ class AddMissingProperties implements Transformer
             $sourceBuilder->namespace($class->name()->namespace());
         }
 
-        $code = $this->updater->textEditsFor(
+        return $this->updater->textEditsFor(
             $sourceBuilder->build(),
             Code::fromString((string) $code)
-        )->apply($code);
-
-        return SourceCode::fromString($code);
+        );
     }
 
     /**

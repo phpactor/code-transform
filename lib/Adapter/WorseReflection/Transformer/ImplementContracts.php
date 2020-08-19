@@ -7,6 +7,7 @@ use Phpactor\CodeTransform\Domain\Diagnostics;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\TextDocument\ByteOffsetRange;
+use Phpactor\TextDocument\TextEdits;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
@@ -67,7 +68,7 @@ class ImplementContracts implements Transformer
         return new Diagnostics($diagnostics);
     }
 
-    public function transform(SourceCode $source): SourceCode
+    public function transform(SourceCode $source): TextEdits
     {
         $classes = $this->reflector->reflectClassesIn(WorseSourceCode::fromString((string) $source));
         $edits = [];
@@ -113,9 +114,7 @@ class ImplementContracts implements Transformer
             }
         }
 
-        $source = SourceCode::fromString($this->updater->textEditsFor($sourceCodeBuilder->build(), Code::fromString((string) $source))->apply(Code::fromString((string) $source)));
-
-        return $source;
+        return $this->updater->textEditsFor($sourceCodeBuilder->build(), Code::fromString((string) $source));
     }
 
     private function missingClassMethods(ReflectionClass $class): array
