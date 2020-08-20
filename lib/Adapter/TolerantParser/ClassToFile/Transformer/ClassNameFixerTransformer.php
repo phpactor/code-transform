@@ -17,6 +17,7 @@ use Phpactor\CodeTransform\Domain\Diagnostic;
 use Phpactor\CodeTransform\Domain\Diagnostics;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Transformer;
+use Phpactor\LanguageServerProtocol\Diagnostic as PhpactorDiagnostic;
 use Phpactor\TextDocument\ByteOffsetRange;
 use Phpactor\TextDocument\TextEdit;
 use Phpactor\TextDocument\TextEdits;
@@ -125,7 +126,11 @@ class ClassNameFixerTransformer implements Transformer
     public function diagnostics(SourceCode $code): Diagnostics
     {
         $rootNode = $this->parser->parseSourceFile((string) $code);
-        $classFqn = $this->determineClassFqn($code);
+        try {
+            $classFqn = $this->determineClassFqn($code);
+        } catch (RuntimeException $couldNotFindCandidate) {
+            return Diagnostics::none();
+        }
         $correctClassName = $classFqn->name();
         $correctNamespace = $classFqn->namespace();
 
