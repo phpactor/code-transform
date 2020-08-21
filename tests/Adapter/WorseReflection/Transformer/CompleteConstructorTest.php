@@ -15,7 +15,7 @@ class CompleteConstructorTest extends WorseTestCase
     public function testDiagnostics(string $example, int $expectedCount)
     {
         $source = SourceCode::fromString($example);
-        $transformer = new CompleteConstructor($this->reflectorFor($example), $this->updater());
+        $transformer = new CompleteConstructor($this->reflectorForWorkspace($example), $this->updater());
         $this->assertCount($expectedCount, $transformer->diagnostics($source));
     }
 
@@ -50,7 +50,7 @@ EOT
     public function testCompleteConstructor(string $example, string $expected): void
     {
         $source = SourceCode::fromString($example);
-        $transformer = new CompleteConstructor($this->reflectorFor($example), $this->updater());
+        $transformer = new CompleteConstructor($this->reflectorForWorkspace($example), $this->updater());
         $transformed = $transformer->transform($source);
         $this->assertEquals((string) $expected, (string) $transformed->apply($source));
     }

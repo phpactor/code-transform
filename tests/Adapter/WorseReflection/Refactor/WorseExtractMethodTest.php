@@ -22,7 +22,7 @@ class WorseExtractMethodTest extends WorseTestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $reflector = $this->reflectorFor($source);
+        $reflector = $this->reflectorForWorkspace($source);
         $factory = new WorseBuilderFactory($reflector);
         $extractMethod = new WorseExtractMethod($reflector, $factory, $this->updater());
         $transformed = $extractMethod->extractMethod(SourceCode::fromString($source), $offsetStart, $offsetEnd, $name);

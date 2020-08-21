@@ -91,7 +91,7 @@ EOT
 
     private function generateMethod(string $source, int $start, $name)
     {
-        $reflector = $this->reflectorFor($source);
+        $reflector = $this->reflectorForWorkspace($source);
         $factory = new WorseBuilderFactory($reflector);
         $generateMethod = new WorseGenerateMethod($reflector, $factory, $this->updater());
         return $generateMethod->generateMethod(SourceCode::fromString($source), $start, $name);

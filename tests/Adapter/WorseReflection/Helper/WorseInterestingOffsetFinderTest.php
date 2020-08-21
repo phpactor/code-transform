@@ -18,7 +18,7 @@ class WorseInterestingOffsetFinderTest extends WorseTestCase
     public function testFindSomethingIterestingWhen(string $source, string $expectedSymbolType)
     {
         [$source, $offset] = ExtractOffset::fromSource($source);
-        $reflector = $this->reflectorFor($source);
+        $reflector = $this->reflectorForWorkspace($source);
         $document = TextDocumentBuilder::create($source)->build();
         $offset = ByteOffset::fromInt($offset);
 

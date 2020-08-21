@@ -15,7 +15,7 @@ class ImplementContractsTest extends WorseTestCase
     public function testImplementContracts(string $example, string $expected): void
     {
         $source = SourceCode::fromString($example);
-        $reflector = $this->reflectorFor($example);
+        $reflector = $this->reflectorForWorkspace($example);
         $transformer = new ImplementContracts($reflector, $this->updater(), $this->builderFactory($reflector));
         $transformed = $transformer->transform($source);
         $this->assertEquals((string) $expected, (string) $transformed->apply($source));
@@ -485,9 +485,9 @@ EOT
     {
         $source = SourceCode::fromString($example);
         $transformer = new ImplementContracts(
-            $this->reflectorFor($example),
+            $this->reflectorForWorkspace($example),
             $this->updater(),
-            $this->builderFactory($this->reflectorFor($example))
+            $this->builderFactory($this->reflectorForWorkspace($example))
         );
         $this->assertCount($expectedCount, $transformer->diagnostics($source));
     }

@@ -23,7 +23,7 @@ class WorseGenerateAccessorTest extends WorseTestCase
         );
 
         $generateAccessor = new WorseGenerateAccessor(
-            $this->reflectorFor($source),
+            $this->reflectorForWorkspace($source),
             $this->updater(),
             $prefix,
             $upperCaseFirst
@@ -77,7 +77,7 @@ class WorseGenerateAccessorTest extends WorseTestCase
         $this->expectExceptionMessage('Unknown item "bar", known items: "foo"');
         $source = '<?php class Foo { private $foo; }';
 
-        $generateAccessor = new WorseGenerateAccessor($this->reflectorFor(''), $this->updater());
+        $generateAccessor = new WorseGenerateAccessor($this->reflectorForWorkspace(''), $this->updater());
         $generateAccessor->generate(SourceCode::fromString($source), 'bar', 0);
     }
 }

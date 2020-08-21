@@ -14,7 +14,7 @@ class InterfaceFromExistingGeneratorTest extends WorseTestCase
      */
     public function testGenerateInterface(string $className, string $targetName, string $source, string $expected)
     {
-        $reflector = $this->reflectorFor($source);
+        $reflector = $this->reflectorForWorkspace($source);
         $generator = new InterfaceFromExistingGenerator($reflector, $this->renderer());
         $source = $generator->generateFromExisting(ClassName::fromString($className), ClassName::fromString($targetName));
         $this->assertEquals($expected, (string) $source);

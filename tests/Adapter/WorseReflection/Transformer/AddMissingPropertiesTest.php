@@ -15,7 +15,7 @@ class AddMissingPropertiesTest extends WorseTestCase
     public function testAddMissingProperties(string $example, string $expected)
     {
         $source = SourceCode::fromString($example);
-        $transformer = new AddMissingProperties($this->reflectorFor($example), $this->updater());
+        $transformer = new AddMissingProperties($this->reflectorForWorkspace($example), $this->updater());
         $transformed = $transformer->transform(SourceCode::fromString($source));
         $this->assertEquals((string) $expected, (string) $transformed->apply($source));
     }
@@ -382,7 +382,7 @@ EOT
     public function testDiagnostics(string $example, int $diagnosticsCount): void
     {
         $source = SourceCode::fromString($example);
-        $transformer = new AddMissingProperties($this->reflectorFor($example), $this->updater());
+        $transformer = new AddMissingProperties($this->reflectorForWorkspace($example), $this->updater());
         $diagnostics = $transformer->diagnostics($source);
         $this->assertCount($diagnosticsCount, $diagnostics);
     }

@@ -12,7 +12,7 @@ use Phpactor\WorseReflection\ReflectorBuilder;
 
 class WorseTestCase extends AdapterTestCase
 {
-    public function reflectorFor(?string $source = null): Reflector
+    public function reflectorForWorkspace(?string $source = null): Reflector
     {
         $builder = ReflectorBuilder::create();
 
