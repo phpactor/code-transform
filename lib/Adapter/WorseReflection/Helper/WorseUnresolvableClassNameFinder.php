@@ -95,7 +95,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
     private function appendUnresolvedClassName(string $nameText, array $unresolvedNames, QualifiedName $name): array
     {
         try {
-            $class = $this->reflector->reflectClassLike($nameText);
+            $this->reflector->sourceCodeForClassLike($nameText);
         } catch (NotFound $notFound) {
             $unresolvedNames[] = new NameWithByteOffset(
                 PhpactorQualifiedName::fromString($nameText),
@@ -110,7 +110,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
     private function appendUnresolvedFunctionName(string $nameText, array $unresolvedNames, QualifiedName $name): array
     {
         try {
-            $this->reflector->reflectFunction($nameText);
+            $this->reflector->sourceCodeForFunction($nameText);
         } catch (NotFound $notFound) {
             $unresolvedNames[] = new NameWithByteOffset(
                 PhpactorQualifiedName::fromString($nameText),

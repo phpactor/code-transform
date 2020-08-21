@@ -12,17 +12,19 @@ use Phpactor\WorseReflection\ReflectorBuilder;
 
 class WorseTestCase extends AdapterTestCase
 {
-    public function reflectorFor(string $source): Reflector
+    public function reflectorFor(?string $source = null): Reflector
     {
         $builder = ReflectorBuilder::create();
 
         foreach (glob($this->workspace()->path('/*.php')) as $file) {
-            $locator = new TemporarySourceLocator(ReflectorBuilder::create()->build());
+            $locator = new TemporarySourceLocator(ReflectorBuilder::create()->build(), true);
             $locator->pushSourceCode(SourceCode::fromString(file_get_contents($file)));
             $builder->addLocator($locator);
         }
-        $builder->addSource($source);
 
+        if ($source) {
+            $builder->addSource($source);
+        }
 
         return $builder->build();
     }

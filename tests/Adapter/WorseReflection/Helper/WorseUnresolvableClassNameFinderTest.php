@@ -24,7 +24,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
         $source = $this->workspace()->getContents('test.php');
 
         $finder = new WorseUnresolvableClassNameFinder(
-            $this->reflectorFor($source)
+            $this->reflectorFor()
         );
         $found = $finder->find(
             TextDocumentBuilder::create($source)->build()
