@@ -17,7 +17,6 @@ use Phpactor\CodeTransform\Domain\Diagnostic;
 use Phpactor\CodeTransform\Domain\Diagnostics;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Transformer;
-use Phpactor\LanguageServerProtocol\Diagnostic as PhpactorDiagnostic;
 use Phpactor\TextDocument\ByteOffsetRange;
 use Phpactor\TextDocument\TextEdit;
 use Phpactor\TextDocument\TextEdits;
