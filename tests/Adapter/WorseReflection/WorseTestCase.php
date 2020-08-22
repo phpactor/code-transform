@@ -16,7 +16,7 @@ class WorseTestCase extends AdapterTestCase
     {
         $builder = ReflectorBuilder::create();
 
-        foreach (glob($this->workspace()->path('/*.php')) as $file) {
+        foreach ((array)glob($this->workspace()->path('/*.php')) as $file) {
             $locator = new TemporarySourceLocator(ReflectorBuilder::create()->build(), true);
             $locator->pushSourceCode(SourceCode::fromString(file_get_contents($file)));
             $builder->addLocator($locator);

@@ -7,7 +7,6 @@ use Phpactor\CodeTransform\Domain\Diagnostic;
 use Phpactor\CodeTransform\Domain\Diagnostics;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\CodeTransform\Domain\SourceCode;
-use Phpactor\TextDocument\ByteOffset;
 use Phpactor\TextDocument\ByteOffsetRange;
 use Phpactor\TextDocument\TextEdits;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClass;
@@ -124,9 +123,9 @@ class CompleteConstructor implements Transformer
                 }
 
                 $diagnostics[] = new Diagnostic(
-                    new ByteOffsetRange(
-                        ByteOffset::fromInt($parameter->position()->start()),
-                        ByteOffset::fromInt($parameter->position()->end()),
+                    ByteOffsetRange::fromInts(
+                        $parameter->position()->start(),
+                        $parameter->position()->end() + 5 + strlen($class->name()->__toString())
                     ),
                     sprintf(
                         'Parameter "%s" may not have been assigned',
