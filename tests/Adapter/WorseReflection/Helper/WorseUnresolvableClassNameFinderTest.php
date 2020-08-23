@@ -132,6 +132,7 @@ class Barfoo {
     public function foo(): self {}
     public function bar(): {
         static::foo();
+        parent::foo();
     }
 }
 EOT

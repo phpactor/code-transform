@@ -77,7 +77,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         // If node cannot provide a "resolved" name then this is not a valid
         // candidate (e.g. it may be part of a namespace statement) and we can
         // ignore it.
-        if (!$resolvedName || in_array($resolvedName, ['self', 'static'])) {
+        if (!$resolvedName || in_array($resolvedName, ['self', 'static', 'parent'])) {
             return $unresolvedNames;
         }
 
