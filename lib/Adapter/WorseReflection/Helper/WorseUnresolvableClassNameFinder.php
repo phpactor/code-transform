@@ -4,7 +4,13 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Helper;
 
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\Expression\CallExpression;
+use Microsoft\PhpParser\Node\Expression\ObjectCreationExpression;
+use Microsoft\PhpParser\Node\Expression\ScopedPropertyAccessExpression;
+use Microsoft\PhpParser\Node\MethodDeclaration;
+use Microsoft\PhpParser\Node\Parameter;
 use Microsoft\PhpParser\Node\QualifiedName;
+use Microsoft\PhpParser\Node\Statement\FunctionDeclaration;
+use Microsoft\PhpParser\Node\Statement\NamespaceDefinition;
 use Phpactor\CodeTransform\Domain\NameWithByteOffset;
 use Phpactor\CodeTransform\Domain\NameWithByteOffsets;
 use Phpactor\Name\QualifiedName as PhpactorQualifiedName;
@@ -87,7 +93,14 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
             return $this->appendUnresolvedFunctionName($name->getResolvedName() ?? $name->getText(), $unresolvedNames, $name);
         }
 
-        $type = NameWithByteOffset::TYPE_CLASS;
+        if (
+            !$name->parent instanceof ObjectCreationExpression &&
+            !$name->parent instanceof ScopedPropertyAccessExpression &&
+            !$name->parent instanceof FunctionDeclaration &&
+            !$name->parent instanceof Parameter
+        ) {
+            return $unresolvedNames;
+        }
 
         return $this->appendUnresolvedClassName($resolvedName, $unresolvedNames, $name);
     }
@@ -95,7 +108,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
     private function appendUnresolvedClassName(string $nameText, array $unresolvedNames, QualifiedName $name): array
     {
         try {
-            $this->reflector->sourceCodeForClassLike($nameText);
+            $class = $this->reflector->sourceCodeForClassLike($nameText);
         } catch (NotFound $notFound) {
             $unresolvedNames[] = new NameWithByteOffset(
                 PhpactorQualifiedName::fromString($nameText),

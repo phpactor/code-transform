@@ -16,6 +16,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
     /**
      * @dataProvider provideReturnsUnresolableFunctions
      * @dataProvider provideReturnsUnresolableClass
+     * @dataProvider provideConstants
      */
     public function testReturnsUnresolableClass(string $manifest, array $expectedNames)
     {
@@ -42,12 +43,16 @@ EOT
             , []
         ];
 
-        yield 'resolvable class' => [
+        yield 'resolvable class in method' => [
             <<<'EOT'
 // File: test.php
-<?php class Foo() {} new Foo();
+<?php class Foo { public function bar(Bar $bar) {} }
 EOT
             , [
+                new NameWithByteOffset(
+                    QualifiedName::fromString('Bar'),
+                    ByteOffset::fromInt(38)
+                ),
             ]
         ];
 
@@ -185,6 +190,18 @@ EOT
             <<<'EOT'
 // File: test.php
 <?php namespace Foobar; function foo() {} foo();
+EOT
+            ,[
+            ]
+        ];
+    }
+
+    public function provideConstants(): Generator
+    {
+        yield 'global constant' => [
+            <<<'EOT'
+// File: test.php
+<?php namespace Foobar; INF;
 EOT
             ,[
             ]
