@@ -55,6 +55,17 @@ EOT
                 ),
             ]
         ];
+        
+        yield 'class imported in list' => [
+            <<<'EOT'
+// File: test.php
+<?php use Bar\{Foo}; Foo::foo();
+// File: Bar.php
+<?php namespace Bar; class Foo {}
+EOT
+            , [
+            ]
+        ];
 
         yield 'unresolvable class' => [
             <<<'EOT'
@@ -192,6 +203,17 @@ EOT
 <?php namespace Foobar; function foo() {} foo();
 EOT
             ,[
+            ]
+        ];
+
+        yield 'function imported in list' => [
+            <<<'EOT'
+// File: test.php
+<?php use function Bar\{foo}; foo();
+// File: Bar.php
+<?php namespace Bar; function foo() {}
+EOT
+            , [
             ]
         ];
     }
