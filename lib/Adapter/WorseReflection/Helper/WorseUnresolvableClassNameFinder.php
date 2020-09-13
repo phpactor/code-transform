@@ -3,6 +3,8 @@
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Helper;
 
 use Microsoft\PhpParser\Node;
+use Microsoft\PhpParser\Node\ClassBaseClause;
+use Microsoft\PhpParser\Node\DelimitedList\QualifiedNameList;
 use Microsoft\PhpParser\Node\Expression\CallExpression;
 use Microsoft\PhpParser\Node\Expression\ObjectCreationExpression;
 use Microsoft\PhpParser\Node\Expression\ScopedPropertyAccessExpression;
@@ -78,11 +80,14 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
             return $this->appendUnresolvedFunctionName($name->getNamespacedName()->__toString(), $unresolvedNames, $name);
         }
 
-        // If node cannot provide a "resolved" name then this is not a valid
-        // candidate (e.g. it may be part of a namespace statement) and we can
-        // ignore it.
-        if (!$resolvedName || in_array($resolvedName, ['self', 'static', 'parent'])) {
+        if (in_array($resolvedName, ['self', 'static', 'parent'])) {
             return $unresolvedNames;
+        }
+
+        // if the tolerant parser did not provide the resolved name (because of
+        // bug) then use the namespaced name.
+        if (!$resolvedName) {
+            $resolvedName = $name->getNamespacedName();
         }
 
         // Function names in global namespace have a "resolved name"
@@ -92,6 +97,8 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         }
 
         if (
+            !$name->parent instanceof ClassBaseClause &&
+            !$name->parent instanceof QualifiedNameList &&
             !$name->parent instanceof ObjectCreationExpression &&
             !$name->parent instanceof ScopedPropertyAccessExpression &&
             !$name->parent instanceof FunctionDeclaration &&

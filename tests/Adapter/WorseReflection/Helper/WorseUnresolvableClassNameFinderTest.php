@@ -117,6 +117,56 @@ EOT
             ]
         ];
 
+        yield 'interfaces' => [
+            <<<'EOT'
+// File: test.php
+<?php 
+
+class Bar implements Sugar {}
+EOT
+,
+            [
+                new NameWithByteOffset(
+                    QualifiedName::fromString('Sugar'),
+                    ByteOffset::fromInt(29)
+                ),
+            ]
+        ];
+
+        yield 'parent' => [
+            <<<'EOT'
+// File: test.php
+<?php 
+
+class Bar extends Sugar {}
+EOT
+,
+            [
+                new NameWithByteOffset(
+                    QualifiedName::fromString('Sugar'),
+                    ByteOffset::fromInt(26)
+                ),
+            ]
+        ];
+
+        yield 'trait' => [
+            <<<'EOT'
+// File: test.php
+<?php 
+
+class Bar {
+    use Sugar;
+}
+EOT
+,
+            [
+                new NameWithByteOffset(
+                    QualifiedName::fromString('Sugar'),
+                    ByteOffset::fromInt(28)
+                ),
+            ]
+        ];
+
         yield 'external resolvable class' => [
             <<<'EOT'
 // File: Foobar.php
