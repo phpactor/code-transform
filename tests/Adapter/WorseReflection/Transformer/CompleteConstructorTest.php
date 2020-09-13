@@ -93,6 +93,40 @@ EOT
 
         ];
 
+        yield  'It does nothing on an empty constructor in currency class' => [
+            <<<'EOT'
+<?php
+class Barfoo
+{
+    private $bar;
+    public function __construct(string $bar)
+    {
+        $this->bar = $bar;
+    }
+}
+
+class Foobar extends Barfoo
+{
+}
+EOT
+        ,
+            <<<'EOT'
+<?php
+class Barfoo
+{
+    private $bar;
+    public function __construct(string $bar)
+    {
+        $this->bar = $bar;
+    }
+}
+
+class Foobar extends Barfoo
+{
+}
+EOT
+        ];
+
         yield  'It does nothing with no constructor' => [
             <<<'EOT'
 <?php

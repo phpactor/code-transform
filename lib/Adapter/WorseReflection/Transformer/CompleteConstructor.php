@@ -94,7 +94,7 @@ class CompleteConstructor implements Transformer
                 continue;
             }
         
-            if (!$class->methods()->has('__construct')) {
+            if (!$class->methods()->belongingTo($class->name())->has('__construct')) {
                 continue;
             }
 
@@ -109,7 +109,7 @@ class CompleteConstructor implements Transformer
     {
         $diagnostics = [];
         foreach ($this->candidateClasses($source) as $class) {
-            $constructMethod = $class->methods()->get('__construct');
+            $constructMethod = $class->methods()->belongingTo($class->name())->get('__construct');
             assert($constructMethod instanceof ReflectionMethod);
             foreach ($constructMethod->parameters() as $parameter) {
                 assert($parameter instanceof ReflectionParameter);
