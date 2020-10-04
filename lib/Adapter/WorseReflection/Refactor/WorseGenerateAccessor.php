@@ -41,12 +41,12 @@ class WorseGenerateAccessor implements GenerateAccessor
         Reflector $reflector,
         Updater $updater,
         string $prefix = '',
-        bool $upperCaseFirst = false
+        bool $upperCaseFirst = null
     ) {
         $this->reflector = $reflector;
         $this->updater = $updater;
         $this->prefix = $prefix;
-        $this->upperCaseFirst = $upperCaseFirst;
+        $this->upperCaseFirst = ($prefix && $upperCaseFirst === null) || $upperCaseFirst;
     }
 
     public function generate(SourceCode $sourceCode, string $propertyName, int $offset): SourceCode

@@ -16,7 +16,7 @@ class WorseGenerateAccessorTest extends WorseTestCase
         string $test,
         string $propertyName,
         string $prefix = '',
-        bool $upperCaseFirst = false
+        ?bool $upperCaseFirst = null
     ) {
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(
             __DIR__ . '/fixtures/' . $test
@@ -67,6 +67,17 @@ class WorseGenerateAccessorTest extends WorseTestCase
             'multiple-classes' => [
                 'generateAccessor6.test',
                 $propertyName,
+            ],
+            'prefix but ucfirst by default' => [
+                'generateAccessor7.test',
+                $propertyName,
+                'get',
+            ],
+            'prefix but ucfirst to false' => [
+                'generateAccessor8.test',
+                $propertyName,
+                'get',
+                false,
             ],
         ];
     }
