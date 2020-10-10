@@ -4,6 +4,7 @@ namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 
 use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\NamespacedNameInterface;
+use Microsoft\PhpParser\Node\SourceFileNode;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameImport;
 use Phpactor\CodeTransform\Domain\Refactor\ImportName;
 use Microsoft\PhpParser\Parser;
@@ -46,11 +47,7 @@ class TolerantImportName implements ImportName
     public function importName(SourceCode $source, ByteOffset $offset, NameImport $nameImport): TextEdits
     {
         $sourceNode = $this->parser->parseSourceFile($source);
-        $node = $sourceNode->getDescendantNodeAtPosition($offset->toInt());
-
-        if (!$node instanceof NamespacedNameInterface) {
-            return TextEdits::none();
-        }
+        $node = $this->getLastNodeAtPosition($sourceNode, $offset);
 
         $this->assertNotAlreadyImported($node, $nameImport);
 
@@ -173,5 +170,28 @@ class TolerantImportName implements ImportName
         }
 
         $builder->use($nameImport->name()->__toString(), $nameImport->alias());
+    }
+
+    private function getLastNodeAtPosition(SourceFileNode $sourceNode, ByteOffset $offset): Node
+    {
+        $node = $sourceNode->getDescendantNodeAtPosition($offset->toInt());
+
+        /*
+         * In case the cursor is not on a recognized node we need to find the
+         * first available node after the cusror in order to make sure the
+         * import table will be loaded.
+         */
+        if ($node instanceof SourceFileNode) {
+            /** @var Node $childNode */
+            foreach ($node->getChildNodes() as $childNode) {
+                if ($childNode->getStart() > $offset->toInt()) {
+                    break;
+                }
+
+                $node = $childNode;
+            }
+        }
+
+        return $node;
     }
 }
