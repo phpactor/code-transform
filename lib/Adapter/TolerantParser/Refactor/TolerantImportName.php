@@ -9,7 +9,6 @@ use Phpactor\CodeTransform\Domain\Refactor\ImportName;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Microsoft\PhpParser\Node\QualifiedName;
-use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameAlreadyImportedException;
 use Phpactor\CodeTransform\Domain\ClassName;
 use Phpactor\CodeBuilder\Domain\Updater;
@@ -64,21 +63,6 @@ class TolerantImportName implements ImportName
         return $edits;
     }
 
-    private function nameFromQualifiedName(QualifiedName $node): string
-    {
-        $parts = $node->getNameParts();
-
-        if (count($parts) === 0) {
-            throw new TransformException(sprintf(
-                'Name must have at least one part (this shouldn\'t happen'
-            ));
-        }
-
-        $name = array_shift($parts);
-
-        return $name->getText($node->getFileContents());
-    }
-
     private function assertNotAlreadyImported(Node $node, NameImport $nameImport): void
     {
         $currentClass = $this->currentClass($node);
@@ -117,7 +101,6 @@ class TolerantImportName implements ImportName
 
         return false;
     }
-
 
     private function addImport(SourceCode $source, NameImport $nameImport): TextEdits
     {
