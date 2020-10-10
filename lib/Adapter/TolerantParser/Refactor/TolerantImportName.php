@@ -55,7 +55,7 @@ class TolerantImportName implements ImportName
 
         $this->assertNotAlreadyImported($node, $nameImport);
 
-        $edits = $this->addImport($source, $node, $nameImport);
+        $edits = $this->addImport($source, $nameImport);
 
         if ($nameImport->alias() !== null) {
             $edits = $this->updateReferences($node, $nameImport, $edits);
@@ -119,7 +119,7 @@ class TolerantImportName implements ImportName
     }
 
 
-    private function addImport(SourceCode $source, Node $node, NameImport $nameImport): TextEdits
+    private function addImport(SourceCode $source, NameImport $nameImport): TextEdits
     {
         $builder = SourceCodeBuilder::create();
 
