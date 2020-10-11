@@ -3,6 +3,7 @@
     "description": "Applies introspective transformations on source code",
     "license": "MIT",
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "Daniel Leech",
