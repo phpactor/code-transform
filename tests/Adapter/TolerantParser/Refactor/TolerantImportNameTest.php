@@ -27,49 +27,49 @@ class TolerantImportNameTest extends TolerantTestCase
 
     public function provideImportClass()
     {
-        /* yield 'with existing class imports' => [ */
-        /*     'importClass1.test', */
-        /*     'Barfoo\Foobar', */
-        /* ]; */
+        yield 'with existing class imports' => [
+            'importClass1.test',
+            'Barfoo\Foobar',
+        ];
 
-        /* yield 'with namespace' => [ */
-        /*     'importClass2.test', */
-        /*     'Barfoo\Foobar', */
-        /* ]; */
+        yield 'with namespace' => [
+            'importClass2.test',
+            'Barfoo\Foobar',
+        ];
 
-        /* yield 'with no namespace declaration or use statements' => [ */
-        /*     'importClass3.test', */
-        /*     'Barfoo\Foobar', */
-        /* ]; */
+        yield 'with no namespace declaration or use statements' => [
+            'importClass3.test',
+            'Barfoo\Foobar',
+        ];
 
-        /* yield 'with alias' => [ */
-        /*     'importClass4.test', */
-        /*     'Barfoo\Foobar', */
-        /*     'Barfoo', */
-        /* ]; */
+        yield 'with alias' => [
+            'importClass4.test',
+            'Barfoo\Foobar',
+            'Barfoo',
+        ];
 
-        /* yield 'with static alias' => [ */
-        /*     'importClass5.test', */
-        /*     'Barfoo\Foobar', */
-        /*     'Barfoo', */
-        /* ]; */
+        yield 'with static alias' => [
+            'importClass5.test',
+            'Barfoo\Foobar',
+            'Barfoo',
+        ];
 
-        /* yield 'with multiple aliases' => [ */
-        /*     'importClass6.test', */
-        /*     'Barfoo\Foobar', */
-        /*     'Barfoo', */
-        /* ]; */
+        yield 'with multiple aliases' => [
+            'importClass6.test',
+            'Barfoo\Foobar',
+            'Barfoo',
+        ];
 
-        /* yield 'with alias and existing name' => [ */
-        /*     'importClass7.test', */
-        /*     'Barfoo\Foobar', */
-        /*     'Barfoo', */
-        /* ]; */
+        yield 'with alias and existing name' => [
+            'importClass7.test',
+            'Barfoo\Foobar',
+            'Barfoo',
+        ];
 
-        /* yield 'with class in root namespace' => [ */
-        /*     'importClass8.test', */
-        /*     'Foobar', */
-        /* ]; */
+        yield 'with class in root namespace' => [
+            'importClass8.test',
+            'Foobar',
+        ];
 
         yield 'from phpdoc' => [
             'importClass9.test',
