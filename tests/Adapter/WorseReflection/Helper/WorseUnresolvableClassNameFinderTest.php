@@ -149,7 +149,7 @@ EOT
             ]
         ];
 
-        yield 'trait' => [
+        yield 'unresolvable trait' => [
             <<<'EOT'
 // File: test.php
 <?php 
@@ -165,6 +165,100 @@ EOT
                     ByteOffset::fromInt(28)
                 ),
             ]
+        ];
+
+        yield 'resolvable fully qualified trait' => [
+            <<<'EOT'
+// File: test.php
+<?php 
+
+namespace Test;
+
+class Bar {
+    use \App\Sugar;
+}
+// File: Sugar.php
+<?php 
+
+namespace App;
+
+trait Sugar {
+}
+EOT
+,
+            []
+        ];
+
+        yield 'resolvable partially qualified trait' => [
+            <<<'EOT'
+// File: test.php
+<?php 
+
+namespace Test;
+
+use App;
+
+class Bar {
+    use App\Sugar;
+}
+// File: Sugar.php
+<?php 
+
+namespace App;
+
+trait Sugar {
+}
+EOT
+,
+            []
+        ];
+
+        yield 'resolvable unqualified trait' => [
+            <<<'EOT'
+// File: test.php
+<?php 
+
+namespace Test;
+
+use App\Sugar;
+
+class Bar {
+    use Sugar;
+}
+// File: Sugar.php
+<?php 
+
+namespace App;
+
+trait Sugar {
+}
+EOT
+,
+            []
+        ];
+
+        yield 'resolvable alias trait' => [
+            <<<'EOT'
+// File: test.php
+<?php 
+
+namespace Test;
+
+use App\Sugar as SweetSugar;
+
+class Bar {
+    use SweetSugar;
+}
+// File: Sugar.php
+<?php 
+
+namespace App;
+
+trait Sugar {
+}
+EOT
+,
+            []
         ];
 
         yield 'external resolvable class' => [
