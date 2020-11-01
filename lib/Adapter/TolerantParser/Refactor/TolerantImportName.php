@@ -4,12 +4,12 @@ namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 
 use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\NamespacedNameInterface;
+use Microsoft\PhpParser\Node\SourceFileNode;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameImport;
 use Phpactor\CodeTransform\Domain\Refactor\ImportName;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Microsoft\PhpParser\Node\QualifiedName;
-use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameAlreadyImportedException;
 use Phpactor\CodeTransform\Domain\ClassName;
 use Phpactor\CodeBuilder\Domain\Updater;
@@ -47,36 +47,17 @@ class TolerantImportName implements ImportName
     public function importName(SourceCode $source, ByteOffset $offset, NameImport $nameImport): TextEdits
     {
         $sourceNode = $this->parser->parseSourceFile($source);
-        $node = $sourceNode->getDescendantNodeAtPosition($offset->toInt());
-
-        if (!$node instanceof NamespacedNameInterface) {
-            return TextEdits::none();
-        }
+        $node = $this->getLastNodeAtPosition($sourceNode, $offset);
 
         $this->assertNotAlreadyImported($node, $nameImport);
 
-        $edits = $this->addImport($source, $node, $nameImport);
+        $edits = $this->addImport($source, $nameImport);
 
         if ($nameImport->alias() !== null) {
             $edits = $this->updateReferences($node, $nameImport, $edits);
         }
 
         return $edits;
-    }
-
-    private function nameFromQualifiedName(QualifiedName $node): string
-    {
-        $parts = $node->getNameParts();
-
-        if (count($parts) === 0) {
-            throw new TransformException(sprintf(
-                'Name must have at least one part (this shouldn\'t happen'
-            ));
-        }
-
-        $name = array_shift($parts);
-
-        return $name->getText($node->getFileContents());
     }
 
     private function assertNotAlreadyImported(Node $node, NameImport $nameImport): void
@@ -118,8 +99,7 @@ class TolerantImportName implements ImportName
         return false;
     }
 
-
-    private function addImport(SourceCode $source, Node $node, NameImport $nameImport): TextEdits
+    private function addImport(SourceCode $source, NameImport $nameImport): TextEdits
     {
         $builder = SourceCodeBuilder::create();
 
@@ -190,5 +170,28 @@ class TolerantImportName implements ImportName
         }
 
         $builder->use($nameImport->name()->__toString(), $nameImport->alias());
+    }
+
+    private function getLastNodeAtPosition(SourceFileNode $sourceNode, ByteOffset $offset): Node
+    {
+        $node = $sourceNode->getDescendantNodeAtPosition($offset->toInt());
+
+        /*
+         * In case the cursor is not on a recognized node we need to find the
+         * first available node after the cusror in order to make sure the
+         * import table will be loaded.
+         */
+        if ($node instanceof SourceFileNode) {
+            /** @var Node $childNode */
+            foreach ($node->getChildNodes() as $childNode) {
+                if ($childNode->getStart() > $offset->toInt()) {
+                    break;
+                }
+
+                $node = $childNode;
+            }
+        }
+
+        return $node;
     }
 }

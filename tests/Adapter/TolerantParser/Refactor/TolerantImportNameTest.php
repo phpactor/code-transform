@@ -70,6 +70,16 @@ class TolerantImportNameTest extends TolerantTestCase
             'importClass8.test',
             'Foobar',
         ];
+
+        yield 'from phpdoc' => [
+            'importClass9.test',
+            'Barfoo\Foobar',
+        ];
+
+        yield 'from phpdoc (resolved in a SourceFileNode)' => [
+            'importClass10.test',
+            'Barfoo\Foobar',
+        ];
     }
 
     public function testThrowsExceptionIfClassAlreadyImported()
