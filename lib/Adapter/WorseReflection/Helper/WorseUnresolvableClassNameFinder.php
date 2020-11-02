@@ -19,6 +19,7 @@ use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\Helper\UnresolvableClassNameFinder;
 use Phpactor\TextDocument\ByteOffset;
 use Phpactor\TextDocument\TextDocument;
+use Phpactor\WorseReflection\Bridge\TolerantParser\Patch\TolerantQualifiedNameResolver;
 use Phpactor\WorseReflection\Core\Exception\NotFound;
 use Phpactor\WorseReflection\Reflector;
 
@@ -72,7 +73,8 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
 
     private function appendUnresolvedName(QualifiedName $name, array $unresolvedNames): array
     {
-        $resolvedName = (string)$name->getResolvedName();
+        // Tolerant parser does not resolve names for constructs that define symbol names or aliases
+        $resolvedName = TolerantQualifiedNameResolver::getResolvedName($name);
 
         // Parser returns "NULL" for unqualified namespaced function / constant
         // names, but will return the FQN for references...
