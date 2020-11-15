@@ -406,5 +406,26 @@ EOT
             '<?php class A { private $bar; public function bar() { $this->bar = "foo"; } }',
             0
         ];
+
+        yield 'ignores property from another class' => [
+            <<<'EOT'
+<?php
+
+namespace Test;
+
+use Test\Yet\AnotherClass;
+
+class Foo
+{
+    public function test(AnotherClass $anotherClass): void
+    {
+        assert($anotherClass->doesNotMatter instanceof SecretImplementation);
+
+        $anotherClass->doesNotMatter = 'test';
+    }
+}
+EOT
+            , 0
+        ];
     }
 }
