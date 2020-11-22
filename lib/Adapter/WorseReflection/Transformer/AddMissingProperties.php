@@ -111,6 +111,16 @@ class AddMissingProperties implements Transformer
 
                 foreach ($frame->properties() as $assignedProperty) {
                     assert($assignedProperty instanceof Variable);
+
+                    $assignedPropertyClass = $assignedProperty->symbolContext()->containerType();
+
+                    if (
+                        $assignedPropertyClass
+                        && $class->name() != $assignedPropertyClass->className()
+                    ) {
+                        continue;
+                    }
+
                     if ($class->properties()->has($assignedProperty->name())) {
                         continue;
                     }
