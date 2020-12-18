@@ -2,8 +2,6 @@ parameters:
     checkMissingIterableValueType: false
     level: 7
     inferPrivatePropertyTypeFromConstructor: true
-    ignoreErrors:
-        
+    ignoreErrors: null
     paths:
         - lib
-
