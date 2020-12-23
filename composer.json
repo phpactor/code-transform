@@ -2,8 +2,6 @@
     "name": "phpactor/code-transform",
     "description": "Applies introspective transformations on source code",
     "license": "MIT",
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "authors": [
         {
             "name": "Daniel Leech",
@@ -12,18 +10,24 @@
     ],
     "require": {
         "php": "^7.3",
-        "phpactor/code-builder": "^0.4.1",
-        "webmozart/path-util": "~2.3",
         "phpactor/class-to-file": "~0.3",
+        "phpactor/code-builder": "^0.4.1",
         "phpactor/name-specification": "^0.1",
         "phpactor/text-document": "^1.2.3",
-        "phpactor/worse-reflection": "^0.4.4"
+        "phpactor/worse-reflection": "^0.4.4",
+        "webmozart/path-util": "~2.3"
     },
     "require-dev": {
+        "ergebnis/composer-normalize": "^2.0",
+        "friendsofphp/php-cs-fixer": "^2.17",
         "phpactor/test-utils": "^1.0@dev",
         "phpstan/phpstan": "~0.12.0",
-        "phpunit/phpunit": "^8.0",
-        "friendsofphp/php-cs-fixer": "~2.15.0"
+        "phpunit/phpunit": "^8.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.4.x-dev"
+        }
     },
     "autoload": {
         "psr-4": {
@@ -35,11 +39,8 @@
             "Phpactor\\CodeTransform\\Tests\\": "tests/"
         }
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "0.4.x-dev"
-        }
-    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "scripts": {
         "integrate": [
             "./vendor/bin/php-cs-fixer fix",
