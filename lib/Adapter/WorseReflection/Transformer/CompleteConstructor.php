@@ -48,18 +48,23 @@ class CompleteConstructor implements Transformer
             $constructMethod = $class->methods()->get('__construct');
             $methodBody = (string) $constructMethod->body();
 
-            foreach ($constructMethod->parameters() as $parameter) {
+            foreach ($constructMethod->parameters()->notPromoted() as $parameter) {
                 if (preg_match('{this\s*->' . $parameter->name() . '}', $methodBody)) {
                     continue;
                 }
                 $methodBuilder->body()->line('$this->' . $parameter->name() . ' = $' . $parameter->name() .';');
             }
 
-            foreach ($constructMethod->parameters() as $parameter) {
+            foreach ($constructMethod->parameters()->notPromoted() as $parameter) {
+                if ($parameter->isPromoted()) {
+                    continue;
+                }
+
                 assert($parameter instanceof ReflectionParameter);
                 if (true === $class->properties()->has($parameter->name())) {
                     continue;
                 }
+
 
                 $propertyBuilder = $classBuilder->property($parameter->name());
                 $propertyBuilder->visibility('private');
@@ -111,7 +116,7 @@ class CompleteConstructor implements Transformer
         foreach ($this->candidateClasses($source) as $class) {
             $constructMethod = $class->methods()->belongingTo($class->name())->get('__construct');
             assert($constructMethod instanceof ReflectionMethod);
-            foreach ($constructMethod->parameters() as $parameter) {
+            foreach ($constructMethod->parameters()->notPromoted() as $parameter) {
                 assert($parameter instanceof ReflectionParameter);
                 $frame = $constructMethod->frame();
 

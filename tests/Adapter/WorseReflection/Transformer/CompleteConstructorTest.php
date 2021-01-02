@@ -498,5 +498,36 @@ class Foobar
 EOT
 
         ];
+
+        yield  'Ignores promoted properties' => [
+            <<<'EOT'
+<?php
+
+class Foobar
+{
+    public function __construct(Foobar $foo, private Barfoo $bar)
+    {
+    }
+}
+EOT
+        ,
+            <<<'EOT'
+<?php
+
+class Foobar
+{
+    /**
+     * @var Foobar
+     */
+    private $foo;
+
+    public function __construct(Foobar $foo, private Barfoo $bar)
+    {
+        $this->foo = $foo;
+    }
+}
+EOT
+
+        ];
     }
 }
