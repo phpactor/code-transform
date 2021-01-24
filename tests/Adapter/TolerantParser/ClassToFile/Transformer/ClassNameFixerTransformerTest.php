@@ -71,7 +71,7 @@ class ClassNameFixerTransformerTest extends AdapterTestCase
         ];
     }
 
-    public function testThrowsExceptionIfSourceCodeHasNoPath()
+    public function testThrowsExceptionIfSourceCodeHasNoPath(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Source code has no path');
@@ -90,11 +90,11 @@ class ClassNameFixerTransformerTest extends AdapterTestCase
         $source = SourceCode::fromStringAndPath('', $this->workspace()->path('/PathTo/FileOne.php'));
         $transformed = $transformer->transform($source);
         $this->assertEquals(<<<'EOT'
-<?php
+            <?php
 
-namespace PathTo;
+            namespace PathTo;
 
-EOT
+            EOT
         , (string) $transformed->apply($source));
     }
 
@@ -105,14 +105,14 @@ EOT
         }
 
         $composer = <<<'EOT'
-{
-"autoload": {
-    "psr-4": {
-        "": ""
-    }
-}
-}
-EOT
+            {
+            "autoload": {
+                "psr-4": {
+                    "": ""
+                }
+            }
+            }
+            EOT
         ;
         file_put_contents($workspace->path('/composer.json'), $composer);
         $cwd = getcwd();

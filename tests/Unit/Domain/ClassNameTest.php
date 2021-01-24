@@ -10,7 +10,7 @@ class ClassNameTest extends TestCase
     /**
      * It returns the namespace
      */
-    public function testNamespace()
+    public function testNamespace(): void
     {
         $class = ClassName::fromString('This\\Is\\A\\Namespace\\ClassName');
         $this->assertEquals('This\\Is\\A\\Namespace', $class->namespace());
@@ -19,7 +19,7 @@ class ClassNameTest extends TestCase
     /**
      * It returns empty strsing if no namespace
      */
-    public function testNamespaceNone()
+    public function testNamespaceNone(): void
     {
         $class = ClassName::fromString('ClassName');
         $this->assertEquals('', $class->namespace());
@@ -28,7 +28,7 @@ class ClassNameTest extends TestCase
     /**
      * @testdox It returns the class short name
      */
-    public function testShort()
+    public function testShort(): void
     {
         $class = ClassName::fromString('Namespace\\ClassName');
         $this->assertEquals('ClassName', $class->short());
@@ -37,7 +37,7 @@ class ClassNameTest extends TestCase
     /**
      * @testdox It returns the class short name with no namespace
      */
-    public function testShortNoNamespace()
+    public function testShortNoNamespace(): void
     {
         $class = ClassName::fromString('ClassName');
         $this->assertEquals('ClassName', $class->short());
@@ -46,7 +46,7 @@ class ClassNameTest extends TestCase
     /**
      * @testdox It throws exception if classname is empty.
      */
-    public function testEmpty()
+    public function testEmpty(): void
     {
         $this->expectExceptionMessage('Class name cannot be empty');
         ClassName::fromString('');

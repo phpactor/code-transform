@@ -18,7 +18,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
      * @dataProvider provideReturnsUnresolableClass
      * @dataProvider provideConstants
      */
-    public function testReturnsUnresolableClass(string $manifest, array $expectedNames)
+    public function testReturnsUnresolableClass(string $manifest, array $expectedNames): void
     {
         $this->workspace()->reset();
         $this->workspace()->loadManifest($manifest);
@@ -37,17 +37,17 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
     {
         yield 'no classes' => [
             <<<'EOT'
-// File: test.php
-<?
-EOT
+                // File: test.php
+                <?
+                EOT
             , []
         ];
 
         yield 'resolvable class in method' => [
             <<<'EOT'
-// File: test.php
-<?php class Foo { public function bar(Bar $bar) {} }
-EOT
+                // File: test.php
+                <?php class Foo { public function bar(Bar $bar) {} }
+                EOT
             , [
                 new NameWithByteOffset(
                     QualifiedName::fromString('Bar'),
@@ -58,20 +58,20 @@ EOT
         
         yield 'class imported in list' => [
             <<<'EOT'
-// File: test.php
-<?php use Bar\{Foo}; Foo::foo();
-// File: Bar.php
-<?php namespace Bar; class Foo {}
-EOT
+                // File: test.php
+                <?php use Bar\{Foo}; Foo::foo();
+                // File: Bar.php
+                <?php namespace Bar; class Foo {}
+                EOT
             , [
             ]
         ];
 
         yield 'unresolvable class' => [
             <<<'EOT'
-// File: test.php
-<?php new NotFound();
-EOT
+                // File: test.php
+                <?php new NotFound();
+                EOT
             ,[
                 new NameWithByteOffset(
                     QualifiedName::fromString('NotFound'),
@@ -82,9 +82,9 @@ EOT
 
         yield 'namespaced unresolvable class' => [
             <<<'EOT'
-// File: test.php
-<?php namespace Foo; new NotFound();
-EOT
+                // File: test.php
+                <?php namespace Foo; new NotFound();
+                EOT
             , [
                 new NameWithByteOffset(
                     QualifiedName::fromString('Foo\\NotFound'),
@@ -95,15 +95,15 @@ EOT
 
         yield 'multiple unresolvable classes' => [
             <<<'EOT'
-// File: test.php
-<?php 
+                // File: test.php
+                <?php 
 
-new Bar\NotFound();
+                new Bar\NotFound();
 
-class Bar {}
+                class Bar {}
 
-new NotFound36();
-EOT
+                new NotFound36();
+                EOT
 ,
             [
                 new NameWithByteOffset(
@@ -119,11 +119,11 @@ EOT
 
         yield 'interfaces' => [
             <<<'EOT'
-// File: test.php
-<?php 
+                // File: test.php
+                <?php 
 
-class Bar implements Sugar {}
-EOT
+                class Bar implements Sugar {}
+                EOT
 ,
             [
                 new NameWithByteOffset(
@@ -135,11 +135,11 @@ EOT
 
         yield 'parent' => [
             <<<'EOT'
-// File: test.php
-<?php 
+                // File: test.php
+                <?php 
 
-class Bar extends Sugar {}
-EOT
+                class Bar extends Sugar {}
+                EOT
 ,
             [
                 new NameWithByteOffset(
@@ -151,13 +151,13 @@ EOT
 
         yield 'unresolvable trait' => [
             <<<'EOT'
-// File: test.php
-<?php 
+                // File: test.php
+                <?php 
 
-class Bar {
-    use Sugar;
-}
-EOT
+                class Bar {
+                    use Sugar;
+                }
+                EOT
 ,
             [
                 new NameWithByteOffset(
@@ -169,113 +169,113 @@ EOT
 
         yield 'resolvable fully qualified trait' => [
             <<<'EOT'
-// File: test.php
-<?php 
+                // File: test.php
+                <?php 
 
-namespace Test;
+                namespace Test;
 
-class Bar {
-    use \App\Sugar;
-}
-// File: Sugar.php
-<?php 
+                class Bar {
+                    use \App\Sugar;
+                }
+                // File: Sugar.php
+                <?php 
 
-namespace App;
+                namespace App;
 
-trait Sugar {
-}
-EOT
+                trait Sugar {
+                }
+                EOT
 ,
             []
         ];
 
         yield 'resolvable partially qualified trait' => [
             <<<'EOT'
-// File: test.php
-<?php 
+                // File: test.php
+                <?php 
 
-namespace Test;
+                namespace Test;
 
-use App;
+                use App;
 
-class Bar {
-    use App\Sugar;
-}
-// File: Sugar.php
-<?php 
+                class Bar {
+                    use App\Sugar;
+                }
+                // File: Sugar.php
+                <?php 
 
-namespace App;
+                namespace App;
 
-trait Sugar {
-}
-EOT
+                trait Sugar {
+                }
+                EOT
 ,
             []
         ];
 
         yield 'resolvable unqualified trait' => [
             <<<'EOT'
-// File: test.php
-<?php 
+                // File: test.php
+                <?php 
 
-namespace Test;
+                namespace Test;
 
-use App\Sugar;
+                use App\Sugar;
 
-class Bar {
-    use Sugar;
-}
-// File: Sugar.php
-<?php 
+                class Bar {
+                    use Sugar;
+                }
+                // File: Sugar.php
+                <?php 
 
-namespace App;
+                namespace App;
 
-trait Sugar {
-}
-EOT
+                trait Sugar {
+                }
+                EOT
 ,
             []
         ];
 
         yield 'resolvable alias trait' => [
             <<<'EOT'
-// File: test.php
-<?php 
+                // File: test.php
+                <?php 
 
-namespace Test;
+                namespace Test;
 
-use App\Sugar as SweetSugar;
+                use App\Sugar as SweetSugar;
 
-class Bar {
-    use SweetSugar;
-}
-// File: Sugar.php
-<?php 
+                class Bar {
+                    use SweetSugar;
+                }
+                // File: Sugar.php
+                <?php 
 
-namespace App;
+                namespace App;
 
-trait Sugar {
-}
-EOT
+                trait Sugar {
+                }
+                EOT
 ,
             []
         ];
 
         yield 'external resolvable class' => [
             <<<'EOT'
-// File: Foobar.php
-<?php
+                // File: Foobar.php
+                <?php
 
-namespace Foobar;
+                namespace Foobar;
 
-class Barfoo {}
-// File: test.php
-<?php 
+                class Barfoo {}
+                // File: test.php
+                <?php 
 
-use Foobar\Barfoo;
+                use Foobar\Barfoo;
 
-new Barfoo();
-EOT
+                new Barfoo();
+                EOT
 ,
             [
             ]
@@ -283,19 +283,19 @@ EOT
 
         yield 'reserved names' => [
             <<<'EOT'
-// File: test.php
-<?php
+                // File: test.php
+                <?php
 
-namespace Foobar;
+                namespace Foobar;
 
-class Barfoo { 
-    public function foo(): self {}
-    public function bar(): {
-        static::foo();
-        parent::foo();
-    }
-}
-EOT
+                class Barfoo { 
+                    public function foo(): self {}
+                    public function bar(): {
+                        static::foo();
+                        parent::foo();
+                    }
+                }
+                EOT
 ,
             [
             ]
@@ -306,18 +306,18 @@ EOT
     {
         yield 'resolvable function' => [
             <<<'EOT'
-// File: test.php
-<?php function bar() {} bar();
-EOT
+                // File: test.php
+                <?php function bar() {} bar();
+                EOT
             , [
             ]
         ];
 
         yield 'unresolvable function' => [
             <<<'EOT'
-// File: test.php
-<?php foo();
-EOT
+                // File: test.php
+                <?php foo();
+                EOT
             ,[
                 new NameWithByteOffset(
                     QualifiedName::fromString('foo'),
@@ -329,9 +329,9 @@ EOT
 
         yield 'namespaced unresolveable function' => [
             <<<'EOT'
-// File: test.php
-<?php namespace Foobar; foo();
-EOT
+                // File: test.php
+                <?php namespace Foobar; foo();
+                EOT
             ,[
                 new NameWithByteOffset(
                     QualifiedName::fromString('Foobar\foo'),
@@ -343,20 +343,20 @@ EOT
 
         yield 'resolveable namespaced function' => [
             <<<'EOT'
-// File: test.php
-<?php namespace Foobar; function foo() {} foo();
-EOT
+                // File: test.php
+                <?php namespace Foobar; function foo() {} foo();
+                EOT
             ,[
             ]
         ];
 
         yield 'function imported in list' => [
             <<<'EOT'
-// File: test.php
-<?php use function Bar\{foo}; foo();
-// File: Bar.php
-<?php namespace Bar; function foo() {}
-EOT
+                // File: test.php
+                <?php use function Bar\{foo}; foo();
+                // File: Bar.php
+                <?php namespace Bar; function foo() {}
+                EOT
             , [
             ]
         ];
@@ -366,9 +366,9 @@ EOT
     {
         yield 'global constant' => [
             <<<'EOT'
-// File: test.php
-<?php namespace Foobar; INF;
-EOT
+                // File: test.php
+                <?php namespace Foobar; INF;
+                EOT
             ,[
             ]
         ];

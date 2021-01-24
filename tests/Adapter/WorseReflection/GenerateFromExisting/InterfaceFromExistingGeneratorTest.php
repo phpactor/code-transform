@@ -12,7 +12,7 @@ class InterfaceFromExistingGeneratorTest extends WorseTestCase
      * @testdox Generate interface
      * @dataProvider provideGenerateInterface
      */
-    public function testGenerateInterface(string $className, string $targetName, string $source, string $expected)
+    public function testGenerateInterface(string $className, string $targetName, string $source, string $expected): void
     {
         $reflector = $this->reflectorForWorkspace($source);
         $generator = new InterfaceFromExistingGenerator($reflector, $this->renderer());
@@ -27,118 +27,118 @@ class InterfaceFromExistingGeneratorTest extends WorseTestCase
                 'Music\Beat',
                 'Music\BeatInterface',
                 <<<'EOT'
-<?php
+                    <?php
 
-namespace Music;
+                    namespace Music;
 
-use Sound\Snare;
+                    use Sound\Snare;
 
-class Beat
-{
-    private $foobar;
+                    class Beat
+                    {
+                        private $foobar;
 
-    public function __construct(string $foobar)
-    {
-        $this->foobar = $foobar;
-    }
+                        public function __construct(string $foobar)
+                        {
+                            $this->foobar = $foobar;
+                        }
 
-    /**
-     * This is some documentation.
-     */
-    public function play(Snare $snare = null, int $bar = "boo")
-    {
-        $snare->hit();
-    }
+                        /**
+                         * This is some documentation.
+                         */
+                        public function play(Snare $snare = null, int $bar = "boo")
+                        {
+                            $snare->hit();
+                        }
 
-    public function empty()
-    {
-    }
+                        public function empty()
+                        {
+                        }
 
-    private function something()
-    {
-    }
+                        private function something()
+                        {
+                        }
 
-    protected function somethingElse()
-    {
-    }
-}
-EOT
+                        protected function somethingElse()
+                        {
+                        }
+                    }
+                    EOT
                 , <<<'EOT'
-<?php
+                    <?php
 
-namespace Music;
+                    namespace Music;
 
-use Sound\Snare;
+                    use Sound\Snare;
 
-interface BeatInterface
-{
-    /**
-     * This is some documentation.
-     */
-    public function play(Snare $snare = null, int $bar = 'boo');
+                    interface BeatInterface
+                    {
+                        /**
+                         * This is some documentation.
+                         */
+                        public function play(Snare $snare = null, int $bar = 'boo');
 
-    public function empty();
-}
-EOT
+                        public function empty();
+                    }
+                    EOT
 
             ],
             'Generates interface with return types' => [
                 'Music\Beat',
                 'Music\BeatInterface',
                 <<<'EOT'
-<?php
+                    <?php
 
-namespace Music;
+                    namespace Music;
 
-use Sound\Snare;
+                    use Sound\Snare;
 
-class Beat
-{
-    public function play(Snare $snare = null, int $bar = "boo"): Music
-    {
-    }
-}
-EOT
+                    class Beat
+                    {
+                        public function play(Snare $snare = null, int $bar = "boo"): Music
+                        {
+                        }
+                    }
+                    EOT
                 , <<<'EOT'
-<?php
+                    <?php
 
-namespace Music;
+                    namespace Music;
 
-use Music\Music;
-use Sound\Snare;
+                    use Music\Music;
+                    use Sound\Snare;
 
-interface BeatInterface
-{
-    public function play(Snare $snare = null, int $bar = 'boo'): Music;
-}
-EOT
+                    interface BeatInterface
+                    {
+                        public function play(Snare $snare = null, int $bar = 'boo'): Music;
+                    }
+                    EOT
 
             ],
             'Does not import scalar types' => [
                 'Music\Beat',
                 'Music\BeatInterface',
                 <<<'EOT'
-<?php
+                    <?php
 
-namespace Music;
+                    namespace Music;
 
-class Beat
-{
-    public function play(): string
-    {
-    }
-}
-EOT
+                    class Beat
+                    {
+                        public function play(): string
+                        {
+                        }
+                    }
+                    EOT
                 , <<<'EOT'
-<?php
+                    <?php
 
-namespace Music;
+                    namespace Music;
 
-interface BeatInterface
-{
-    public function play(): string;
-}
-EOT
+                    interface BeatInterface
+                    {
+                        public function play(): string;
+                    }
+                    EOT
 
             ],
         ];

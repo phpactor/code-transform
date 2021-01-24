@@ -13,7 +13,7 @@ class WorseGenerateMethodTest extends WorseTestCase
     /**
      * @dataProvider provideExtractMethod
      */
-    public function testGenerateMethod(string $test, $name = null)
+    public function testGenerateMethod(string $test, $name = null): void
     {
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
@@ -61,29 +61,29 @@ class WorseGenerateMethodTest extends WorseTestCase
         ];
     }
 
-    public function testGenerateOnNonClassInterfaceException()
+    public function testGenerateOnNonClassInterfaceException(): void
     {
         $this->expectException(TransformException::class);
         $this->expectExceptionMessage('Can only generate methods on classes');
         $source = <<<'EOT'
-<?php 
-trait Hello
-{
-}
+            <?php 
+            trait Hello
+            {
+            }
 
-class Goodbye
-{
-    /**
-     * @var Hello
-     */
-    private $hello;
+            class Goodbye
+            {
+                /**
+                 * @var Hello
+                 */
+                private $hello;
 
-    public function greet()
-    {
-        $this->hello->asd();
-    }
-}
-EOT
+                public function greet()
+                {
+                    $this->hello->asd();
+                }
+            }
+            EOT
         ;
 
         $this->generateMethod($source, 152, 'test_name');

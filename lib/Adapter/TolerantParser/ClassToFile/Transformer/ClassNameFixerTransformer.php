@@ -61,6 +61,49 @@ class ClassNameFixerTransformer implements Transformer
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function diagnostics(SourceCode $code): Diagnostics
+    {
+        $rootNode = $this->parser->parseSourceFile((string) $code);
+        try {
+            $classFqn = $this->determineClassFqn($code);
+        } catch (RuntimeException $couldNotFindCandidate) {
+            return Diagnostics::none();
+        }
+        $correctClassName = $classFqn->name();
+        $correctNamespace = $classFqn->namespace();
+
+        $diagnostics = [];
+
+        if (null !== $this->fixNamespace($rootNode, $correctNamespace)) {
+            $namespaceDefinition = $rootNode->getFirstDescendantNode(NamespaceDefinition::class);
+            $diagnostics[] = new Diagnostic(
+                ByteOffsetRange::fromInts(
+                    $namespaceDefinition ? $namespaceDefinition->getStart() : 0,
+                    $namespaceDefinition ? $namespaceDefinition->getEndPosition() : 0,
+                ),
+                sprintf('Namespace should probably be "%s"', $correctNamespace),
+                Diagnostic::WARNING
+            );
+        }
+        if (null !== $edits = $this->fixClassName($rootNode, $correctClassName)) {
+            $classLike = $rootNode->getFirstDescendantNode(ClassLike::class);
+
+            $diagnostics[] = new Diagnostic(
+                ByteOffsetRange::fromInts(
+                    $classLike ? $classLike->getStart() : 0,
+                    $classLike ? $classLike->getEndPosition() : 0
+                ),
+                sprintf('Class name should probably be "%s"', $correctClassName),
+                Diagnostic::WARNING
+            );
+        }
+
+        return new Diagnostics($diagnostics);
+    }
+
+    /**
      * @return TextEdit|null
      */
     private function fixClassName(SourceFileNode $rootNode, string $correctClassName): ?TextEdit
@@ -117,49 +160,6 @@ class ClassNameFixerTransformer implements Transformer
             $namespaceDefinition->getEndPosition() - $namespaceDefinition->getStart(),
             $statement
         );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function diagnostics(SourceCode $code): Diagnostics
-    {
-        $rootNode = $this->parser->parseSourceFile((string) $code);
-        try {
-            $classFqn = $this->determineClassFqn($code);
-        } catch (RuntimeException $couldNotFindCandidate) {
-            return Diagnostics::none();
-        }
-        $correctClassName = $classFqn->name();
-        $correctNamespace = $classFqn->namespace();
-
-        $diagnostics = [];
-
-        if (null !== $this->fixNamespace($rootNode, $correctNamespace)) {
-            $namespaceDefinition = $rootNode->getFirstDescendantNode(NamespaceDefinition::class);
-            $diagnostics[] = new Diagnostic(
-                ByteOffsetRange::fromInts(
-                    $namespaceDefinition ? $namespaceDefinition->getStart() : 0,
-                    $namespaceDefinition ? $namespaceDefinition->getEndPosition() : 0,
-                ),
-                sprintf('Namespace should probably be "%s"', $correctNamespace),
-                Diagnostic::WARNING
-            );
-        }
-        if (null !== $edits = $this->fixClassName($rootNode, $correctClassName)) {
-            $classLike = $rootNode->getFirstDescendantNode(ClassLike::class);
-
-            $diagnostics[] = new Diagnostic(
-                ByteOffsetRange::fromInts(
-                    $classLike ? $classLike->getStart() : 0,
-                    $classLike ? $classLike->getEndPosition() : 0
-                ),
-                sprintf('Class name should probably be "%s"', $correctClassName),
-                Diagnostic::WARNING
-            );
-        }
-
-        return new Diagnostics($diagnostics);
     }
 
     private function determineClassFqn(SourceCode $code): ClassName

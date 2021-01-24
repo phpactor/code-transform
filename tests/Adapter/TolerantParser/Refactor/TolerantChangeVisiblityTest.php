@@ -11,7 +11,7 @@ class TolerantChangeVisiblityTest extends TolerantTestCase
     /**
      * @dataProvider provideChangeVisibility
      */
-    public function testExtractExpression(string $test)
+    public function testExtractExpression(string $test): void
     {
         list($source, $expected, $offsetStart) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 

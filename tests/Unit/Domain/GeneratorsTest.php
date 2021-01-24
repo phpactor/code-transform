@@ -12,7 +12,7 @@ class GeneratorsTest extends TestCase
     /**
      * @testdox It can retrieve and iterate generators.
      */
-    public function testIterateAndRetrieve()
+    public function testIterateAndRetrieve(): void
     {
         $generator1 = $this->prophesize(Generator::class);
         $generator2 = $this->prophesize(Generator::class);

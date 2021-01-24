@@ -3,12 +3,15 @@
 namespace Phpactor\CodeTransform\Domain;
 
 use Countable;
+use IteratorAggregate;
+use ArrayIterator;
+use InvalidArgumentException;
 
 /**
  * @template T
  * @implements \IteratorAggregate<string,T>
  */
-abstract class AbstractCollection implements \IteratorAggregate, Countable
+abstract class AbstractCollection implements IteratorAggregate, Countable
 {
     /**
      * @var array<string, T>
@@ -23,7 +26,7 @@ abstract class AbstractCollection implements \IteratorAggregate, Countable
         foreach ($elements as $name => $element) {
             $type = $this->type();
             if (false === $element instanceof $type) {
-                throw new \InvalidArgumentException(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     'Collection element must be instanceof "%s"',
                     $type
                 ));
@@ -43,7 +46,7 @@ abstract class AbstractCollection implements \IteratorAggregate, Countable
 
     public function getIterator()
     {
-        return new \ArrayIterator($this->elements);
+        return new ArrayIterator($this->elements);
     }
 
     public function names(): array
@@ -57,7 +60,7 @@ abstract class AbstractCollection implements \IteratorAggregate, Countable
     public function get(string $name)
     {
         if (!isset($this->elements[$name])) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Generator "%s" not known, known elements: "%s"',
                 $name,
                 implode('", "', array_keys($this->elements))

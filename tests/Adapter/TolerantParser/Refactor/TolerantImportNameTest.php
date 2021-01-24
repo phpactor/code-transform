@@ -18,7 +18,7 @@ class TolerantImportNameTest extends TolerantTestCase
     /**
      * @dataProvider provideImportClass
      */
-    public function testImportClass(string $test, string $name, string $alias = null)
+    public function testImportClass(string $test, string $name, string $alias = null): void
     {
         list($expected, $transformed) = $this->importNameFromTestFile('class', $test, $name, $alias);
 
@@ -82,52 +82,52 @@ class TolerantImportNameTest extends TolerantTestCase
         ];
     }
 
-    public function testThrowsExceptionIfClassAlreadyImported()
+    public function testThrowsExceptionIfClassAlreadyImported(): void
     {
         $this->expectException(NameAlreadyImportedException::class);
         $this->expectExceptionMessage('Class "DateTime" is already imported');
         $this->importNameFromTestFile('class', 'importClass1.test', 'DateTime');
     }
 
-    public function testThrowsExceptionIfImportedClassIsTheCurrentClass1()
+    public function testThrowsExceptionIfImportedClassIsTheCurrentClass1(): void
     {
         $this->expectException(ClassIsCurrentClassException::class);
         $this->expectExceptionMessage('Class "Foobar" is the current class');
         $this->importName('<?php class Foobar {}', 14, NameImport::forClass('Foobar'));
     }
 
-    public function testThrowsExceptionIfAliasAlredayUsed()
+    public function testThrowsExceptionIfAliasAlredayUsed(): void
     {
         $this->expectException(AliasAlreadyUsedException::class);
         $this->expectExceptionMessage('Class alias "DateTime" is already used');
         $this->importNameFromTestFile('class', 'importClass1.test', 'Foobar', 'DateTime');
     }
 
-    public function testThrowsExceptionIfImportedClassHasSameNameAsCurrentClassName()
+    public function testThrowsExceptionIfImportedClassHasSameNameAsCurrentClassName(): void
     {
         $this->expectException(NameAlreadyImportedException::class);
         $this->importName('<?php namespace Barfoo; class Foobar extends Foobar', 47, NameImport::forClass('BazBar\Foobar'));
     }
 
-    public function testThrowsExceptionIfImportedClassHasSameNameAsCurrentInterfaceName()
+    public function testThrowsExceptionIfImportedClassHasSameNameAsCurrentInterfaceName(): void
     {
         $this->expectException(NameAlreadyImportedException::class);
         $this->importName('<?php namespace Barfoo; interface Foobar extends Foobar', 50, NameImport::forClass('BazBar\Foobar'));
     }
 
-    public function testThrowsExceptionIfImportedClassInSameNamespace()
+    public function testThrowsExceptionIfImportedClassInSameNamespace(): void
     {
         $this->expectException(NameAlreadyInNamespaceException::class);
         $this->expectExceptionMessage('Class "Barfoo" is in the same namespace as current class');
         $source = <<<'EOT'
-<?php
+            <?php
 
-namespace Barfoo;
-class Foobar {
-    public function use(Barfoo $barfoo) {}
-    }
-}
-EOT
+            namespace Barfoo;
+            class Foobar {
+                public function use(Barfoo $barfoo) {}
+                }
+            }
+            EOT
         ;
         $this->importName($source, 64, NameImport::forClass('Barfoo\Barfoo'));
     }
@@ -135,7 +135,7 @@ EOT
     /**
      * @dataProvider provideImportFunction
      */
-    public function testImportFunction(string $test, string $name, string $alias = null)
+    public function testImportFunction(string $test, string $name, string $alias = null): void
     {
         list($expected, $transformed) = $this->importNameFromTestFile('function', $test, $name, $alias);
 

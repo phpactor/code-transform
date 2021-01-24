@@ -12,7 +12,7 @@ class WorseExtractConstantTest extends WorseTestCase
     /**
      * @dataProvider provideExtractMethod
      */
-    public function testExtractConstant(string $test, $name)
+    public function testExtractConstant(string $test, $name): void
     {
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
@@ -52,14 +52,14 @@ class WorseExtractConstantTest extends WorseTestCase
         ];
     }
 
-    public function testNoClass()
+    public function testNoClass(): void
     {
         $this->expectException(TransformException::class);
         $this->expectExceptionMessage('Node does not belong to a class');
 
         $code = <<<'EOT'
-<?php 1234;
-EOT
+            <?php 1234;
+            EOT
         ;
 
         $extractConstant = new WorseExtractConstant($this->reflectorForWorkspace($code), $this->updater());

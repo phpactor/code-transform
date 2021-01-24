@@ -13,7 +13,7 @@ class WorseExtractMethodTest extends WorseTestCase
     /**
      * @dataProvider provideExtractMethod
      */
-    public function testExtractMethod(string $test, $name, $expectedExceptionMessage = null)
+    public function testExtractMethod(string $test, $name, $expectedExceptionMessage = null): void
     {
         list($source, $expected, $offsetStart, $offsetEnd) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 

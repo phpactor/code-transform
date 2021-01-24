@@ -10,7 +10,7 @@ class TextUtilsTest extends TestCase
     /**
      * @dataProvider provideRemoveIndentation
      */
-    public function testRemoveIndentation(string $code, string $expected)
+    public function testRemoveIndentation(string $code, string $expected): void
     {
         $this->assertEquals($expected, TextUtils::removeIndentation($code));
     }
@@ -24,36 +24,36 @@ class TextUtilsTest extends TestCase
 
         yield [
                 <<<'EOT'
-    hello
-        world
-    hello
-            world
-EOT
+                        hello
+                            world
+                        hello
+                                world
+                    EOT
                 ,
                 <<<'EOT'
-hello
-    world
-hello
-        world
-EOT
+                    hello
+                        world
+                    hello
+                            world
+                    EOT
             ];
 
         yield [
                 <<<'EOT'
-hello
-    hello
-        world
-    hello
-            world
-EOT
+                    hello
+                        hello
+                            world
+                        hello
+                                world
+                    EOT
                 ,
                 <<<'EOT'
-hello
-    hello
-        world
-    hello
-            world
-EOT
+                    hello
+                        hello
+                            world
+                        hello
+                                world
+                    EOT
         ];
     }
 }
