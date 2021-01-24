@@ -2,6 +2,8 @@
 
 namespace Phpactor\CodeTransform\Domain\Exception;
 
-class TransformException extends \Exception
+use Exception;
+
+class TransformException extends Exception
 {
 }

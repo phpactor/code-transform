@@ -18,7 +18,7 @@ class CodeTransformTest extends TestCase
     /**
      * @testdox It should apply the given transformers to source code.
      */
-    public function testApplyTransformers()
+    public function testApplyTransformers(): void
     {
         $expectedCode = SourceCode::fromString('hello goodbye');
         $trans1 = $this->prophesize(Transformer::class);
@@ -33,7 +33,7 @@ class CodeTransformTest extends TestCase
         $this->assertEquals($expectedCode, $code);
     }
 
-    public function testAcceptsSourceCodeAsParameter()
+    public function testAcceptsSourceCodeAsParameter(): void
     {
         $expectedCode = SourceCode::fromStringAndPath('hello goodbye', '/path/to');
 

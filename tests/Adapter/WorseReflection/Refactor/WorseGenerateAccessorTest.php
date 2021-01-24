@@ -17,7 +17,7 @@ class WorseGenerateAccessorTest extends WorseTestCase
         string $propertyName,
         string $prefix = '',
         ?bool $upperCaseFirst = null
-    ) {
+    ): void {
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(
             __DIR__ . '/fixtures/' . $test
         );
@@ -82,7 +82,7 @@ class WorseGenerateAccessorTest extends WorseTestCase
         ];
     }
 
-    public function testNonProperty()
+    public function testNonProperty(): void
     {
         $this->expectException(ItemNotFound::class);
         $this->expectExceptionMessage('Unknown item "bar", known items: "foo"');

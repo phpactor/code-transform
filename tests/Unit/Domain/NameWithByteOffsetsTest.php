@@ -10,7 +10,7 @@ use Phpactor\TextDocument\ByteOffset;
 
 class NameWithByteOffsetsTest extends TestCase
 {
-    public function testReduceToUniquelyNamedItems()
+    public function testReduceToUniquelyNamedItems(): void
     {
         $names = new NameWithByteOffsets(...[
             new NameWithByteOffset(

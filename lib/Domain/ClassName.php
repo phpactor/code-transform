@@ -2,6 +2,8 @@
 
 namespace Phpactor\CodeTransform\Domain;
 
+use InvalidArgumentException;
+
 final class ClassName
 {
     private $name;
@@ -9,21 +11,21 @@ final class ClassName
     private function __construct(string $name)
     {
         if (empty($name)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Class name cannot be empty'
             );
         }
         $this->name = $name;
     }
 
-    public static function fromString(string $name): self
-    {
-        return new self($name);
-    }
-
     public function __toString()
     {
         return $this->name;
+    }
+
+    public static function fromString(string $name): self
+    {
+        return new self($name);
     }
 
     public function namespace(): string

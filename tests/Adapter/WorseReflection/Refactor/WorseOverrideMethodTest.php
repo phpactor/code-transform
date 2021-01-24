@@ -13,7 +13,7 @@ class WorseOverrideMethodTest extends WorseTestCase
     /**
      * @dataProvider provideExtractMethod
      */
-    public function testOverrideMethod(string $test, string $className, $methodName)
+    public function testOverrideMethod(string $test, string $className, $methodName): void
     {
         list($source, $expected) = $this->sourceExpected(__DIR__ . '/fixtures/' . $test);
 
@@ -53,7 +53,7 @@ class WorseOverrideMethodTest extends WorseTestCase
         ];
     }
 
-    public function testClassNoParent()
+    public function testClassNoParent(): void
     {
         $this->expectException(TransformException::class);
         $this->overrideMethod('<?php class Foobar {}', 'Foobar', 'foo');

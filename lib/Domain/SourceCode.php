@@ -22,13 +22,18 @@ final class SourceCode
         $this->code = $code;
 
         if ($path && false === Path::isAbsolute($path)) {
-            throw new \RuntimeException(sprintf(
+            throw new RuntimeException(sprintf(
                 'Path "%s" must be absolute',
                 $path
             ));
         }
 
         $this->path = $path ? Path::canonicalize($path) : null;
+    }
+
+    public function __toString()
+    {
+        return $this->code;
     }
 
     public static function fromString(string $code): SourceCode
@@ -39,11 +44,6 @@ final class SourceCode
     public static function fromStringAndPath(string $code, string $path = null): SourceCode
     {
         return new self($code, $path);
-    }
-
-    public function __toString()
-    {
-        return $this->code;
     }
 
     public function withSource(string $code): SourceCode

@@ -82,20 +82,6 @@ class AddMissingProperties implements Transformer
         );
     }
 
-    /**
-     * @return TraitBuilder|ClassBuilder
-     */
-    private function resolveClassBuilder(SourceCodeBuilder $sourceBuilder, ReflectionClassLike $class): ClassLikeBuilder
-    {
-        $name = $class->name()->short();
-
-        if ($class->isTrait()) {
-            return $sourceBuilder->trait($name);
-        }
-
-        return $sourceBuilder->class($name);
-    }
-
     public function diagnostics(SourceCode $code): Diagnostics
     {
         $diagnostics = [];
@@ -138,5 +124,19 @@ class AddMissingProperties implements Transformer
         }
 
         return new Diagnostics($diagnostics);
+    }
+
+    /**
+     * @return TraitBuilder|ClassBuilder
+     */
+    private function resolveClassBuilder(SourceCodeBuilder $sourceBuilder, ReflectionClassLike $class): ClassLikeBuilder
+    {
+        $name = $class->name()->short();
+
+        if ($class->isTrait()) {
+            return $sourceBuilder->trait($name);
+        }
+
+        return $sourceBuilder->class($name);
     }
 }

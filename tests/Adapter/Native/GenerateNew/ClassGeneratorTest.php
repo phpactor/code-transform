@@ -11,21 +11,21 @@ class ClassGeneratorTest extends AdapterTestCase
     /**
      * It should generate a class
      */
-    public function testGenerateClass()
+    public function testGenerateClass(): void
     {
         $className = ClassName::fromString('Acme\\Blog\\Post');
         $generator = new ClassGenerator($this->renderer());
         $code = $generator->generateNew($className);
 
         $this->assertEquals(<<<'EOT'
-<?php
+            <?php
 
-namespace Acme\Blog;
+            namespace Acme\Blog;
 
-class Post
-{
-}
-EOT
+            class Post
+            {
+            }
+            EOT
         , (string) $code);
     }
 }

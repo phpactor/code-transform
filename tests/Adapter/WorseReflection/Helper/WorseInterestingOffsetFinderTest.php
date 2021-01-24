@@ -15,7 +15,7 @@ class WorseInterestingOffsetFinderTest extends WorseTestCase
     /**
      * @dataProvider provideFindSomethingInterestingWhen
      */
-    public function testFindSomethingIterestingWhen(string $source, string $expectedSymbolType)
+    public function testFindSomethingIterestingWhen(string $source, string $expectedSymbolType): void
     {
         [$source, $offset] = ExtractOffset::fromSource($source);
         $reflector = $this->reflectorForWorkspace($source);
@@ -32,112 +32,112 @@ class WorseInterestingOffsetFinderTest extends WorseTestCase
     {
         yield 'offset in empty file' => [
             <<<'EOT'
-<?php
+                <?php
 
-<>
-EOT
+                <>
+                EOT
             , Symbol::UNKNOWN,
         ];
 
         yield 'offset over target class' => [
             <<<'EOT'
-<?php
+                <?php
 
-class F<>oobar
-{
-    }
-EOT
+                class F<>oobar
+                {
+                    }
+                EOT
             , Symbol::CLASS_,
         ];
 
         yield 'offset in whitespace in target class' => [
             <<<'EOT'
-<?php
+                <?php
 
-class Foobar
-{
-<>
-}
-EOT
+                class Foobar
+                {
+                <>
+                }
+                EOT
             , Symbol::CLASS_,
             ];
 
         yield 'offset on method' => [
             <<<'EOT'
-<?php
+                <?php
 
-class Foobar
-{
-    public function <>methodOne()
-    {
-    }
-}
-EOT
+                class Foobar
+                {
+                    public function <>methodOne()
+                    {
+                    }
+                }
+                EOT
             , Symbol::METHOD,
         ];
 
         yield 'offset in method' => [
             <<<'EOT'
-<?php
+                <?php
 
-class Foobar
-{
-    public function methodOne()
-    {
-        <>
-    }
-}
-EOT
+                class Foobar
+                {
+                    public function methodOne()
+                    {
+                        <>
+                    }
+                }
+                EOT
             , Symbol::METHOD,
             ];
 
         yield 'offset in method call' => [
             <<<'EOT'
-<?php
+                <?php
 
-class Foobar
-{
-    public function methodOne()
-    {
-        $this->ba<>r();
-    }
+                class Foobar
+                {
+                    public function methodOne()
+                    {
+                        $this->ba<>r();
+                    }
 
-    private function bar()
-    {
-    }
-}
-EOT
+                    private function bar()
+                    {
+                    }
+                }
+                EOT
             , Symbol::METHOD,
         ];
 
 
         yield 'offset on var' => [
             <<<'EOT'
-<?php
+                <?php
 
-class Foobar
-{
-    public function methodOne()
-    {
-        $fo<>o;
-    }
-}
-EOT
+                class Foobar
+                {
+                    public function methodOne()
+                    {
+                        $fo<>o;
+                    }
+                }
+                EOT
             , Symbol::VARIABLE,
         ];
 
         yield 'offset on expression' => [
             <<<'EOT'
-<?php
+                <?php
 
-class Foobar
-{
-    public function methodOne()
-    {
-        $foo = $bar + 3 / 2 + $<>foo;
-    }
-}
-EOT
+                class Foobar
+                {
+                    public function methodOne()
+                    {
+                        $foo = $bar + 3 / 2 + $<>foo;
+                    }
+                }
+                EOT
             , Symbol::VARIABLE,
         ];
     }

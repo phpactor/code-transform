@@ -89,25 +89,6 @@ class CompleteConstructor implements Transformer
     }
 
     /**
-     * @return Generator<ReflectionClass>
-     */
-    private function candidateClasses(SourceCode $source): Generator
-    {
-        $classes = $this->reflector->reflectClassesIn(WorseSourceCode::fromString((string) $source));
-        foreach ($classes as $class) {
-            if ($class instanceof ReflectionInterface) {
-                continue;
-            }
-        
-            if (!$class->methods()->belongingTo($class->name())->has('__construct')) {
-                continue;
-            }
-
-            yield $class;
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function diagnostics(SourceCode $source): Diagnostics
@@ -142,5 +123,24 @@ class CompleteConstructor implements Transformer
         }
 
         return new Diagnostics($diagnostics);
+    }
+
+    /**
+     * @return Generator<ReflectionClass>
+     */
+    private function candidateClasses(SourceCode $source): Generator
+    {
+        $classes = $this->reflector->reflectClassesIn(WorseSourceCode::fromString((string) $source));
+        foreach ($classes as $class) {
+            if ($class instanceof ReflectionInterface) {
+                continue;
+            }
+        
+            if (!$class->methods()->belongingTo($class->name())->has('__construct')) {
+                continue;
+            }
+
+            yield $class;
+        }
     }
 }
