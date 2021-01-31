@@ -167,6 +167,26 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
             ]
         ];
 
+        yield 'method reutrn type' => [
+            <<<'EOT'
+// File: test.php
+<?php
+
+namespace Foobar;
+
+class Barfoo { 
+    public function foo(): Baz {}
+}
+EOT
+,
+            [
+                new NameWithByteOffset(
+                    QualifiedName::fromString('Foobar\\Baz'),
+                    ByteOffset::fromInt(69)
+                ),
+            ]
+        ];
+
         yield 'resolvable fully qualified trait' => [
             <<<'EOT'
                 // File: test.php

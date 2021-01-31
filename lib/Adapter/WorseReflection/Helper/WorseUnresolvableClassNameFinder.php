@@ -8,6 +8,7 @@ use Microsoft\PhpParser\Node\DelimitedList\QualifiedNameList;
 use Microsoft\PhpParser\Node\Expression\CallExpression;
 use Microsoft\PhpParser\Node\Expression\ObjectCreationExpression;
 use Microsoft\PhpParser\Node\Expression\ScopedPropertyAccessExpression;
+use Microsoft\PhpParser\Node\MethodDeclaration;
 use Microsoft\PhpParser\Node\Parameter;
 use Microsoft\PhpParser\Node\QualifiedName;
 use Microsoft\PhpParser\Node\Statement\FunctionDeclaration;
@@ -104,6 +105,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
             !$name->parent instanceof ObjectCreationExpression &&
             !$name->parent instanceof ScopedPropertyAccessExpression &&
             !$name->parent instanceof FunctionDeclaration &&
+            !$name->parent instanceof MethodDeclaration &&
             !$name->parent instanceof Parameter
         ) {
             return $unresolvedNames;
