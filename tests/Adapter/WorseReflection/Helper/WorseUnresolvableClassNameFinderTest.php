@@ -169,15 +169,15 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
 
         yield 'method reutrn type' => [
             <<<'EOT'
-// File: test.php
-<?php
+                // File: test.php
+                <?php
 
-namespace Foobar;
+                namespace Foobar;
 
-class Barfoo { 
-    public function foo(): Baz {}
-}
-EOT
+                class Barfoo { 
+                    public function foo(): Baz {}
+                }
+                EOT
 ,
             [
                 new NameWithByteOffset(
