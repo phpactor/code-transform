@@ -5,6 +5,7 @@ namespace Phpactor\CodeTransform\Adapter\WorseReflection\Helper;
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\ClassBaseClause;
 use Microsoft\PhpParser\Node\DelimitedList\QualifiedNameList;
+use Microsoft\PhpParser\Node\Expression;
 use Microsoft\PhpParser\Node\Expression\CallExpression;
 use Microsoft\PhpParser\Node\Expression\ObjectCreationExpression;
 use Microsoft\PhpParser\Node\Expression\ScopedPropertyAccessExpression;
@@ -106,6 +107,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
             !$name->parent instanceof ScopedPropertyAccessExpression &&
             !$name->parent instanceof FunctionDeclaration &&
             !$name->parent instanceof MethodDeclaration &&
+            !$name->parent instanceof Expression &&
             !$name->parent instanceof Parameter
         ) {
             return $unresolvedNames;

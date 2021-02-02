@@ -133,6 +133,7 @@ class ImplementContracts implements Transformer
         }
 
         foreach ($class->methods()->abstract() as $method) {
+            assert($method instanceof ReflectionMethod);
             if ($method->declaringClass()->name() == $class->name()) {
                 continue;
             }
