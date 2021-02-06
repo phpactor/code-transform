@@ -144,7 +144,7 @@ class AddMissingProperties implements Transformer
     }
 
     /**
-     * @return Generator<string, Expression>
+     * @return Generator<array{string, Token, Expression}>
      */
     private function missingPropertyNames(SourceFileNode $rootNode, ReflectionClassLike $class): Generator
     {
