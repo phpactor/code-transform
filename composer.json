@@ -14,7 +14,7 @@
         "phpactor/code-builder": "^0.4.1",
         "phpactor/name-specification": "^0.1",
         "phpactor/text-document": "^1.2.3",
-        "phpactor/worse-reflection": "^0.4.4",
+        "phpactor/worse-reflection": "^0.4.5",
         "webmozart/path-util": "~2.3"
     },
     "require-dev": {
