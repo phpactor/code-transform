@@ -92,12 +92,10 @@ class WorseGenerateMethodTest extends WorseTestCase
     private function generateMethod(string $source, int $start, ?string $name): string
     {
         $reflector = $this->reflectorForWorkspace($source);
-        $factory = new WorseBuilderFactory($reflector);
-        $generateMethod = new WorseGenerateMethod($reflector, $factory, $this->updater());
+        $generateMethod = new WorseGenerateMethod($reflector, new WorseBuilderFactory($reflector), $this->updater());
         $sourceCode = SourceCode::fromString($source);
-        $edits = $generateMethod->generateMethod($sourceCode, $start, $name);
         $transformed = SourceCode::fromStringAndPath(
-            (string) $edits->apply($sourceCode),
+            (string) $generateMethod->generateMethod($sourceCode, $start, $name)->apply($sourceCode),
             $sourceCode->path()
         );
         return $transformed;
