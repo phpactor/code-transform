@@ -13,7 +13,7 @@ class WorseGenerateMethodTest extends WorseTestCase
     /**
      * @dataProvider provideExtractMethod
      */
-    public function testGenerateMethod(string $test, $name = null): void
+    public function testGenerateMethod(string $test, ?string $name = null): void
     {
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
@@ -22,7 +22,7 @@ class WorseGenerateMethodTest extends WorseTestCase
         $this->assertEquals(trim($expected), trim($transformed));
     }
 
-    public function provideExtractMethod()
+    public function provideExtractMethod(): array
     {
         return [
             'string' => [
@@ -89,11 +89,17 @@ class WorseGenerateMethodTest extends WorseTestCase
         $this->generateMethod($source, 152, 'test_name');
     }
 
-    private function generateMethod(string $source, int $start, $name)
+    private function generateMethod(string $source, int $start, ?string $name): string
     {
         $reflector = $this->reflectorForWorkspace($source);
         $factory = new WorseBuilderFactory($reflector);
         $generateMethod = new WorseGenerateMethod($reflector, $factory, $this->updater());
-        return $generateMethod->generateMethod(SourceCode::fromString($source), $start, $name);
+        $sourceCode = SourceCode::fromString($source);
+        $edits = $generateMethod->generateMethod($sourceCode, $start, $name);
+        $transformed = SourceCode::fromStringAndPath(
+            (string) $edits->apply($sourceCode),
+            $sourceCode->path()
+        );
+        return $transformed;
     }
 }

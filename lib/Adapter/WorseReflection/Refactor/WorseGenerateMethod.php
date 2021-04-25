@@ -7,6 +7,7 @@ use Phpactor\CodeBuilder\Domain\Prototype\SourceCode as PhpactorSourceCode;
 use Phpactor\CodeBuilder\Domain\Prototype\Visibility;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeTransform\Domain\Refactor\GenerateMethod;
+use Phpactor\TextDocument\TextEdits;
 use Phpactor\WorseReflection\Reflector;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionArgument;
 use Phpactor\CodeTransform\Domain\SourceCode;
@@ -46,7 +47,7 @@ class WorseGenerateMethod implements GenerateMethod
         $this->factory = $factory;
     }
 
-    public function generateMethod(SourceCode $sourceCode, int $offset, ?string $methodName = null): SourceCode
+    public function generateMethod(SourceCode $sourceCode, int $offset, ?string $methodName = null): TextEdits
     {
         $contextType = $this->contextType($sourceCode, $offset);
         $worseSourceCode = WorseSourceCode::fromPathAndString((string) $sourceCode->path(), (string) $sourceCode);
@@ -57,10 +58,11 @@ class WorseGenerateMethod implements GenerateMethod
         $prototype = $this->addMethodCallToBuilder($methodCall, $visibility, $methodCall->isStatic(), $methodName);
         $sourceCode = $this->resolveSourceCode($sourceCode, $methodCall, $visibility);
 
-        return SourceCode::fromStringAndPath(
-            (string) $this->updater->textEditsFor($prototype, Code::fromString((string) $sourceCode))->apply($sourceCode),
-            $sourceCode->path()
-        );
+        return $this->updater->textEditsFor($prototype, Code::fromString((string) $sourceCode));
+        // return SourceCode::fromStringAndPath(
+        //     (string) $this->updater->textEditsFor($prototype, Code::fromString((string) $sourceCode))->apply($sourceCode),
+        //     $sourceCode->path()
+        // );
     }
 
     private function resolveSourceCode(SourceCode $sourceCode, ReflectionMethodCall $methodCall, string $visibility): SourceCode
