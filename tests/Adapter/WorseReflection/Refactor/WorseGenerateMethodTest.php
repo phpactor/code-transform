@@ -5,6 +5,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseGenerateMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeBuilder\Adapter\WorseReflection\WorseBuilderFactory;
 
@@ -91,12 +92,16 @@ class WorseGenerateMethodTest extends WorseTestCase
 
     private function generateMethod(string $source, int $start, ?string $name): string
     {
-        $reflector = $this->reflectorForWorkspace($source);
+        $worseSourceCode = WorseSourceCode::fromPathAndString('file:///source', $source);
+        $reflector = $this->reflectorForWorkspace($worseSourceCode);
+        
         $generateMethod = new WorseGenerateMethod($reflector, new WorseBuilderFactory($reflector), $this->updater());
-        $sourceCode = SourceCode::fromString($source);
+        $sourceCode = SourceCode::fromStringAndPath($source, 'file:///source');
+        $textDocumentEdits = $generateMethod->generateMethod($sourceCode, $start, $name);
+        
         $transformed = SourceCode::fromStringAndPath(
-            (string) $generateMethod->generateMethod($sourceCode, $start, $name)->apply($sourceCode),
-            $sourceCode->path()
+            (string) $textDocumentEdits->textEdits()->apply($sourceCode),
+            $textDocumentEdits->uri()->path()
         );
         return $transformed;
     }

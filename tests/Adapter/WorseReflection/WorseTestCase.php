@@ -13,13 +13,13 @@ use Phpactor\WorseReflection\ReflectorBuilder;
 
 class WorseTestCase extends AdapterTestCase
 {
-    public function reflectorForWorkspace(?string $source = null): Reflector
+    public function reflectorForWorkspace($source = null): Reflector
     {
         $builder = ReflectorBuilder::create();
 
         foreach ((array)glob($this->workspace()->path('/*.php')) as $file) {
             $locator = new TemporarySourceLocator(ReflectorBuilder::create()->build(), true);
-            $locator->pushSourceCode(SourceCode::fromString(file_get_contents($file)));
+            $locator->pushSourceCode(SourceCode::fromPathAndString($file, file_get_contents($file)));
             $builder->addLocator($locator);
         }
 

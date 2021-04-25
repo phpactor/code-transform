@@ -3,9 +3,9 @@
 namespace Phpactor\CodeTransform\Domain\Refactor;
 
 use Phpactor\CodeTransform\Domain\SourceCode;
-use Phpactor\TextDocument\TextEdits;
+use Phpactor\TextDocument\TextDocumentEdits;
 
 interface GenerateMethod
 {
-    public function generateMethod(SourceCode $sourceCode, int $offset): TextEdits;
+    public function generateMethod(SourceCode $sourceCode, int $offset): TextDocumentEdits;
 }
