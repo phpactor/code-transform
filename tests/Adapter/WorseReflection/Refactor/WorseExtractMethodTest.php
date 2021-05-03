@@ -5,6 +5,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseExtractMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
 use Phpactor\CodeBuilder\Adapter\WorseReflection\WorseBuilderFactory;
 use Exception;
 
@@ -13,7 +14,7 @@ class WorseExtractMethodTest extends WorseTestCase
     /**
      * @dataProvider provideExtractMethod
      */
-    public function testExtractMethod(string $test, $name, $expectedExceptionMessage = null): void
+    public function testExtractMethod(string $test, ?string $name, ?string $expectedExceptionMessage = null): void
     {
         list($source, $expected, $offsetStart, $offsetEnd) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
@@ -22,15 +23,23 @@ class WorseExtractMethodTest extends WorseTestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $reflector = $this->reflectorForWorkspace($source);
+        $worseSourceCode = WorseSourceCode::fromPathAndString('file:///source', $source);
+        $reflector = $this->reflectorForWorkspace($worseSourceCode);
+
         $factory = new WorseBuilderFactory($reflector);
         $extractMethod = new WorseExtractMethod($reflector, $factory, $this->updater());
-        $transformed = $extractMethod->extractMethod(SourceCode::fromString($source), $offsetStart, $offsetEnd, $name);
 
+        $sourceCode = SourceCode::fromStringAndPath($source, 'file:///source');
+        $textDocumentEdits = $extractMethod->extractMethod($sourceCode, $offsetStart, $offsetEnd, $name);
+
+        $transformed = SourceCode::fromStringAndPath(
+            (string) $textDocumentEdits->textEdits()->apply($sourceCode),
+            $textDocumentEdits->uri()->path()
+        );
         $this->assertEquals(trim($expected), trim($transformed));
     }
 
-    public function provideExtractMethod()
+    public function provideExtractMethod(): array
     {
         return [
             'no free variables' => [

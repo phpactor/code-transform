@@ -8,6 +8,9 @@ use Microsoft\PhpParser\Node\Statement\CompoundStatementNode;
 use Microsoft\PhpParser\Node\Statement\ReturnStatement;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeBuilder\Domain\Updater;
+use Phpactor\TextDocument\TextDocumentEdits;
+use Phpactor\TextDocument\TextDocumentUri;
+use Phpactor\TextDocument\TextEdit;
 use Phpactor\WorseReflection\Reflector;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
@@ -53,7 +56,7 @@ class WorseExtractMethod implements ExtractMethod
         $this->factory = $factory;
     }
 
-    public function extractMethod(SourceCode $source, int $offsetStart, int $offsetEnd, string $name): SourceCode
+    public function extractMethod(SourceCode $source, int $offsetStart, int $offsetEnd, string $name): TextDocumentEdits
     {
         $isExpression = $this->isSelectionAnExpression($source, $offsetStart, $offsetEnd);
 
@@ -89,15 +92,21 @@ class WorseExtractMethod implements ExtractMethod
             $replacement = rtrim($replacement, ';');
         }
 
-        $source = $source->replaceSelection(
-            $replacement,
-            $offsetStart,
-            $offsetEnd
-        );
+        // dump($source, $replacement, $offsetStart, $offsetEnd);
+        // $source = $source->replaceSelection(
+        //     $replacement,
+        //     $offsetStart,
+        //     $offsetEnd
+        // );
 
-        return $source->withSource(
-            (string) $this->updater->textEditsFor($prototype, Code::fromString((string) $source))->apply($source)
+        return new TextDocumentEdits(
+            TextDocumentUri::fromString($source->path()),
+            $this->updater->textEditsFor($prototype, Code::fromString((string) $source))
+                ->add(TextEdit::create($offsetStart, $offsetEnd - $offsetStart, $replacement))
         );
+        // return $source->withSource(
+        //     (string) $this->updater->textEditsFor($prototype, Code::fromString((string) $source))->apply($source)
+        // );
     }
 
     private function parameterVariables(Assignments $locals, string $selection, int $offsetStart): array
