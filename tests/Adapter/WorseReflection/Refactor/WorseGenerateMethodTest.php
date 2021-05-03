@@ -5,6 +5,7 @@ namespace Phpactor\CodeTransform\Tests\Adapter\WorseReflection\Refactor;
 use Phpactor\CodeTransform\Tests\Adapter\WorseReflection\WorseTestCase;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseGenerateMethod;
 use Phpactor\CodeTransform\Domain\SourceCode;
+use Phpactor\WorseReflection\Core\SourceCode as WorseSourceCode;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeBuilder\Adapter\WorseReflection\WorseBuilderFactory;
 
@@ -13,7 +14,7 @@ class WorseGenerateMethodTest extends WorseTestCase
     /**
      * @dataProvider provideExtractMethod
      */
-    public function testGenerateMethod(string $test, $name = null): void
+    public function testGenerateMethod(string $test, ?string $name = null): void
     {
         list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
@@ -22,7 +23,7 @@ class WorseGenerateMethodTest extends WorseTestCase
         $this->assertEquals(trim($expected), trim($transformed));
     }
 
-    public function provideExtractMethod()
+    public function provideExtractMethod(): array
     {
         return [
             'string' => [
@@ -89,11 +90,19 @@ class WorseGenerateMethodTest extends WorseTestCase
         $this->generateMethod($source, 152, 'test_name');
     }
 
-    private function generateMethod(string $source, int $start, $name)
+    private function generateMethod(string $source, int $start, ?string $name): string
     {
-        $reflector = $this->reflectorForWorkspace($source);
-        $factory = new WorseBuilderFactory($reflector);
-        $generateMethod = new WorseGenerateMethod($reflector, $factory, $this->updater());
-        return $generateMethod->generateMethod(SourceCode::fromString($source), $start, $name);
+        $worseSourceCode = WorseSourceCode::fromPathAndString('file:///source', $source);
+        $reflector = $this->reflectorForWorkspace($worseSourceCode);
+        
+        $generateMethod = new WorseGenerateMethod($reflector, new WorseBuilderFactory($reflector), $this->updater());
+        $sourceCode = SourceCode::fromStringAndPath($source, 'file:///source');
+        $textDocumentEdits = $generateMethod->generateMethod($sourceCode, $start, $name);
+        
+        $transformed = SourceCode::fromStringAndPath(
+            (string) $textDocumentEdits->textEdits()->apply($sourceCode),
+            $textDocumentEdits->uri()->path()
+        );
+        return $transformed;
     }
 }

@@ -13,7 +13,7 @@
         "phpactor/class-to-file": "~0.4.0",
         "phpactor/code-builder": "^0.4.1",
         "phpactor/name-specification": "^0.1",
-        "phpactor/text-document": "^1.2.3",
+        "phpactor/text-document": "^1.2.4",
         "phpactor/worse-reflection": "^0.4.4",
         "webmozart/path-util": "~2.3"
     },
