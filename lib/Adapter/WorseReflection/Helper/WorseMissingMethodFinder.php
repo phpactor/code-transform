@@ -44,6 +44,11 @@ class WorseMissingMethodFinder implements MissingMethodFinder
         foreach ($names as $name) {
             $offset = $this->reflector->reflectOffset($sourceCode, $name->start);
             $containerType = $offset->symbolContext()->containerType();
+
+            if (!$containerType) {
+                continue;
+            }
+
             try {
                 $class = $this->reflector->reflectClass($containerType->__toString());
             } catch (NotFound $notFound) {
