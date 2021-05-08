@@ -92,21 +92,11 @@ class WorseExtractMethod implements ExtractMethod
             $replacement = rtrim($replacement, ';');
         }
 
-        // dump($source, $replacement, $offsetStart, $offsetEnd);
-        // $source = $source->replaceSelection(
-        //     $replacement,
-        //     $offsetStart,
-        //     $offsetEnd
-        // );
-
         return new TextDocumentEdits(
             TextDocumentUri::fromString($source->path()),
             $this->updater->textEditsFor($prototype, Code::fromString((string) $source))
                 ->add(TextEdit::create($offsetStart, $offsetEnd - $offsetStart, $replacement))
         );
-        // return $source->withSource(
-        //     (string) $this->updater->textEditsFor($prototype, Code::fromString((string) $source))->apply($source)
-        // );
     }
 
     private function parameterVariables(Assignments $locals, string $selection, int $offsetStart): array
