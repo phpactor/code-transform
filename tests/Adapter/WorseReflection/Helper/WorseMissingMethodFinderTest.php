@@ -51,5 +51,44 @@ class WorseMissingMethodFinderTest extends WorseTestCase
                 EOT
             , 1
         ];
+        yield 'missing static method' => [
+            <<<'EOT'
+                <?php
+                class foobar { public function bar() { self::foo(); } }
+                EOT
+            , 1
+        ];
+        yield 'present static method' => [
+            <<<'EOT'
+                <?php
+                class foobar { public static function foo() { self::foo(); } }
+                EOT
+            , 0
+        ];
+        yield 'dynamic method call (not supported)' => [
+            <<<'EOT'
+                <?php
+                class foobar { public static function foo() { self::$foo(); } }
+                EOT
+            , 0
+        ];
+        yield 'call foreign class missing' => [
+            <<<'EOT'
+                <?php
+                class Bar () { function zed() {} }
+                $new = new Bar();
+                $new->bof();
+                EOT
+            , 1
+        ];
+        yield 'call foreign class present' => [
+            <<<'EOT'
+                <?php
+                class Bar { function zed() {} }
+                $new = new Bar();
+                $new->zed();
+                EOT
+            , 0
+        ];
     }
 }
