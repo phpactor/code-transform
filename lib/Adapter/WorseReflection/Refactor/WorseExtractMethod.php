@@ -25,6 +25,8 @@ use Phpactor\CodeBuilder\Domain\Builder\MethodBuilder;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeTransform\Domain\Utils\TextUtils;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
+use function iterator_to_array;
+use function prev;
 
 class WorseExtractMethod implements ExtractMethod
 {
@@ -56,8 +58,62 @@ class WorseExtractMethod implements ExtractMethod
         $this->factory = $factory;
     }
 
+    public function canExtractMethod(SourceCode $source, int $offsetStart, int $offsetEnd): bool
+    {
+        $node = $this->parser->parseSourceFile($source->__toString());
+        $endNode = $node->getDescendantNodeAtPosition($offsetEnd);
+        $startNode = $node->getDescendantNodeAtPosition($offsetStart);
+
+        if(
+            $endNode instanceof CompoundStatementNode && 
+            $endNode->closeBrace->getStartPosition() >= $offsetEnd &&
+            count($endNode->statements) > 0
+        ){
+            $stmt = end($endNode->statements);
+            assert($stmt instanceof Node);
+            while($stmt->getEndPosition() > $offsetEnd)
+                $stmt = prev($endNode->statements);
+            
+            $endNode = $stmt;
+            assert($endNode instanceof Node);
+        }
+
+        while ($endNode->parent && !($endNode->parent instanceof CompoundStatementNode)) {
+            $endNode = $endNode->parent;
+        }
+
+        if(
+            $startNode instanceof CompoundStatementNode && 
+            $startNode->openBrace->getEndPosition() <= $offsetStart && 
+            count($startNode->statements) > 0
+        ) {
+            $stmt = current($startNode->statements);
+            assert($stmt instanceof Node);
+            while($stmt->getStart() < $offsetStart)
+                $stmt = next($startNode->statements);
+            
+            $startNode = $stmt;
+            assert($startNode instanceof Node);
+            
+        }
+
+        while ($startNode->parent && !($startNode->parent instanceof CompoundStatementNode)) {
+            $startNode = $startNode->parent;
+        }
+
+        if ($startNode->parent != $endNode->parent) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function extractMethod(SourceCode $source, int $offsetStart, int $offsetEnd, string $name): TextDocumentEdits
     {
+        if (!$this->canExtractMethod($source, $offsetStart, $offsetEnd)) {
+            throw new TransformException('Cannot extract method. Check if start and end statements are in different scopes.');
+        }
+
         $isExpression = $this->isSelectionAnExpression($source, $offsetStart, $offsetEnd);
 
         $selection = $source->extractSelection($offsetStart, $offsetEnd);

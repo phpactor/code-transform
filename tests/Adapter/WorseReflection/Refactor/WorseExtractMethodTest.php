@@ -135,6 +135,21 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod23.test',
                 'newMethod',
             ],
+            'different scopes 1' => [
+                'extractMethod24.test',
+                'newMethod',
+                'Cannot extract method. Check if start and end statements are in different scopes.'
+            ],
+            'different scopes 2' => [
+                'extractMethod25.test',
+                'newMethod',
+                'Cannot extract method. Check if start and end statements are in different scopes.'
+            ],
+            'different scopes 3' => [
+                'extractMethod26.test',
+                'newMethod',
+                'Cannot extract method. Check if start and end statements are in different scopes.'
+            ],
         ];
     }
 }
