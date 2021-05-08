@@ -150,6 +150,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'newMethod',
                 'Cannot extract method. Check if start and end statements are in different scopes.'
             ],
+            'empty selection' => [
+                'extractMethod27.test',
+                'newMethod',
+            ],
         ];
     }
 }
