@@ -64,15 +64,16 @@ class WorseExtractMethod implements ExtractMethod
         $endNode = $node->getDescendantNodeAtPosition($offsetEnd);
         $startNode = $node->getDescendantNodeAtPosition($offsetStart);
 
-        if(
-            $endNode instanceof CompoundStatementNode && 
+        if (
+            $endNode instanceof CompoundStatementNode &&
             $endNode->closeBrace->getStartPosition() >= $offsetEnd &&
             count($endNode->statements) > 0
-        ){
+        ) {
             $stmt = end($endNode->statements);
             assert($stmt instanceof Node);
-            while($stmt->getEndPosition() > $offsetEnd)
+            while ($stmt->getEndPosition() > $offsetEnd) {
                 $stmt = prev($endNode->statements);
+            }
             
             $endNode = $stmt;
             assert($endNode instanceof Node);
@@ -82,19 +83,19 @@ class WorseExtractMethod implements ExtractMethod
             $endNode = $endNode->parent;
         }
 
-        if(
-            $startNode instanceof CompoundStatementNode && 
-            $startNode->openBrace->getEndPosition() <= $offsetStart && 
+        if (
+            $startNode instanceof CompoundStatementNode &&
+            $startNode->openBrace->getEndPosition() <= $offsetStart &&
             count($startNode->statements) > 0
         ) {
             $stmt = current($startNode->statements);
             assert($stmt instanceof Node);
-            while($stmt->getStart() < $offsetStart)
+            while ($stmt->getStart() < $offsetStart) {
                 $stmt = next($startNode->statements);
+            }
             
             $startNode = $stmt;
             assert($startNode instanceof Node);
-            
         }
 
         while ($startNode->parent && !($startNode->parent instanceof CompoundStatementNode)) {
