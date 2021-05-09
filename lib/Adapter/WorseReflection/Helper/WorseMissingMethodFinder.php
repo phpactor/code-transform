@@ -50,7 +50,7 @@ class WorseMissingMethodFinder implements MissingMethodFinder
             }
 
             try {
-                $class = $this->reflector->reflectClass($containerType->__toString());
+                $class = $this->reflector->reflectClassLike($containerType->__toString());
             } catch (NotFound $notFound) {
                 continue;
             }
