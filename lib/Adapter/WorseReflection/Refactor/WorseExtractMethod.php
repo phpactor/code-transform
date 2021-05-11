@@ -60,8 +60,9 @@ class WorseExtractMethod implements ExtractMethod
 
     public function canExtractMethod(SourceCode $source, int $offsetStart, int $offsetEnd): bool
     {
-        if($offsetEnd == $offsetStart)
+        if ($offsetEnd == $offsetStart) {
             return false;
+        }
         $node = $this->parser->parseSourceFile($source->__toString());
         $endNode = $node->getDescendantNodeAtPosition($offsetEnd);
         $startNode = $node->getDescendantNodeAtPosition($offsetStart);
@@ -98,7 +99,7 @@ class WorseExtractMethod implements ExtractMethod
                 $stmt = next($startNode->statements);
             }
             
-            if($stmt === false) {
+            if ($stmt === false) {
                 dump($startNode->getStart(), $startNode->getEndPosition(), $offsetStart);
             }
             $startNode = $stmt ?? $startNode;
