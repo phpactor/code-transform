@@ -99,9 +99,6 @@ class WorseExtractMethod implements ExtractMethod
                 $stmt = next($startNode->statements);
             }
             
-            if ($stmt === false) {
-                dump($startNode->getStart(), $startNode->getEndPosition(), $offsetStart);
-            }
             $startNode = $stmt ?? $startNode;
             assert($startNode instanceof Node);
         }
