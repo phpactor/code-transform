@@ -60,6 +60,16 @@ class TolerantImportName implements ImportName
         return $edits;
     }
 
+    public function importNameOnly(SourceCode $source, ByteOffset $offset, NameImport $nameImport): TextEdits
+    {
+        $sourceNode = $this->parser->parseSourceFile($source);
+        $node = $this->getLastNodeAtPosition($sourceNode, $offset);
+
+        $this->assertNotAlreadyImported($node, $nameImport);
+
+        return $this->addImport($source, $nameImport);
+    }
+
     private function assertNotAlreadyImported(Node $node, NameImport $nameImport): void
     {
         $currentClass = $this->currentClass($node);
