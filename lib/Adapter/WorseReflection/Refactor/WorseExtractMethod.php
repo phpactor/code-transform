@@ -8,6 +8,9 @@ use Microsoft\PhpParser\Node\Statement\CompoundStatementNode;
 use Microsoft\PhpParser\Node\Statement\ReturnStatement;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeBuilder\Domain\Updater;
+use Phpactor\TextDocument\TextDocumentEdits;
+use Phpactor\TextDocument\TextDocumentUri;
+use Phpactor\TextDocument\TextEdit;
 use Phpactor\WorseReflection\Reflector;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
@@ -22,6 +25,8 @@ use Phpactor\CodeBuilder\Domain\Builder\MethodBuilder;
 use Phpactor\CodeTransform\Domain\Exception\TransformException;
 use Phpactor\CodeTransform\Domain\Utils\TextUtils;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
+use function iterator_to_array;
+use function prev;
 
 class WorseExtractMethod implements ExtractMethod
 {
@@ -53,8 +58,68 @@ class WorseExtractMethod implements ExtractMethod
         $this->factory = $factory;
     }
 
-    public function extractMethod(SourceCode $source, int $offsetStart, int $offsetEnd, string $name): SourceCode
+    public function canExtractMethod(SourceCode $source, int $offsetStart, int $offsetEnd): bool
     {
+        if ($offsetEnd == $offsetStart) {
+            return false;
+        }
+        $node = $this->parser->parseSourceFile($source->__toString());
+        $endNode = $node->getDescendantNodeAtPosition($offsetEnd);
+        $startNode = $node->getDescendantNodeAtPosition($offsetStart);
+
+        if (
+            $endNode instanceof CompoundStatementNode &&
+            $endNode->openBrace->getEndPosition() < $offsetEnd &&
+            $endNode->closeBrace->getStartPosition() >= $offsetEnd &&
+            count($endNode->statements) > 0
+        ) {
+            $stmt = end($endNode->statements);
+            assert($stmt instanceof Node);
+            while ($stmt && $stmt->getEndPosition() > $offsetEnd) {
+                $stmt = prev($endNode->statements);
+            }
+            
+            $endNode = $stmt ?? $endNode;
+            assert($endNode instanceof Node);
+        }
+
+        while ($endNode->parent && !($endNode->parent instanceof CompoundStatementNode)) {
+            $endNode = $endNode->parent;
+        }
+
+        if (
+            $startNode instanceof CompoundStatementNode &&
+            $startNode->openBrace->getEndPosition() <= $offsetStart &&
+            $startNode->closeBrace->getStartPosition() > $offsetStart &&
+            count($startNode->statements) > 0
+        ) {
+            $stmt = current($startNode->statements);
+            assert($stmt instanceof Node);
+            while ($stmt && $stmt->getStart() < $offsetStart) {
+                $stmt = next($startNode->statements);
+            }
+            
+            $startNode = $stmt ?? $startNode;
+            assert($startNode instanceof Node);
+        }
+
+        while ($startNode->parent && !($startNode->parent instanceof CompoundStatementNode)) {
+            $startNode = $startNode->parent;
+        }
+
+        if ($startNode->parent != $endNode->parent) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function extractMethod(SourceCode $source, int $offsetStart, int $offsetEnd, string $name): TextDocumentEdits
+    {
+        if (!$this->canExtractMethod($source, $offsetStart, $offsetEnd)) {
+            throw new TransformException('Cannot extract method. Check if start and end statements are in different scopes.');
+        }
+
         $isExpression = $this->isSelectionAnExpression($source, $offsetStart, $offsetEnd);
 
         $selection = $source->extractSelection($offsetStart, $offsetEnd);
@@ -89,14 +154,10 @@ class WorseExtractMethod implements ExtractMethod
             $replacement = rtrim($replacement, ';');
         }
 
-        $source = $source->replaceSelection(
-            $replacement,
-            $offsetStart,
-            $offsetEnd
-        );
-
-        return $source->withSource(
-            (string) $this->updater->textEditsFor($prototype, Code::fromString((string) $source))->apply($source)
+        return new TextDocumentEdits(
+            TextDocumentUri::fromString($source->path()),
+            $this->updater->textEditsFor($prototype, Code::fromString((string) $source))
+                ->add(TextEdit::create($offsetStart, $offsetEnd - $offsetStart, $replacement))
         );
     }
 
