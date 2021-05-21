@@ -43,6 +43,15 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
             , []
         ];
 
+        yield 'empty segment' => [
+            <<<'EOT'
+                // File: test.php
+                <?php
+                $a = new \
+                EOT
+            , []
+        ];
+
         yield 'resolvable class in method' => [
             <<<'EOT'
                 // File: test.php
@@ -104,7 +113,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
 
                 new NotFound36();
                 EOT
-,
+            ,
             [
                 new NameWithByteOffset(
                     QualifiedName::fromString('Bar\\NotFound'),
@@ -124,7 +133,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
 
                 class Bar implements Sugar {}
                 EOT
-,
+            ,
             [
                 new NameWithByteOffset(
                     QualifiedName::fromString('Sugar'),
@@ -140,7 +149,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
 
                 class Bar extends Sugar {}
                 EOT
-,
+            ,
             [
                 new NameWithByteOffset(
                     QualifiedName::fromString('Sugar'),
@@ -158,7 +167,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
                     use Sugar;
                 }
                 EOT
-,
+            ,
             [
                 new NameWithByteOffset(
                     QualifiedName::fromString('Sugar'),
@@ -178,7 +187,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
                     public function foo(): Baz {}
                 }
                 EOT
-,
+            ,
             [
                 new NameWithByteOffset(
                     QualifiedName::fromString('Foobar\\Baz'),
@@ -205,7 +214,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
                 trait Sugar {
                 }
                 EOT
-,
+            ,
             []
         ];
 
@@ -229,7 +238,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
                 trait Sugar {
                 }
                 EOT
-,
+            ,
             []
         ];
 
@@ -253,7 +262,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
                 trait Sugar {
                 }
                 EOT
-,
+            ,
             []
         ];
 
@@ -277,7 +286,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
                 trait Sugar {
                 }
                 EOT
-,
+            ,
             []
         ];
 
@@ -296,7 +305,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
 
                 new Barfoo();
                 EOT
-,
+            ,
             [
             ]
         ];
@@ -316,7 +325,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
                     }
                 }
                 EOT
-,
+            ,
             [
             ]
         ];
