@@ -94,6 +94,10 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
             $resolvedName = $name->getNamespacedName();
         }
 
+        if (count($resolvedName->getNameParts()) == 0) {
+            return $unresolvedNames;
+        }
+
         // Function names in global namespace have a "resolved name"
         // (inconsistent parser behavior)
         if ($name->parent instanceof CallExpression) {
