@@ -2,7 +2,9 @@
 
 namespace Phpactor\CodeTransform\Adapter\WorseReflection\Refactor;
 
+use Microsoft\PhpParser\FunctionLike;
 use Microsoft\PhpParser\Node;
+use Microsoft\PhpParser\Node\CatchClause;
 use Microsoft\PhpParser\Node\SourceFileNode;
 use Microsoft\PhpParser\Node\Statement\CompoundStatementNode;
 use Microsoft\PhpParser\Node\Statement\ReturnStatement;
@@ -15,7 +17,6 @@ use Phpactor\WorseReflection\Reflector;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
 use Phpactor\CodeBuilder\Domain\Code;
-use Microsoft\PhpParser\Token;
 use Microsoft\PhpParser\TokenKind;
 use Phpactor\WorseReflection\Core\Inference\Assignments;
 use Phpactor\WorseReflection\Core\Inference\Variable;
@@ -139,13 +140,13 @@ class WorseExtractMethod implements ExtractMethod
         $args = $this->addParametersAndGetArgs($parameterVariables, $methodBuilder, $builder);
 
         $returnVariables = $this->returnVariables($locals, $reflectionMethod, $source, $offsetStart, $offsetEnd);
-
+        
         $returnAssignment = $this->addReturnAndGetAssignment(
             $returnVariables,
             $methodBuilder,
             $args
         );
-
+        
         $prototype = $builder->build();
 
         $replacement = $this->replacement($name, $args, $selection, $returnAssignment);
@@ -263,10 +264,10 @@ class WorseExtractMethod implements ExtractMethod
             }
 
             $parameterBuilder = $methodBuilder->parameter($freeVariable->name());
-            $variableType = $freeVariable->symbolContext()->type();
-
+            $variableType = $freeVariable->symbolContext()->types()->best();
             if ($variableType->isDefined()) {
-                $parameterBuilder->type($variableType->short());
+                $prefix = $variableType->isNullable() ? '?' : '';
+                $parameterBuilder->type($prefix.$variableType->short());
                 if ($variableType->isClass()) {
                     $builder->use((string) $variableType);
                 }
@@ -289,20 +290,36 @@ class WorseExtractMethod implements ExtractMethod
     private function variableNames(string $source): array
     {
         $node = $this->parseSelection($source);
-        $variables = [];
+        $variables = $this->extractVariableNamesFromNode($node, []);
+        return array_values($variables);
+    }
 
-        /** @var Token $token */
-        foreach ($node->getDescendantTokens() as $token) {
-            if ($token->kind == TokenKind::VariableName) {
-                $text = $token->getText($node->getFileContents());
-                if (is_string($text)) {
+    private function extractVariableNamesFromNode(Node $node, array $ignoreNames): array
+    {
+        $fileContents = $node->getFileContents();
+        if ($node instanceof CatchClause && $node->variableName !== null) {
+            $ignoreNames[] = $node->variableName->getText($fileContents);
+        }
+        $variables = [];
+        foreach ($node->getChildNodesAndTokens() as $nodeOrToken) {
+            if ($nodeOrToken instanceof FunctionLike) {
+                continue;
+            }
+
+            if ($nodeOrToken instanceof Node) {
+                $variables = array_merge($variables, $this->extractVariableNamesFromNode($nodeOrToken, $ignoreNames));
+                continue;
+            }
+
+            if ($nodeOrToken->kind == TokenKind::VariableName) {
+                $text = $nodeOrToken->getText($fileContents);
+                if (is_string($text) && !in_array($text, $ignoreNames)) {
                     $name = substr($text, 1);
                     $variables[$name] = $name;
                 }
             }
         }
-
-        return array_values($variables);
+        return $variables;
     }
 
     private function addReturnAndGetAssignment(array $returnVariables, MethodBuilder $methodBuilder, array $args): ?string
@@ -327,11 +344,11 @@ class WorseExtractMethod implements ExtractMethod
             /** @var Variable $variable */
             $variable = reset($returnVariables);
             $methodBuilder->body()->line('return $' . $variable->name() . ';');
-
-            if ($variable->symbolContext()->type()->isDefined()) {
-                $type = $variable->symbolContext()->type();
+            $type = $variable->symbolContext()->types()->best();
+            if ($type->isDefined()) {
+                $prefix = $type->isNullable() ? '?' : '';
                 $className = $type->className();
-                $methodBuilder->returnType($type->short());
+                $methodBuilder->returnType($prefix.$type->short());
                 if ($className) {
                     $methodBuilder->end()->end()->use($className->full());
                 }
@@ -359,7 +376,7 @@ class WorseExtractMethod implements ExtractMethod
             $replacement = $indentation . $callString;
             $selectionRootNode = $this->parseSelection($selection);
 
-            if ($selectionRootNode->getFirstDescendantNode(ReturnStatement::class)) {
+            if ($this->nodeContainsReturnStatement($selectionRootNode)) {
                 $replacement = 'return ' . $replacement;
             }
 
@@ -367,6 +384,20 @@ class WorseExtractMethod implements ExtractMethod
         }
 
         return $indentation . $returnAssignment . ' = ' . $callString;
+    }
+
+    private function nodeContainsReturnStatement(Node $node): bool
+    {
+        foreach ($node->getDescendantNodes(
+            function (Node $n) {
+                return !($n instanceof FunctionLike);
+            }
+        ) as $node) {
+            if ($node instanceof ReturnStatement) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function isSelectionAnExpression(SourceCode $source, int $offsetStart, int $offsetEnd): bool

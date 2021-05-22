@@ -107,6 +107,10 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod16.test',
                 'newMethod',
             ],
+            'adds return type for nullable scalar' => [
+                'extractMethod16A.test',
+                'newMethod',
+            ],
             'adds return type for class' => [
                 'extractMethod17.test',
                 'newMethod',
@@ -158,6 +162,18 @@ class WorseExtractMethodTest extends WorseTestCase
                 'extractMethod28.test',
                 'newMethod',
                 'Cannot extract method. Check if start and end statements are in different scopes.'
+            ],
+            'nullable argument' => [
+                'extractMethod29.test',
+                'newMethod',
+            ],
+            'ignore scoped variables: catch clause' => [
+                'extractMethod30.test',
+                'newMethod',
+            ],
+            'ignore scoped variables: anonimous function' => [
+                'extractMethod31.test',
+                'newMethod',
             ],
         ];
     }
