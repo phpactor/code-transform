@@ -6,7 +6,6 @@ use Microsoft\PhpParser\FunctionLike;
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\Expression;
 use Microsoft\PhpParser\Node\StatementNode;
-use Microsoft\PhpParser\Node\Statement\ExpressionStatement;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\Refactor\ExtractExpression;
 use Phpactor\CodeTransform\Domain\SourceCode;
@@ -35,8 +34,9 @@ class TolerantExtractExpression implements ExtractExpression
     public function extractExpression(SourceCode $source, int $offsetStart, ?int $offsetEnd = null, string $variableName): TextEdits
     {
         $expression = $this->getExtractedExpression($source, $offsetStart, $offsetEnd);
-        if($expression === null)
+        if ($expression === null) {
             return TextEdits::none();
+        }
 
         $startPosition = $expression->getStart();
         $endPosition = $expression->getEndPosition();
@@ -61,11 +61,11 @@ class TolerantExtractExpression implements ExtractExpression
             $endNode = $rootNode->getDescendantNodeAtPosition($offsetEnd);
 
             $expression = $this->getCommonExpression($startNode, $endNode);
-            if($expression === null) {
+            if ($expression === null) {
                 // check if $endNode is not the whole row - try the last child
                 $children = iterator_to_array($endNode->getDescendantNodes());
                 $endNode = end($children);
-                if($endNode === false) {
+                if ($endNode === false) {
                     return null;
                 }
                 $expression = $this->getCommonExpression($startNode, $endNode);
@@ -74,7 +74,7 @@ class TolerantExtractExpression implements ExtractExpression
             $expression = $this->outerExpression($startNode);
         }
 
-        if($expression === null) {
+        if ($expression === null) {
             return null;
         }
         return $expression;
@@ -82,29 +82,32 @@ class TolerantExtractExpression implements ExtractExpression
     
     private function getCommonExpression(Node $node1, Node $node2): ?Expression
     {
-        if($node1 == $node2 && $node1 instanceof Expression)
+        if ($node1 == $node2 && $node1 instanceof Expression) {
             return $node1;
+        }
         $ancestor = $node1;
         $expressions = [];
-        if($node1 instanceof Expression)
+        if ($node1 instanceof Expression) {
             $expressions[] = $node1;
+        }
 
         while (($ancestor = $ancestor->parent) !== null) {
             if ($ancestor instanceof FunctionLike) {
                 break;
             }
-            if($ancestor instanceof Expression === false) {
+            if ($ancestor instanceof Expression === false) {
                 continue;
             }
             $expressions[] = $ancestor;
         }
 
-        if(empty($expressions))
+        if (empty($expressions)) {
             return null;
+        }
 
         $ancestor = $node2;
         while (($ancestor = $ancestor->parent) !== null) {
-            if(in_array($ancestor, $expressions, true)) {
+            if (in_array($ancestor, $expressions, true)) {
                 return $ancestor;
             }
         }
