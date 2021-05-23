@@ -3,6 +3,7 @@
 namespace Phpactor\CodeTransform\Tests\Adapter\TolerantParser\Refactor;
 
 use Exception;
+use Generator;
 use Phpactor\CodeTransform\Adapter\TolerantParser\Refactor\TolerantExtractExpression;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Tests\Adapter\TolerantParser\TolerantTestCase;
@@ -28,7 +29,7 @@ class TolerantExtractExpressionTest extends TolerantTestCase
         $this->assertEquals(trim($expected), trim($transformed));
     }
 
-    public function provideExtractExpression()
+    public function provideExtractExpression(): Generator
     {
         yield 'no op' => [
             'extractExpression1.test',
@@ -72,6 +73,41 @@ class TolerantExtractExpressionTest extends TolerantTestCase
 
         yield 'extract element in array' => [
             'extractExpression9.test',
+            'foobar',
+        ];
+
+        yield 'should not: start on method definition' => [
+            'extractExpression10.test',
+            'foobar',
+        ];
+
+        yield 'should not: start and end in different methods' => [
+            'extractExpression11.test',
+            'foobar',
+        ];
+
+        yield 'should not: start and end in different expressions' => [
+            'extractExpression12.test',
+            'foobar',
+        ];
+
+        yield 'multiline expression' => [
+            'extractExpression13.test',
+            'foobar',
+        ];
+
+        yield 'should not: inside class member list' => [
+            'extractExpression14.test',
+            'foobar',
+        ];
+
+        yield 'should not: class declaration' => [
+            'extractExpression15.test',
+            'foobar',
+        ];
+
+        yield 'should not: on function declaration' => [
+            'extractExpression16.test',
             'foobar',
         ];
     }
