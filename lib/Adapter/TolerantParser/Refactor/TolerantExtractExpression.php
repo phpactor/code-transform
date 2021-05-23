@@ -22,7 +22,7 @@ class TolerantExtractExpression implements ExtractExpression
         $this->parser = $parser ?: new Parser();
     }
 
-    public function extractExpression(SourceCode $source, int $offsetStart, int $offsetEnd = null, string $variableName): SourceCode
+    public function extractExpression(SourceCode $source, int $offsetStart, int $offsetEnd = null, string $variableName): TextEdits
     {
         $rootNode = $this->parser->parseSourceFile((string) $source);
         $startNode = $rootNode->getDescendantNodeAtPosition($offsetStart);
@@ -48,14 +48,16 @@ class TolerantExtractExpression implements ExtractExpression
         }
 
         if (null === $statement) {
-            return $source;
+            return TextEdits::none();
+            // return $source;
         }
 
         assert($statement instanceof StatementNode);
 
         $edits = $this->resolveEdits($statement, $startNode, $extractedString, $assigment, $variableName);
 
-        return $source->withSource(TextEdits::fromTextEdits($edits)->apply((string) $source));
+        return TextEdits::fromTextEdits($edits);
+        // return $source->withSource(TextEdits::fromTextEdits($edits)->apply((string) $source));
     }
 
     /**
