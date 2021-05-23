@@ -41,7 +41,7 @@ class TolerantExtractExpressionTest extends TolerantTestCase
             'foobar',
         ];
 
-        yield 'extract on end position semi-colon' => [
+        yield 'extract on end position semi-colon: object creation' => [
             'extractExpression3.test',
             'foobar',
         ];
@@ -56,8 +56,13 @@ class TolerantExtractExpressionTest extends TolerantTestCase
             'foobar',
         ];
 
-        yield 'single stand-alone array expression' => [
+        yield 'stand-alone expression: whole expression' => [
             'extractExpression6.test',
+            'foobar',
+        ];
+
+        yield 'stand-alone expression: partial expression' => [
+            'extractExpression6A.test',
             'foobar',
         ];
 
@@ -68,6 +73,11 @@ class TolerantExtractExpressionTest extends TolerantTestCase
 
         yield 'preserve statement indentation' => [
             'extractExpression8.test',
+            'foobar',
+        ];
+
+        yield 'preserve statement indentation with tabs' => [
+            'extractExpression8A.test',
             'foobar',
         ];
 
@@ -108,6 +118,16 @@ class TolerantExtractExpressionTest extends TolerantTestCase
 
         yield 'should not: on function declaration' => [
             'extractExpression16.test',
+            'foobar',
+        ];
+
+        yield 'single assignment expression: method call without semi-colon' => [
+            'extractExpression17.test',
+            'foobar',
+        ];
+
+        yield 'single assignment expression: method call with semi-colon' => [
+            'extractExpression17A.test',
             'foobar',
         ];
     }

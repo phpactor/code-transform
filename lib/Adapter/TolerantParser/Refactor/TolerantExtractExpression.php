@@ -6,6 +6,7 @@ use Microsoft\PhpParser\FunctionLike;
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\Expression;
 use Microsoft\PhpParser\Node\StatementNode;
+use Microsoft\PhpParser\Node\Statement\ExpressionStatement;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Domain\Refactor\ExtractExpression;
 use Phpactor\CodeTransform\Domain\SourceCode;
@@ -59,16 +60,25 @@ class TolerantExtractExpression implements ExtractExpression
 
         if ($offsetEnd) {
             $endNode = $rootNode->getDescendantNodeAtPosition($offsetEnd);
-
             $expression = $this->getCommonExpression($startNode, $endNode);
-            if ($expression === null) {
-                // check if $endNode is not the whole row - try the last child
-                $children = iterator_to_array($endNode->getDescendantNodes());
-                $endNode = end($children);
-                if ($endNode === false) {
+            
+            if ($expression === null && $endNode instanceof ExpressionStatement) {
+                // <expression-statement> := <expression>;
+                // check if $endNode does not contain the semi-colon
+                // then find the last child expression that ends at the semi-colon
+                assert($endNode instanceof ExpressionStatement);
+                $expressions = array_filter(
+                    iterator_to_array($endNode->getDescendantNodes(), false),
+                    function (Node $item) use ($endNode) {
+                        return $item instanceof Expression && $item->getEndPosition() == $endNode->expression->getEndPosition();
+                    }
+                );
+                
+                if (empty($expressions)) {
                     return null;
                 }
-                $expression = $this->getCommonExpression($startNode, $endNode);
+                
+                $expression = $this->getCommonExpression($startNode, end($expressions));
             }
         } else {
             $expression = $this->outerExpression($startNode);
@@ -77,6 +87,7 @@ class TolerantExtractExpression implements ExtractExpression
         if ($expression === null) {
             return null;
         }
+
         return $expression;
     }
     
@@ -106,6 +117,9 @@ class TolerantExtractExpression implements ExtractExpression
         }
 
         $ancestor = $node2;
+        if (in_array($ancestor, $expressions, true)) {
+            return $ancestor;
+        }
         while (($ancestor = $ancestor->parent) !== null) {
             if (in_array($ancestor, $expressions, true)) {
                 return $ancestor;
@@ -124,16 +138,19 @@ class TolerantExtractExpression implements ExtractExpression
         string $assignment,
         string $variableName
     ): array {
-        if ($statement->getStart() === $expression->getStart()) {
+        if ($statement instanceof ExpressionStatement && $statement->expression === $expression) {
             return [
                 TextEdit::create($statement->getStart(), $statement->getWidth(), $assignment)
             ];
         }
 
-        $indentation = mb_substr_count($statement->getLeadingCommentAndWhitespaceText(), ' ');
+        $leadingWhitespace = $statement->getLeadingCommentAndWhitespaceText();
+        $leadingSpaces = mb_substr_count($leadingWhitespace, ' ');
+        $leadingTabs = mb_substr_count($leadingWhitespace, "\t");
+        $indentation = max($leadingSpaces, $leadingTabs);
         
         return [
-            TextEdit::create($statement->getStart(), 0, $assignment . str_repeat(' ', $indentation)),
+            TextEdit::create($statement->getStart(), 0, $assignment . str_repeat($leadingSpaces > $leadingTabs ? ' ' : "\t", $indentation)),
             TextEdit::create($expression->getStart(), strlen($extractedString), '$' . $variableName),
         ];
     }
