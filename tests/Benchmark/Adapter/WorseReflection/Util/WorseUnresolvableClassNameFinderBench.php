@@ -6,6 +6,10 @@ use Generator;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Helper\WorseUnresolvableClassNameFinder;
 use Phpactor\TextDocument\TextDocumentBuilder;
+use Phpactor\WorseReflection\Core\Exception\SourceNotFound;
+use Phpactor\WorseReflection\Core\Name;
+use Phpactor\WorseReflection\Core\SourceCode;
+use Phpactor\WorseReflection\Core\SourceCodeLocator;
 use Phpactor\WorseReflection\ReflectorBuilder;
 
 final class WorseUnresolvableClassNameFinderBench
@@ -17,8 +21,15 @@ final class WorseUnresolvableClassNameFinderBench
 
     public function __construct()
     {
+        $locator = new class implements SourceCodeLocator {
+            public function locate(Name $name): SourceCode
+            {
+                usleep(10);
+                throw new SourceNotFound('Nope');
+            }
+        };
         $this->finder = new WorseUnresolvableClassNameFinder(
-            ReflectorBuilder::create()->build(),
+            ReflectorBuilder::create()->addLocator($locator)->build(),
             new Parser()
         );
     }
