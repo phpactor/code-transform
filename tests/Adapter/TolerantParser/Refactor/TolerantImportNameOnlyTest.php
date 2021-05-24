@@ -9,7 +9,7 @@ use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\TextDocument\ByteOffset;
 use Phpactor\TextDocument\TextEdits;
 
-class TolerantImportNameTest extends AbstractTolerantImportNameTest
+class TolerantImportNameOnlyTest extends AbstractTolerantImportNameTest
 {
     public function provideImportClass(): Generator
     {
@@ -29,25 +29,25 @@ class TolerantImportNameTest extends AbstractTolerantImportNameTest
         ];
 
         yield 'with alias' => [
-            'importClass4.test',
+            'importOnlyClass4.test',
             'Barfoo\Foobar',
             'Barfoo',
         ];
 
         yield 'with static alias' => [
-            'importClass5.test',
+            'importOnlyClass5.test',
             'Barfoo\Foobar',
             'Barfoo',
         ];
 
         yield 'with multiple aliases' => [
-            'importClass6.test',
+            'importOnlyClass6.test',
             'Barfoo\Foobar',
             'Barfoo',
         ];
 
         yield 'with alias and existing name' => [
-            'importClass7.test',
+            'importOnlyClass7.test',
             'Barfoo\Foobar',
             'Barfoo',
         ];
@@ -79,6 +79,6 @@ class TolerantImportNameTest extends AbstractTolerantImportNameTest
     protected function importName($source, int $offset, NameImport $nameImport): TextEdits
     {
         $importClass = (new TolerantImportName($this->updater(), $this->parser()));
-        return $importClass->importName(SourceCode::fromString($source), ByteOffset::fromInt($offset), $nameImport);
+        return $importClass->importNameOnly(SourceCode::fromString($source), ByteOffset::fromInt($offset), $nameImport);
     }
 }
