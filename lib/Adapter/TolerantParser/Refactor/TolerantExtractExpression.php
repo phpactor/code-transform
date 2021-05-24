@@ -14,6 +14,7 @@ use Phpactor\TextDocument\TextEdit;
 use Phpactor\TextDocument\TextEdits;
 use function end;
 use function iterator_to_array;
+use function preg_match;
 
 class TolerantExtractExpression implements ExtractExpression
 {
@@ -144,13 +145,14 @@ class TolerantExtractExpression implements ExtractExpression
             ];
         }
 
-        $leadingWhitespace = $statement->getLeadingCommentAndWhitespaceText();
-        $leadingSpaces = mb_substr_count($leadingWhitespace, ' ');
-        $leadingTabs = mb_substr_count($leadingWhitespace, "\t");
-        $indentation = max($leadingSpaces, $leadingTabs);
+        $matches = [];
+        $indentation = '';
+        if (preg_match('/(\t| )*$/', $statement->getLeadingCommentAndWhitespaceText(), $matches) > 0) {
+            $indentation = $matches[0];
+        }
         
         return [
-            TextEdit::create($statement->getStart(), 0, $assignment . str_repeat($leadingSpaces > $leadingTabs ? ' ' : "\t", $indentation)),
+            TextEdit::create($statement->getStart(), 0, $assignment . $indentation),
             TextEdit::create($expression->getStart(), strlen($extractedString), '$' . $variableName),
         ];
     }

@@ -71,13 +71,18 @@ class TolerantExtractExpressionTest extends TolerantTestCase
             'foobar',
         ];
 
-        yield 'preserve statement indentation' => [
+        yield 'preserve statement indentation: spaces' => [
             'extractExpression8.test',
             'foobar',
         ];
 
-        yield 'preserve statement indentation with tabs' => [
+        yield 'preserve statement indentation: tabs' => [
             'extractExpression8A.test',
+            'foobar',
+        ];
+ 
+        yield 'preserve statement indentation: tabs and comments' => [
+            'extractExpression8B.test',
             'foobar',
         ];
 
