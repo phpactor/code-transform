@@ -71,7 +71,9 @@ class TolerantExtractExpression implements ExtractExpression
                 $expressions = array_filter(
                     iterator_to_array($endNode->getDescendantNodes(), false),
                     function (Node $item) use ($endNode) {
-                        return $item instanceof Expression && $item->getEndPosition() == $endNode->expression->getEndPosition();
+                        return
+                            $item instanceof Expression &&
+                            $item->getEndPosition() == $endNode->expression->getEndPosition();
                     }
                 );
                 
