@@ -60,7 +60,7 @@ class WorseExtractMethod implements ExtractMethod
 
     public function canExtractMethod(SourceCode $source, int $offsetStart, int $offsetEnd): bool
     {
-        if ($offsetEnd == $offsetStart) {
+        if ($offsetEnd == $offsetStart || $offsetEnd - $offsetStart === strlen($source->__toString())) {
             return false;
         }
         $node = $this->parser->parseSourceFile($source->__toString());
