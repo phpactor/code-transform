@@ -5,7 +5,6 @@ namespace Phpactor\CodeTransform\Tests\Benchmark\Adapter\WorseReflection\Util;
 use Generator;
 use Microsoft\PhpParser\Parser;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Helper\WorseUnresolvableClassNameFinder;
-use Phpactor\TextDocument\TextDocument;
 use Phpactor\TextDocument\TextDocumentBuilder;
 use Phpactor\WorseReflection\ReflectorBuilder;
 
