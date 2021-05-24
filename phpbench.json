@@ -1,0 +1,8 @@
+{
+    "runner.revs": 30,
+    "runner.iterations": 10,
+    "runner.retry_threshold": 5,
+    "runner.assert": "mode(variant.time.avg) as ms < mode(baseline.time.avg) as ms +/- 10%",
+    "runner.path": "tests/Benchmark",
+    "runner.bootstrap": "vendor/autoload.php"
+}
