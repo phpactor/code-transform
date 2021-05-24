@@ -79,7 +79,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
         yield 'unresolvable class' => [
             <<<'EOT'
                 // File: test.php
-                <?php new NotFound();
+                <?php new NotFound(); new NotFound();
                 EOT
             ,[
                 new NameWithByteOffset(
@@ -345,7 +345,7 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
         yield 'unresolvable function' => [
             <<<'EOT'
                 // File: test.php
-                <?php foo();
+                <?php foo(); foo();
                 EOT
             ,[
                 new NameWithByteOffset(

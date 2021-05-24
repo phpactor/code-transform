@@ -122,6 +122,12 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
 
     private function appendUnresolvedClassName(string $nameText, array $unresolvedNames, QualifiedName $name): array
     {
+        if (current(array_filter($unresolvedNames, function (NameWithByteOffset $name) use ($nameText) {
+            return (string)$name->name() === $nameText;
+        })) !== false) {
+            return $unresolvedNames;
+        }
+        
         try {
             $class = $this->reflector->sourceCodeForClassLike($nameText);
         } catch (NotFound $notFound) {
@@ -137,6 +143,12 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
 
     private function appendUnresolvedFunctionName(string $nameText, array $unresolvedNames, QualifiedName $name): array
     {
+        if (current(array_filter($unresolvedNames, function (NameWithByteOffset $name) use ($nameText) {
+            return (string)$name->name() === $nameText;
+        })) !== false) {
+            return $unresolvedNames;
+        }
+
         try {
             $this->reflector->sourceCodeForFunction($nameText);
         } catch (NotFound $notFound) {
