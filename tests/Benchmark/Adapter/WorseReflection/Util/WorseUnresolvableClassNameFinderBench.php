@@ -29,7 +29,9 @@ final class WorseUnresolvableClassNameFinderBench
             }
         };
         $this->finder = new WorseUnresolvableClassNameFinder(
-            ReflectorBuilder::create()->addLocator($locator)->build(),
+            ReflectorBuilder::create()
+                ->enableCache()
+                ->addLocator($locator)->build(),
             new Parser()
         );
     }
