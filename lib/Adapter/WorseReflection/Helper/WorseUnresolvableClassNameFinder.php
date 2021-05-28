@@ -66,14 +66,15 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
     private function filterResolvedNames(array $names): array
     {
         $unresolvedNames = [];
+        $notFound = [];
         foreach ($names as $name) {
-            $unresolvedNames = $this->appendUnresolvedName($name, $unresolvedNames);
+            $unresolvedNames = $this->appendUnresolvedName($name, $unresolvedNames, $notFound);
         }
 
         return $unresolvedNames;
     }
 
-    private function appendUnresolvedName(QualifiedName $name, array $unresolvedNames): array
+    private function appendUnresolvedName(QualifiedName $name, array $unresolvedNames, array &$notFoundCache): array
     {
         // Tolerant parser does not resolve names for constructs that define symbol names or aliases
         $resolvedName = TolerantQualifiedNameResolver::getResolvedName($name);
@@ -81,7 +82,12 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         // Parser returns "NULL" for unqualified namespaced function / constant
         // names, but will return the FQN for references...
         if (!$resolvedName && $name->parent instanceof CallExpression) {
-            return $this->appendUnresolvedFunctionName($name->getNamespacedName()->__toString(), $unresolvedNames, $name);
+            return $this->appendUnresolvedFunctionName(
+                $name->getNamespacedName()->__toString(),
+                $unresolvedNames,
+                $name,
+                $notFoundCache
+            );
         }
 
         if (in_array($resolvedName, ['self', 'static', 'parent'])) {
@@ -101,7 +107,12 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         // Function names in global namespace have a "resolved name"
         // (inconsistent parser behavior)
         if ($name->parent instanceof CallExpression) {
-            return $this->appendUnresolvedFunctionName($name->getResolvedName() ?? $name->getText(), $unresolvedNames, $name);
+            return $this->appendUnresolvedFunctionName(
+                $name->getResolvedName() ?? $name->getText(),
+                $unresolvedNames,
+                $name,
+                $notFoundCache
+            );
         }
 
         if (
@@ -117,14 +128,27 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
             return $unresolvedNames;
         }
 
-        return $this->appendUnresolvedClassName($resolvedName, $unresolvedNames, $name);
+        return $this->appendUnresolvedClassName(
+            $resolvedName,
+            $unresolvedNames,
+            $name,
+            $notFoundCache
+        );
     }
 
-    private function appendUnresolvedClassName(string $nameText, array $unresolvedNames, QualifiedName $name): array
+    /**
+     * @param array<string,NotFound> $notFoundCache
+     */
+    private function appendUnresolvedClassName(string $nameText, array $unresolvedNames, QualifiedName $name, &$notFoundCache): array
     {
+        $cacheKey =  'c:' . $nameText;
         try {
+            if (isset($notFoundCache[$cacheKey])) {
+                throw $notFoundCache[$cacheKey];
+            }
             $class = $this->reflector->sourceCodeForClassLike($nameText);
         } catch (NotFound $notFound) {
+            $notFoundCache[$cacheKey] = $notFound;
             $unresolvedNames[] = new NameWithByteOffset(
                 PhpactorQualifiedName::fromString($nameText),
                 ByteOffset::fromInt($name->getStart()),
@@ -135,11 +159,19 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         return $unresolvedNames;
     }
 
-    private function appendUnresolvedFunctionName(string $nameText, array $unresolvedNames, QualifiedName $name): array
+    /**
+     * @param array<string,NotFound> $notFoundCache
+     */
+    private function appendUnresolvedFunctionName(string $nameText, array $unresolvedNames, QualifiedName $name, &$notFoundCache): array
     {
+        $cacheKey = 'f:' . $nameText;
         try {
+            if (isset($notFoundCache[$cacheKey])) {
+                throw $notFoundCache[$cacheKey];
+            }
             $this->reflector->sourceCodeForFunction($nameText);
         } catch (NotFound $notFound) {
+            $notFoundCache[$cacheKey] = $notFound;
             $unresolvedNames[] = new NameWithByteOffset(
                 PhpactorQualifiedName::fromString($nameText),
                 ByteOffset::fromInt($name->getStart()),
