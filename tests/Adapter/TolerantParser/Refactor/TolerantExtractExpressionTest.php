@@ -3,6 +3,7 @@
 namespace Phpactor\CodeTransform\Tests\Adapter\TolerantParser\Refactor;
 
 use Exception;
+use Generator;
 use Phpactor\CodeTransform\Adapter\TolerantParser\Refactor\TolerantExtractExpression;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Tests\Adapter\TolerantParser\TolerantTestCase;
@@ -22,12 +23,13 @@ class TolerantExtractExpressionTest extends TolerantTestCase
         }
 
         $extractMethod = new TolerantExtractExpression();
-        $transformed = $extractMethod->extractExpression(SourceCode::fromString($source), $offsetStart, $offsetEnd, $name);
-
+        
+        $textEdits = $extractMethod->extractExpression(SourceCode::fromString($source), $offsetStart, $offsetEnd, $name);
+        $transformed = $textEdits->apply($source);
         $this->assertEquals(trim($expected), trim($transformed));
     }
 
-    public function provideExtractExpression()
+    public function provideExtractExpression(): Generator
     {
         yield 'no op' => [
             'extractExpression1.test',
@@ -39,7 +41,7 @@ class TolerantExtractExpressionTest extends TolerantTestCase
             'foobar',
         ];
 
-        yield 'extract on end position semi-colon' => [
+        yield 'extract on end position semi-colon: object creation' => [
             'extractExpression3.test',
             'foobar',
         ];
@@ -54,8 +56,13 @@ class TolerantExtractExpressionTest extends TolerantTestCase
             'foobar',
         ];
 
-        yield 'single stand-alone array expression' => [
+        yield 'stand-alone expression: whole expression' => [
             'extractExpression6.test',
+            'foobar',
+        ];
+
+        yield 'stand-alone expression: partial expression' => [
+            'extractExpression6A.test',
             'foobar',
         ];
 
@@ -64,13 +71,68 @@ class TolerantExtractExpressionTest extends TolerantTestCase
             'foobar',
         ];
 
-        yield 'preserve statement indentation' => [
+        yield 'preserve statement indentation: spaces' => [
             'extractExpression8.test',
+            'foobar',
+        ];
+
+        yield 'preserve statement indentation: tabs' => [
+            'extractExpression8A.test',
+            'foobar',
+        ];
+ 
+        yield 'preserve statement indentation: tabs and comments' => [
+            'extractExpression8B.test',
             'foobar',
         ];
 
         yield 'extract element in array' => [
             'extractExpression9.test',
+            'foobar',
+        ];
+
+        yield 'should not: start on method definition' => [
+            'extractExpression10.test',
+            'foobar',
+        ];
+
+        yield 'should not: start and end in different methods' => [
+            'extractExpression11.test',
+            'foobar',
+        ];
+
+        yield 'should not: start and end in different expressions' => [
+            'extractExpression12.test',
+            'foobar',
+        ];
+
+        yield 'multiline expression' => [
+            'extractExpression13.test',
+            'foobar',
+        ];
+
+        yield 'should not: inside class member list' => [
+            'extractExpression14.test',
+            'foobar',
+        ];
+
+        yield 'should not: class declaration' => [
+            'extractExpression15.test',
+            'foobar',
+        ];
+
+        yield 'should not: on function declaration' => [
+            'extractExpression16.test',
+            'foobar',
+        ];
+
+        yield 'single assignment expression: method call without semi-colon' => [
+            'extractExpression17.test',
+            'foobar',
+        ];
+
+        yield 'single assignment expression: method call with semi-colon' => [
+            'extractExpression17A.test',
             'foobar',
         ];
     }
