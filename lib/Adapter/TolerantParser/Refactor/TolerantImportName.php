@@ -18,7 +18,6 @@ use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Microsoft\PhpParser\Node;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\AliasAlreadyUsedException;
-use Microsoft\PhpParser\Node\Statement\ClassDeclaration;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassIsCurrentClassException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameAlreadyInNamespaceException;
 use Phpactor\Name\FullyQualifiedName;
@@ -129,7 +128,7 @@ class TolerantImportName implements ImportName
 
     private function currentClassIsSameAsImportClass(Node $node, FullyQualifiedName $className): bool
     {
-        if (!$node instanceof ClassDeclaration) {
+        if (!$node instanceof ClassLike || !$node instanceof NamespacedNameInterface) {
             return false;
         }
 

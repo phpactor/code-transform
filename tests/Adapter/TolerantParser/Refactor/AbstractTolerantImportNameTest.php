@@ -41,6 +41,20 @@ abstract class AbstractTolerantImportNameTest extends TolerantTestCase
         $this->importName('<?php class Foobar {}', 14, NameImport::forClass('Foobar'));
     }
 
+    public function testThrowsExceptionClassIsCurrentClassExceptionTrait(): void
+    {
+        $this->expectException(ClassIsCurrentClassException::class);
+        $this->expectExceptionMessage('Class "Foobar" is the current class');
+        $this->importName('<?php trait Foobar {}', 14, NameImport::forClass('Foobar'));
+    }
+
+    public function testThrowsExceptionClassIsCurrentClassExceptionInterface(): void
+    {
+        $this->expectException(ClassIsCurrentClassException::class);
+        $this->expectExceptionMessage('Class "Foobar" is the current class');
+        $this->importName('<?php interface Foobar {}', 14, NameImport::forClass('Foobar'));
+    }
+
     public function testThrowsExceptionIfAliasAlreadyUsed(): void
     {
         $this->expectException(AliasAlreadyUsedException::class);
