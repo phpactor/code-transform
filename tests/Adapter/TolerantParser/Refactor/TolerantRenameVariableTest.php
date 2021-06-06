@@ -14,7 +14,7 @@ class TolerantRenameVariableTest extends TolerantTestCase
      */
     public function testRenameVariable(string $test, $name, string $scope = RenameVariable::SCOPE_FILE): void
     {
-        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
+        [$source, $expected, $offset] = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
         $renameVariable = new TolerantRenameVariable($this->parser());
         $transformed = $renameVariable->renameVariable(SourceCode::fromString($source), $offset, $name, $scope);

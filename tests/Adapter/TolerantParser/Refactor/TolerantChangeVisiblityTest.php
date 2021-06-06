@@ -13,7 +13,7 @@ class TolerantChangeVisiblityTest extends TolerantTestCase
      */
     public function testExtractExpression(string $test): void
     {
-        list($source, $expected, $offsetStart) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
+        [$source, $expected, $offsetStart] = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
         $extractMethod = new TolerantChangeVisiblity();
         $transformed = $extractMethod->changeVisiblity(SourceCode::fromString($source), $offsetStart);

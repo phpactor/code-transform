@@ -16,7 +16,7 @@ class WorseGenerateMethodTest extends WorseTestCase
      */
     public function testGenerateMethod(string $test, ?string $name = null): void
     {
-        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
+        [$source, $expected, $offset] = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
         $transformed = $this->generateMethod($source, $offset, $name);
 

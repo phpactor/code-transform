@@ -20,7 +20,7 @@ abstract class AbstractTolerantImportNameTest extends TolerantTestCase
      */
     public function testImportClass(string $test, string $name, string $alias = null): void
     {
-        list($expected, $transformed) = $this->importNameFromTestFile('class', $test, $name, $alias);
+        [$expected, $transformed] = $this->importNameFromTestFile('class', $test, $name, $alias);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -195,7 +195,7 @@ abstract class AbstractTolerantImportNameTest extends TolerantTestCase
      */
     public function testImportFunction(string $test, string $name, string $alias = null): void
     {
-        list($expected, $transformed) = $this->importNameFromTestFile('function', $test, $name, $alias);
+        [$expected, $transformed] = $this->importNameFromTestFile('function', $test, $name, $alias);
 
         $this->assertEquals(trim($expected), trim($transformed));
     }
@@ -206,7 +206,7 @@ abstract class AbstractTolerantImportNameTest extends TolerantTestCase
 
     private function importNameFromTestFile(string $type, string $test, string $name, string $alias = null)
     {
-        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
+        [$source, $expected, $offset] = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
         $edits = TextEdits::none();
 
         if ($type === 'class') {

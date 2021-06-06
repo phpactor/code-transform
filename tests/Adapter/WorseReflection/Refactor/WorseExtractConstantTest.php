@@ -14,7 +14,7 @@ class WorseExtractConstantTest extends WorseTestCase
      */
     public function testExtractConstant(string $test, $name): void
     {
-        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
+        [$source, $expected, $offset] = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
         $extractConstant = new WorseExtractConstant($this->reflectorForWorkspace($source), $this->updater());
         $transformed = $extractConstant->extractConstant(SourceCode::fromString($source), $offset, $name);
