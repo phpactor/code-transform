@@ -77,11 +77,15 @@ class TolerantImportName implements ImportName
         $imports = $node->getImportTablesForCurrentScope()[$this->resolveImportTableOffset($nameImport)];
 
         if (null === $nameImport->alias() && isset($imports[$nameImport->name()->head()->__toString()])) {
-            throw new NameAlreadyImportedException($nameImport, $this->findExistingName($nameImport, $imports));
+            throw new NameAlreadyImportedException(
+                $nameImport,
+                $this->findExistingName($nameImport, $imports),
+                $nameImport->name()
+            );
         }
 
         if (null === $nameImport->alias() && $currentClass && $currentClass->short() === $nameImport->name()->head()->__toString()) {
-            throw new NameAlreadyImportedException($nameImport, $currentClass->__toString());
+            throw new NameAlreadyImportedException($nameImport, $currentClass->short(), $currentClass->__toString());
         }
 
         if ($nameImport->alias() && isset($imports[$nameImport->alias()])) {
@@ -113,19 +117,19 @@ class TolerantImportName implements ImportName
     /**
      * @param NameImport $nameImport
      * @param array<ResolvedName> $imports
-     * @return ResolvedName
+     * @return string
      */
-    private function findExistingName(NameImport $nameImport, array $imports): ResolvedName
+    private function findExistingName(NameImport $nameImport, array $imports): string
     {
         $nameImportParts = $nameImport->name()->toArray();
 
-        foreach ($imports as $import) {
+        foreach ($imports as $importName => $import) {
             if ($import->getNameParts() === $nameImportParts) {
-                return $import;
+                return $importName;
             }
         }
 
-        return $imports[$nameImport->name()->head()->__toString()];
+        return $nameImport->name()->head()->__toString();
     }
 
     private function addImport(SourceCode $source, NameImport $nameImport): TextEdits

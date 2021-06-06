@@ -59,18 +59,27 @@ abstract class AbstractTolerantImportNameTest extends TolerantTestCase
             self::fail('Expected NameAlreadyImportedException has not been raised');
         } catch (NameAlreadyImportedException $error) {
             self::assertSame('Class "Bar" is already imported', $error->getMessage());
-            self::assertSame('Foo2\Bar', $error->existingName());
+            self::assertSame('Bar', $error->name());
+            self::assertSame('Foo2Bar', $error->existingName());
+            self::assertSame('Foo2\Bar', $error->existingFQN());
         }
     }
 
     public function testThrowsExceptionIfImportedClassHasSameNameAsCurrentClassName(): void
     {
-        $this->expectException(NameAlreadyImportedException::class);
-        $this->importName(
-            '<?php namespace Barfoo; class Foobar extends Foobar',
-            47,
-            NameImport::forClass('BazBar\Foobar')
-        );
+        try {
+            $this->importName(
+                '<?php namespace Barfoo; class Foobar extends Foobar',
+                47,
+                NameImport::forClass('BazBar\Foobar')
+            );
+            self::fail('Expected NameAlreadyImportedException has not been raised');
+        } catch (NameAlreadyImportedException $error) {
+            self::assertSame('Class "Foobar" is already imported', $error->getMessage());
+            self::assertSame('Foobar', $error->name());
+            self::assertSame('Foobar', $error->existingName());
+            self::assertSame('Barfoo\Foobar', $error->existingFQN());
+        }
     }
 
     public function testThrowsExceptionIfImportedClassHasSameNameAsCurrentInterfaceName(): void
