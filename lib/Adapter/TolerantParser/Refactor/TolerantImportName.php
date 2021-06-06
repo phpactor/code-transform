@@ -5,6 +5,7 @@ namespace Phpactor\CodeTransform\Adapter\TolerantParser\Refactor;
 use Microsoft\PhpParser\ClassLike;
 use Microsoft\PhpParser\NamespacedNameInterface;
 use Microsoft\PhpParser\Node\SourceFileNode;
+use Microsoft\PhpParser\ResolvedName;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameImport;
 use Phpactor\CodeTransform\Domain\Refactor\ImportName;
 use Microsoft\PhpParser\Parser;
@@ -76,7 +77,7 @@ class TolerantImportName implements ImportName
         $imports = $node->getImportTablesForCurrentScope()[$this->resolveImportTableOffset($nameImport)];
 
         if (null === $nameImport->alias() && isset($imports[$nameImport->name()->head()->__toString()])) {
-            throw new NameAlreadyImportedException($nameImport, $imports[$nameImport->name()->head()->__toString()]);
+            throw new NameAlreadyImportedException($nameImport, $this->findExistingName($nameImport, $imports));
         }
 
         if (null === $nameImport->alias() && $currentClass && $currentClass->short() === $nameImport->name()->head()->__toString()) {
@@ -107,6 +108,24 @@ class TolerantImportName implements ImportName
         }
 
         return false;
+    }
+
+    /**
+     * @param NameImport $nameImport
+     * @param array<ResolvedName> $imports
+     * @return ResolvedName
+     */
+    private function findExistingName(NameImport $nameImport, array $imports): ResolvedName
+    {
+        $nameImportParts = $nameImport->name()->toArray();
+
+        foreach ($imports as $import) {
+            if ($import->getNameParts() === $nameImportParts) {
+                return $import;
+            }
+        }
+
+        return $imports[$nameImport->name()->head()->__toString()];
     }
 
     private function addImport(SourceCode $source, NameImport $nameImport): TextEdits
