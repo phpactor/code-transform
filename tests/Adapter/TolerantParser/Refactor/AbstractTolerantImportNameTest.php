@@ -65,6 +65,23 @@ abstract class AbstractTolerantImportNameTest extends TolerantTestCase
         }
     }
 
+    public function testThrowsNameAlreadyImportedNameInUse(): void
+    {
+        try {
+            $this->importName(
+                '<?php namespace Foo; use Foo1\Bar;',
+                34,
+                NameImport::forClass('Foo2\Bar')
+            );
+            self::fail('Expected NameAlreadyImportedException has not been raised');
+        } catch (NameAlreadyImportedException $error) {
+            self::assertSame('Class "Bar" is already imported', $error->getMessage());
+            self::assertSame('Bar', $error->name());
+            self::assertSame('Bar', $error->existingName());
+            self::assertSame('Foo1\Bar', $error->existingFQN());
+        }
+    }
+
     public function testThrowsNameAlreadyImportedOnlyAliasName(): void
     {
         try {
