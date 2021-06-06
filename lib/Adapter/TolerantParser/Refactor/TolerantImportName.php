@@ -76,12 +76,9 @@ class TolerantImportName implements ImportName
         $currentClass = $this->currentClass($node);
         $imports = $node->getImportTablesForCurrentScope()[$this->resolveImportTableOffset($nameImport)];
 
-        if (null === $nameImport->alias() && isset($imports[$nameImport->name()->head()->__toString()])) {
-            throw new NameAlreadyImportedException(
-                $nameImport,
-                $this->findExistingName($nameImport, $imports),
-                $nameImport->name()
-            );
+        $existingName = $this->findExistingName($nameImport, $imports);
+        if (null === $nameImport->alias() && $existingName !== null) {
+            throw new NameAlreadyImportedException($nameImport, $existingName, $nameImport->name());
         }
 
         if (null === $nameImport->alias() && $currentClass && $currentClass->short() === $nameImport->name()->head()->__toString()) {
@@ -101,6 +98,24 @@ class TolerantImportName implements ImportName
         }
     }
 
+    /**
+     * @param NameImport $nameImport
+     * @param array<ResolvedName> $imports
+     * @return string|null
+     */
+    private function findExistingName(NameImport $nameImport, array $imports): ?string
+    {
+        $nameImportParts = $nameImport->name()->toArray();
+
+        foreach ($imports as $name => $import) {
+            if ($import->getNameParts() === $nameImportParts) {
+                return $name;
+            }
+        }
+
+        return null;
+    }
+
     private function currentClassIsSameAsImportClass(Node $node, FullyQualifiedName $className): bool
     {
         if (!$node instanceof ClassDeclaration) {
@@ -112,24 +127,6 @@ class TolerantImportName implements ImportName
         }
 
         return false;
-    }
-
-    /**
-     * @param NameImport $nameImport
-     * @param array<ResolvedName> $imports
-     * @return string
-     */
-    private function findExistingName(NameImport $nameImport, array $imports): string
-    {
-        $nameImportParts = $nameImport->name()->toArray();
-
-        foreach ($imports as $importName => $import) {
-            if ($import->getNameParts() === $nameImportParts) {
-                return $importName;
-            }
-        }
-
-        return $nameImport->name()->head()->__toString();
     }
 
     private function addImport(SourceCode $source, NameImport $nameImport): TextEdits

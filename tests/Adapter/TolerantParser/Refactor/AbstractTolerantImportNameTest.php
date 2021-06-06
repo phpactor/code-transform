@@ -48,7 +48,7 @@ abstract class AbstractTolerantImportNameTest extends TolerantTestCase
         $this->importNameFromTestFile('class', 'importClass1.test', 'Foobar', 'DateTime');
     }
 
-    public function testThrowsNameAlreadyImportedExistingName(): void
+    public function testThrowsNameAlreadyImportedExistingAliasName(): void
     {
         try {
             $this->importName(
@@ -62,6 +62,57 @@ abstract class AbstractTolerantImportNameTest extends TolerantTestCase
             self::assertSame('Bar', $error->name());
             self::assertSame('Foo2Bar', $error->existingName());
             self::assertSame('Foo2\Bar', $error->existingFQN());
+        }
+    }
+
+    public function testThrowsNameAlreadyImportedOnlyAliasName(): void
+    {
+        try {
+            $this->importName(
+                '<?php namespace Foo; use Foo2\Bar as Foo2Bar;',
+                45,
+                NameImport::forClass('Foo2\Bar')
+            );
+            self::fail('Expected NameAlreadyImportedException has not been raised');
+        } catch (NameAlreadyImportedException $error) {
+            self::assertSame('Class "Bar" is already imported', $error->getMessage());
+            self::assertSame('Bar', $error->name());
+            self::assertSame('Foo2Bar', $error->existingName());
+            self::assertSame('Foo2\Bar', $error->existingFQN());
+        }
+    }
+
+    public function testThrowsNameAlreadyImportedFunction(): void
+    {
+        try {
+            $this->importName(
+                '<?php use function in_array;',
+                55,
+                NameImport::forFunction('in_array')
+            );
+            self::fail('Expected NameAlreadyImportedException has not been raised');
+        } catch (NameAlreadyImportedException $error) {
+            self::assertSame('Function "in_array" is already imported', $error->getMessage());
+            self::assertSame('in_array', $error->name());
+            self::assertSame('in_array', $error->existingName());
+            self::assertSame('in_array', $error->existingFQN());
+        }
+    }
+
+    public function testThrowsNameAlreadyImportedFunctionAlias(): void
+    {
+        try {
+            $this->importName(
+                '<?php use function in_array as foo_in_array;',
+                55,
+                NameImport::forFunction('in_array')
+            );
+            self::fail('Expected NameAlreadyImportedException has not been raised');
+        } catch (NameAlreadyImportedException $error) {
+            self::assertSame('Function "in_array" is already imported', $error->getMessage());
+            self::assertSame('in_array', $error->name());
+            self::assertSame('foo_in_array', $error->existingName());
+            self::assertSame('in_array', $error->existingFQN());
         }
     }
 
