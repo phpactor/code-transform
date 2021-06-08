@@ -18,7 +18,6 @@ use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
 use Microsoft\PhpParser\Node;
 use Phpactor\CodeBuilder\Domain\Code;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\AliasAlreadyUsedException;
-use Microsoft\PhpParser\Node\Statement\ClassDeclaration;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\ClassIsCurrentClassException;
 use Phpactor\CodeTransform\Domain\Refactor\ImportClass\NameAlreadyInNamespaceException;
 use Phpactor\Name\FullyQualifiedName;
@@ -76,12 +75,17 @@ class TolerantImportName implements ImportName
         $currentClass = $this->currentClass($node);
         $imports = $node->getImportTablesForCurrentScope()[$this->resolveImportTableOffset($nameImport)];
 
-        if (null === $nameImport->alias() && isset($imports[$nameImport->name()->head()->__toString()])) {
-            throw new NameAlreadyImportedException($nameImport, $this->findExistingName($nameImport, $imports));
+        [ $existingName, $existingImport ] = $this->findExistingImport($nameImport, $imports);
+        if (null === $nameImport->alias() && $existingImport !== null) {
+            throw new NameAlreadyImportedException(
+                $nameImport,
+                $existingName,
+                $existingImport->getFullyQualifiedNameText()
+            );
         }
 
         if (null === $nameImport->alias() && $currentClass && $currentClass->short() === $nameImport->name()->head()->__toString()) {
-            throw new NameAlreadyImportedException($nameImport, $currentClass->__toString());
+            throw new NameAlreadyImportedException($nameImport, $currentClass->short(), $currentClass->__toString());
         }
 
         if ($nameImport->alias() && isset($imports[$nameImport->alias()])) {
@@ -97,9 +101,34 @@ class TolerantImportName implements ImportName
         }
     }
 
+    /**
+     * @param NameImport $nameImport
+     * @param array<ResolvedName> $imports
+     * @return array|null
+     */
+    private function findExistingImport(NameImport $nameImport, array $imports): ?array
+    {
+        $nameImportParts = $nameImport->name()->toArray();
+
+        foreach ($imports as $name => $import) {
+            if ($import->getNameParts() === $nameImportParts) {
+                // fqn already used in imports
+                return [$name, $import];
+            }
+        }
+
+        $shortName = $nameImport->name()->head()->__toString();
+        if (array_key_exists($shortName, $imports)) {
+            // short name already used in imports
+            return [$shortName, $imports[$shortName]];
+        }
+
+        return null;
+    }
+
     private function currentClassIsSameAsImportClass(Node $node, FullyQualifiedName $className): bool
     {
-        if (!$node instanceof ClassDeclaration) {
+        if (!$node instanceof ClassLike || !$node instanceof NamespacedNameInterface) {
             return false;
         }
 
@@ -108,24 +137,6 @@ class TolerantImportName implements ImportName
         }
 
         return false;
-    }
-
-    /**
-     * @param NameImport $nameImport
-     * @param array<ResolvedName> $imports
-     * @return ResolvedName
-     */
-    private function findExistingName(NameImport $nameImport, array $imports): ResolvedName
-    {
-        $nameImportParts = $nameImport->name()->toArray();
-
-        foreach ($imports as $import) {
-            if ($import->getNameParts() === $nameImportParts) {
-                return $import;
-            }
-        }
-
-        return $imports[$nameImport->name()->head()->__toString()];
     }
 
     private function addImport(SourceCode $source, NameImport $nameImport): TextEdits

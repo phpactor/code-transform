@@ -15,7 +15,7 @@ class WorseOverrideMethodTest extends WorseTestCase
      */
     public function testOverrideMethod(string $test, string $className, $methodName): void
     {
-        list($source, $expected) = $this->sourceExpected(__DIR__ . '/fixtures/' . $test);
+        [$source, $expected] = $this->sourceExpected(__DIR__ . '/fixtures/' . $test);
 
         $transformed = $this->overrideMethod($source, $className, $methodName);
 

@@ -18,7 +18,7 @@ class WorseGenerateAccessorTest extends WorseTestCase
         string $prefix = '',
         ?bool $upperCaseFirst = null
     ): void {
-        list($source, $expected, $offset) = $this->sourceExpectedAndOffset(
+        [$source, $expected, $offset] = $this->sourceExpectedAndOffset(
             __DIR__ . '/fixtures/' . $test
         );
 

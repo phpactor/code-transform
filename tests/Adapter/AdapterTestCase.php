@@ -43,8 +43,8 @@ class AdapterTestCase extends TestCase
 
     protected function sourceExpectedAndOffset($manifestPath)
     {
-        list($source, $expected) = $this->sourceExpected($manifestPath);
-        list($source, $offsetStart, $offsetEnd) = ExtractOffset::fromSource($source);
+        [$source, $expected] = $this->sourceExpected($manifestPath);
+        [$source, $offsetStart, $offsetEnd] = ExtractOffset::fromSource($source);
 
         return [ $source, $expected, $offsetStart, $offsetEnd ];
     }

@@ -15,7 +15,7 @@ class TolerantExtractExpressionTest extends TolerantTestCase
      */
     public function testExtractExpression(string $test, string $name, string $expectedExceptionMessage = null): void
     {
-        list($source, $expected, $offsetStart, $offsetEnd) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
+        [$source, $expected, $offsetStart, $offsetEnd] = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
         if ($expectedExceptionMessage) {
             $this->expectException(Exception::class);

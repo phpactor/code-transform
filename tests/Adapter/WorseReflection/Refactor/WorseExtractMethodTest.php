@@ -16,7 +16,7 @@ class WorseExtractMethodTest extends WorseTestCase
      */
     public function testExtractMethod(string $test, ?string $name, ?string $expectedExceptionMessage = null): void
     {
-        list($source, $expected, $offsetStart, $offsetEnd) = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
+        [$source, $expected, $offsetStart, $offsetEnd] = $this->sourceExpectedAndOffset(__DIR__ . '/fixtures/' . $test);
 
         if ($expectedExceptionMessage) {
             $this->expectException(Exception::class);
