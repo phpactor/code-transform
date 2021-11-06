@@ -92,7 +92,8 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
         }
 
         // strange getResolvedName method returns a string if this is a
-        // reserved name (e.g. static, iteerable) in these cases
+        // reserved name (e.g. static, iterable). do not return these as
+        // "unresolved"
         if ($resolvedName && !$resolvedName instanceof ResolvedName) {
             return $unresolvedNames;
         }
