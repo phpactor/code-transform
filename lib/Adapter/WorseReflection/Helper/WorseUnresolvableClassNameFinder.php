@@ -13,6 +13,7 @@ use Microsoft\PhpParser\Node\MethodDeclaration;
 use Microsoft\PhpParser\Node\Parameter;
 use Microsoft\PhpParser\Node\QualifiedName;
 use Microsoft\PhpParser\Node\Statement\FunctionDeclaration;
+use Microsoft\PhpParser\ResolvedName;
 use Phpactor\CodeTransform\Domain\NameWithByteOffset;
 use Phpactor\CodeTransform\Domain\NameWithByteOffsets;
 use Phpactor\Name\QualifiedName as PhpactorQualifiedName;
@@ -90,9 +91,12 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
             );
         }
 
-        if (in_array($resolvedName, ['self', 'static', 'parent'])) {
+        // strange getResolvedName method returns a string if this is a
+        // reserved name (e.g. static, iteerable) in these cases
+        if ($resolvedName && !$resolvedName instanceof ResolvedName) {
             return $unresolvedNames;
         }
+
 
         // if the tolerant parser did not provide the resolved name (because of
         // bug) then use the namespaced name.
