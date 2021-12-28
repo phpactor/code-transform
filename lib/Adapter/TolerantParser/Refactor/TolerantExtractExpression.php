@@ -40,7 +40,7 @@ class TolerantExtractExpression implements ExtractExpression
             return TextEdits::none();
         }
 
-        $startPosition = $expression->getStart();
+        $startPosition = $expression->getStartPosition();
         $endPosition = $expression->getEndPosition();
 
         $extractedString = rtrim(trim($source->extractSelection($startPosition, $endPosition)), ';');
@@ -143,7 +143,7 @@ class TolerantExtractExpression implements ExtractExpression
     ): array {
         if ($statement instanceof ExpressionStatement && $statement->expression === $expression) {
             return [
-                TextEdit::create($statement->getStart(), $statement->getWidth(), $assignment)
+                TextEdit::create($statement->getStartPosition(), $statement->getWidth(), $assignment)
             ];
         }
 
@@ -154,8 +154,8 @@ class TolerantExtractExpression implements ExtractExpression
         }
         
         return [
-            TextEdit::create($statement->getStart(), 0, $assignment . $indentation),
-            TextEdit::create($expression->getStart(), strlen($extractedString), '$' . $variableName),
+            TextEdit::create($statement->getStartPosition(), 0, $assignment . $indentation),
+            TextEdit::create($expression->getStartPosition(), strlen($extractedString), '$' . $variableName),
         ];
     }
 
@@ -169,7 +169,7 @@ class TolerantExtractExpression implements ExtractExpression
             return $node instanceof Expression ? $node : null;
         }
 
-        if ($parent->getStart() !== $originalNode->getStart() && $originalNode instanceof Expression) {
+        if ($parent->getStartPosition() !== $originalNode->getStartPosition() && $originalNode instanceof Expression) {
             return $originalNode;
         }
 

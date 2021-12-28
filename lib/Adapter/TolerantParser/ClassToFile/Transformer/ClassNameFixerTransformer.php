@@ -80,7 +80,7 @@ class ClassNameFixerTransformer implements Transformer
             $namespaceDefinition = $rootNode->getFirstDescendantNode(NamespaceDefinition::class);
             $diagnostics[] = new Diagnostic(
                 ByteOffsetRange::fromInts(
-                    $namespaceDefinition ? $namespaceDefinition->getStart() : 0,
+                    $namespaceDefinition ? $namespaceDefinition->getStartPosition() : 0,
                     $namespaceDefinition ? $namespaceDefinition->getEndPosition() : 0,
                 ),
                 sprintf('Namespace should probably be "%s"', $correctNamespace),
@@ -92,7 +92,7 @@ class ClassNameFixerTransformer implements Transformer
 
             $diagnostics[] = new Diagnostic(
                 ByteOffsetRange::fromInts(
-                    $classLike ? $classLike->getStart() : 0,
+                    $classLike ? $classLike->getStartPosition() : 0,
                     $classLike ? $classLike->getEndPosition() : 0
                 ),
                 sprintf('Class name should probably be "%s"', $correctClassName),
@@ -156,8 +156,8 @@ class ClassNameFixerTransformer implements Transformer
         }
 
         return TextEdit::create(
-            $namespaceDefinition->getStart(),
-            $namespaceDefinition->getEndPosition() - $namespaceDefinition->getStart(),
+            $namespaceDefinition->getStartPosition(),
+            $namespaceDefinition->getEndPosition() - $namespaceDefinition->getStartPosition(),
             $statement
         );
     }

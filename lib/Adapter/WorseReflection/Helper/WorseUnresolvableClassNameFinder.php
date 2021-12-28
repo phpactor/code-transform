@@ -156,7 +156,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
             $notFoundCache[$cacheKey] = $notFound;
             $unresolvedNames[] = new NameWithByteOffset(
                 PhpactorQualifiedName::fromString($nameText),
-                ByteOffset::fromInt($name->getStart()),
+                ByteOffset::fromInt($name->getStartPosition()),
                 NameWithByteOffset::TYPE_CLASS
             );
         }
@@ -179,7 +179,7 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
             $notFoundCache[$cacheKey] = $notFound;
             $unresolvedNames[] = new NameWithByteOffset(
                 PhpactorQualifiedName::fromString($nameText),
-                ByteOffset::fromInt($name->getStart()),
+                ByteOffset::fromInt($name->getStartPosition()),
                 NameWithByteOffset::TYPE_FUNCTION
             );
         }

@@ -75,7 +75,7 @@ class AddMissingProperties implements Transformer
             $classBuilder = $this->resolveClassBuilder($sourceBuilder, $class);
 
             foreach ($this->missingPropertyNames($rootNode, $class) as [$memberName, $token, $expression]) {
-                $offset = $this->reflector->reflectOffset($code->__toString(), $expression->getStart());
+                $offset = $this->reflector->reflectOffset($code->__toString(), $expression->getStartPosition());
                 $propertyBuilder = $classBuilder
                     ->property($memberName)
                     ->visibility('private');

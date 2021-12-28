@@ -173,8 +173,8 @@ class TolerantImportName implements ImportName
         }
 
         return $edits->add(TextEdit::create(
-            $node->getStart(),
-            $node->getEndPosition() - $node->getStart(),
+            $node->getStartPosition(),
+            $node->getEndPosition() - $node->getStartPosition(),
             $alias
         ));
     }
@@ -224,7 +224,7 @@ class TolerantImportName implements ImportName
         if ($node instanceof SourceFileNode) {
             /** @var Node $childNode */
             foreach ($node->getChildNodes() as $childNode) {
-                if ($childNode->getStart() > $offset->toInt()) {
+                if ($childNode->getStartPosition() > $offset->toInt()) {
                     break;
                 }
 
