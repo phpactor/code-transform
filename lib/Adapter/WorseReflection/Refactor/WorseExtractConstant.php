@@ -98,8 +98,8 @@ class WorseExtractConstant implements ExtractConstant
 
             if ($targetValue == $this->getComparableValue($node)) {
                 $textEdits[] = TextEdit::create(
-                    $node->getStart(),
-                    $node->getEndPosition() - $node->getStart(),
+                    $node->getStartPosition(),
+                    $node->getEndPosition() - $node->getStartPosition(),
                     'self::' . $constantName
                 );
             }

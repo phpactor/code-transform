@@ -131,8 +131,8 @@ class TolerantRenameVariable implements RenameVariable
 
         if ($node instanceof Variable || $node instanceof UseVariableName) {
             return TextEdit::create(
-                $node->getStart(),
-                $node->getEndPosition() - $node->getStart(),
+                $node->getStartPosition(),
+                $node->getEndPosition() - $node->getStartPosition(),
                 '$' . $newName
             );
         }

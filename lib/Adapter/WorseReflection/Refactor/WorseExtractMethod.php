@@ -96,7 +96,7 @@ class WorseExtractMethod implements ExtractMethod
         ) {
             $stmt = current($startNode->statements);
             assert($stmt instanceof Node);
-            while ($stmt && $stmt->getStart() < $offsetStart) {
+            while ($stmt && $stmt->getStartPosition() < $offsetStart) {
                 $stmt = next($startNode->statements);
             }
             
