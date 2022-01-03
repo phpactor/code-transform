@@ -55,13 +55,20 @@ class WorseUnresolvableClassNameFinder implements UnresolvableClassNameFinder
 
     private function findNameNodes(SourceFileNode $rootNode): array
     {
-        return array_filter($this->descendants($rootNode), function (Node $node) {
+        $names = [];
+        foreach ($this->descendants($rootNode) as $node) {
             if (!$node instanceof QualifiedName) {
-                return false;
+                continue;
             }
 
-            return true;
-        });
+            if (isset($names[(string)$node])) {
+                continue;
+            }
+
+            $names[(string)$node] = $node;
+        }
+
+        return array_values($names);
     }
 
     private function filterResolvedNames(array $names): array

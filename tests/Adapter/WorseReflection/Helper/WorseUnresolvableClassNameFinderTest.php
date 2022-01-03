@@ -176,6 +176,27 @@ class WorseUnresolvableClassNameFinderTest extends WorseTestCase
             ]
         ];
 
+        yield 'filter duplicates' => [
+            <<<'EOT'
+                // File: test.php
+                <?php 
+
+                class Bar {
+                    use Sugar;
+                }
+                class Baz {
+                    use Sugar;
+                }
+                EOT
+            ,
+            [
+                new NameWithByteOffset(
+                    QualifiedName::fromString('Sugar'),
+                    ByteOffset::fromInt(28)
+                ),
+            ]
+        ];
+
         yield 'method reutrn type' => [
             <<<'EOT'
                 // File: test.php
